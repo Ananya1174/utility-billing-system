@@ -7,7 +7,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.utility.auth.dto.request.LoginRequestDto;
 import com.utility.auth.dto.request.RegisterRequestDto;
+import com.utility.auth.dto.response.LoginResponseDto;
 import com.utility.auth.dto.response.RegisterResponseDto;
 import com.utility.auth.model.Role;
 import com.utility.auth.model.User;
@@ -40,5 +42,14 @@ public class AuthController {
                 new RegisterResponseDto(savedUser.getUserId(), "User registered successfully");
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDto> login(
+            @Valid @RequestBody LoginRequestDto request) {
+
+        LoginResponseDto response =
+                authService.login(request.getUsername(), request.getPassword());
+
+        return ResponseEntity.ok(response);
     }
 }
