@@ -7,8 +7,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.utility.auth.dto.request.ForgotPasswordRequestDto;
 import com.utility.auth.dto.request.LoginRequestDto;
 import com.utility.auth.dto.request.RegisterRequestDto;
+import com.utility.auth.dto.request.ResetPasswordRequestDto;
 import com.utility.auth.dto.response.LoginResponseDto;
 import com.utility.auth.dto.response.RegisterResponseDto;
 import com.utility.auth.model.Role;
@@ -51,5 +53,23 @@ public class AuthController {
                 authService.login(request.getUsername(), request.getPassword());
 
         return ResponseEntity.ok(response);
+    }
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequestDto request) {
+
+        authService.forgotPassword(request.getEmail());
+        return ResponseEntity.ok("Password reset link sent to registered email");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(
+            @Valid @RequestBody ResetPasswordRequestDto request) {
+
+        authService.resetPassword(
+                request.getResetToken(),
+                request.getNewPassword());
+
+        return ResponseEntity.ok("Password reset successful");
     }
 }

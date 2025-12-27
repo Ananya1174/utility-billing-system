@@ -7,4 +7,7 @@ public interface AuthService {
 
     User registerUser(User user);
     LoginResponseDto login(String username, String password);
+    void forgotPassword(String email);
+
+    void resetPassword(String token, String newPassword);
 }
