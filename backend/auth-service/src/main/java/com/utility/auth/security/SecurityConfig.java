@@ -24,7 +24,7 @@ public class SecurityConfig {
 
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
-	private final JwtAuthenticationFilter jwtAuthenticationFilter;
+	private final JwtUtil jwtUtil;
 
 	@Bean
 	public UserDetailsService userDetailsService() {
@@ -48,18 +48,19 @@ public class SecurityConfig {
 	}
 
 	@Bean
+	public JwtAuthenticationFilter jwtAuthenticationFilter() {
+		return new JwtAuthenticationFilter(jwtUtil, userDetailsService());
+	}
+
+	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
 		http.csrf(csrf -> csrf.disable())
-
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
 				.authorizeHttpRequests(auth -> auth.requestMatchers("/auth/register", "/auth/login",
 						"/auth/forgot-password", "/auth/reset-password").permitAll().anyRequest().authenticated())
-
 				.authenticationProvider(authenticationProvider())
-
-				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+				.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();
 	}

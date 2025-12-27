@@ -1,6 +1,7 @@
 package com.utility.auth.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -8,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.utility.auth.dto.response.LoginResponseDto;
+import com.utility.auth.dto.response.UserResponseDto;
 import com.utility.auth.exception.ResourceNotFoundException;
 import com.utility.auth.exception.UserAlreadyExistsException;
 import com.utility.auth.model.PasswordResetToken;
@@ -106,5 +108,59 @@ public class AuthServiceImpl implements AuthService {
 
         resetToken.setUsed(true);
         passwordResetTokenRepository.save(resetToken);
+    }
+    @Override
+    public void changePassword(String username, String oldPassword, String newPassword) {
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new IllegalArgumentException("Old password is incorrect");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setUpdatedAt(LocalDateTime.now());
+
+        userRepository.save(user);
+    }
+    @Override
+    public List<UserResponseDto> getAllUsers() {
+
+        return userRepository.findAll()
+                .stream()
+                .map(user -> UserResponseDto.builder()
+                        .userId(user.getUserId())
+                        .username(user.getUsername())
+                        .email(user.getEmail())
+                        .role(user.getRole().name())
+                        .status(user.getActive() ? "ACTIVE" : "INACTIVE")
+                        .build())
+                .toList();
+    }
+    @Override
+    public UserResponseDto getUserById(String userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        return UserResponseDto.builder()
+                .userId(user.getUserId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .role(user.getRole().name())
+                .status(user.getActive() ? "ACTIVE" : "INACTIVE")
+                .build();
+    }
+    @Override
+    public void deleteUser(String userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        user.setActive(false); // SOFT DELETE
+        user.setUpdatedAt(LocalDateTime.now());
+
+        userRepository.save(user);
     }
 }

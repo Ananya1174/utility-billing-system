@@ -1,18 +1,29 @@
 package com.utility.auth.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.utility.auth.dto.request.ChangePasswordRequestDto;
 import com.utility.auth.dto.request.ForgotPasswordRequestDto;
 import com.utility.auth.dto.request.LoginRequestDto;
 import com.utility.auth.dto.request.RegisterRequestDto;
 import com.utility.auth.dto.request.ResetPasswordRequestDto;
 import com.utility.auth.dto.response.LoginResponseDto;
 import com.utility.auth.dto.response.RegisterResponseDto;
+import com.utility.auth.dto.response.UserResponseDto;
 import com.utility.auth.model.Role;
 import com.utility.auth.model.User;
 import com.utility.auth.service.AuthService;
@@ -71,5 +82,36 @@ public class AuthController {
                 request.getNewPassword());
 
         return ResponseEntity.ok("Password reset successful");
+    }
+    @PutMapping("/change-password")
+    public ResponseEntity<String> changePassword(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @Valid @RequestBody ChangePasswordRequestDto request) {
+
+        authService.changePassword(
+                userDetails.getUsername(),
+                request.getOldPassword(),
+                request.getNewPassword());
+
+        return ResponseEntity.ok("Password updated successfully");
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/users")
+    public ResponseEntity<List<UserResponseDto>> getAllUsers() {
+        return ResponseEntity.ok(authService.getAllUsers());
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<UserResponseDto> getUserById(@PathVariable String userId) {
+
+        UserResponseDto user = authService.getUserById(userId);
+        return ResponseEntity.ok(user);
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/users/{userId}")
+    public ResponseEntity<String> deleteUser(@PathVariable String userId) {
+
+        authService.deleteUser(userId);
+        return ResponseEntity.ok("User deleted successfully");
     }
 }
