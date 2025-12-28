@@ -11,6 +11,8 @@
         <module>service-registry</module>
         <module>api-gateway</module>
         <module>auth-service</module>
+        <module>consumer-service</module>
+        <module>meter-reading-service</module>
         <!-- others later -->
     </modules>
 
