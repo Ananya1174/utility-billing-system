@@ -36,7 +36,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (jwtUtil.isTokenValid(token)) {
 
                 String username = jwtUtil.extractUsername(token);
-                var userDetails = userDetailsService.loadUserByUsername(username);
+                org.springframework.security.core.userdetails.UserDetails userDetails =
+                        userDetailsService.loadUserByUsername(username);
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(

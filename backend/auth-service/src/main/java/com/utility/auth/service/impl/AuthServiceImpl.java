@@ -56,7 +56,7 @@ public class AuthServiceImpl implements AuthService {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password));
 
-        var user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Invalid credentials"));
 
         String token = jwtUtil.generateToken(username, user.getRole().name());
@@ -66,8 +66,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void forgotPassword(String email) {
 
-        var user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    	User user = userRepository.findByEmail(email)
+    	        .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         String token = java.util.UUID.randomUUID().toString();
 
