@@ -1,5 +1,8 @@
 package com.utility.consumer.dto.request;
 
+import com.utility.consumer.enums.TariffPlan;
+import com.utility.consumer.enums.UtilityType;
+
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
@@ -10,11 +13,11 @@ public class ConnectionRequestDTO {
     private String consumerId;
 
     @NotBlank
-    private String utilityType;
+    private UtilityType utilityType;
 
     @NotBlank
     private String meterNumber;
 
     @NotBlank
-    private String tariffPlan;
+    private TariffPlan tariffPlan;
 }

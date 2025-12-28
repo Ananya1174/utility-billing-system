@@ -1,32 +1,38 @@
 package com.utility.consumer.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.utility.consumer.dto.request.ConnectionRequestDTO;
+import com.utility.consumer.dto.response.ConnectionResponseDTO;
+import org.springframework.http.HttpStatus;
+
+import com.utility.consumer.exception.ApiException;
 
 import com.utility.consumer.model.UtilityConnection;
 import com.utility.consumer.repository.ConnectionRepository;
+import com.utility.consumer.repository.ConsumerRepository;
 
-import jakarta.ws.rs.BadRequestException;
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class ConnectionService {
 
-    @Autowired
-    private ConnectionRepository connectionRepository;
-
-    @Autowired
-    private ConsumerRepository consumerRepository;
+    private final ConnectionRepository connectionRepository;
+    private final ConsumerRepository consumerRepository;
 
     public ConnectionResponseDTO addConnection(ConnectionRequestDTO dto) {
 
         if (!consumerRepository.existsById(dto.getConsumerId())) {
-            throw new ResourceNotFoundException("Consumer does not exist");
+        	throw new ApiException(HttpStatus.NOT_FOUND, "Consumer does not exist");
+
         }
 
         if (connectionRepository.existsByMeterNumber(dto.getMeterNumber())) {
-            throw new DuplicateResourceException("Meter already assigned");
+        	throw new ApiException(HttpStatus.CONFLICT, "Meter already assigned");
         }
 
         UtilityConnection connection = new UtilityConnection();

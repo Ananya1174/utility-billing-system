@@ -2,7 +2,13 @@ package com.utility.consumer.model;
 
 import java.time.LocalDateTime;
 
+import jakarta.validation.constraints.NotBlank;
+
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import com.utility.consumer.enums.TariffPlan;
+import com.utility.consumer.enums.UtilityType;
 
 import lombok.Data;
 
@@ -17,13 +23,12 @@ public class UtilityConnection {
     private String consumerId;
 
     @NotBlank
-    private String utilityType; // ELECTRICITY, WATER, GAS
-
+    private UtilityType utilityType;
     @NotBlank
     private String meterNumber;
 
     @NotBlank
-    private String tariffPlan;
+    private TariffPlan tariffPlan;      
 
     private boolean active = true;
 

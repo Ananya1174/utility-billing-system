@@ -13,21 +13,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> handleNotFound(ResourceNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(ApiException.class)
+    public ResponseEntity<Map<String, Object>> handleApiException(ApiException ex) {
+        return ResponseEntity.status(ex.getStatus())
                 .body(Map.of(
-                        "status", 404,
-                        "message", ex.getMessage(),
-                        "timestamp", LocalDateTime.now()
-                ));
-    }
-
-    @ExceptionHandler(DuplicateResourceException.class)
-    public ResponseEntity<Map<String, Object>> handleDuplicate(DuplicateResourceException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(Map.of(
-                        "status", 409,
+                        "status", ex.getStatus().value(),
                         "message", ex.getMessage(),
                         "timestamp", LocalDateTime.now()
                 ));
@@ -40,7 +30,7 @@ public class GlobalExceptionHandler {
         ex.getBindingResult().getFieldErrors()
                 .forEach(err -> errors.put(err.getField(), err.getDefaultMessage()));
 
-        return ResponseEntity.badRequest().body(errors);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
 
     @ExceptionHandler(Exception.class)
@@ -48,7 +38,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of(
                         "status", 500,
-                        "message", "Something went wrong",
+                        "message", "Internal server error",
                         "timestamp", LocalDateTime.now()
                 ));
     }

@@ -1,5 +1,8 @@
 package com.utility.consumer.dto.response;
 
+import com.utility.consumer.enums.TariffPlan;
+import com.utility.consumer.enums.UtilityType;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -7,8 +10,8 @@ import lombok.Data;
 @AllArgsConstructor
 public class ConnectionResponseDTO {
     private String id;
-    private String utilityType;
+    private UtilityType utilityType;
     private String meterNumber;
-    private String tariffPlan;
+    private TariffPlan tariffPlan;
     private boolean active;
 }

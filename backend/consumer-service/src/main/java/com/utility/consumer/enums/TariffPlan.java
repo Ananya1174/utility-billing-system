@@ -1,0 +1,12 @@
+package com.utility.consumer.enums;
+
+public enum TariffPlan {
+
+	DOMESTIC, COMMERCIAL, INDUSTRIAL,
+
+	RESIDENTIAL, MUNICIPAL,
+
+	HOUSEHOLD, COMMERCIAL_GAS,
+
+	FIBER_100MBPS, FIBER_300MBPS, FIBER_1GBPS
+}

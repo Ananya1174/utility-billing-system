@@ -109,9 +109,9 @@ public class AuthController {
     }
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/users/{userId}")
-    public ResponseEntity<String> deleteUser(@PathVariable String userId) {
+    public ResponseEntity<Void> deleteUser(@PathVariable String userId) {
 
         authService.deleteUser(userId);
-        return ResponseEntity.ok("User deleted successfully");
+        return ResponseEntity.noContent().build(); 
     }
 }
