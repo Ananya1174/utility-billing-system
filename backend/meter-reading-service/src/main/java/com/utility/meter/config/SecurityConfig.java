@@ -49,8 +49,8 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/meter-readings").hasRole("BILLING_OFFICER")
-                .requestMatchers("/meter-readings/**").authenticated()
+                .requestMatchers("/meter-readings/**")
+                    .hasRole("BILLING_OFFICER")
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth ->
