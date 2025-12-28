@@ -13,6 +13,7 @@
         <module>auth-service</module>
         <module>consumer-service</module>
         <module>meter-reading-service</module>
+        <module>billing-service</module>
         <!-- others later -->
     </modules>
 
