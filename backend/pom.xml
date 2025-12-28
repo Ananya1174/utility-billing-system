@@ -8,7 +8,7 @@
 
     <modules>
         <module>config-server</module>
-        <module>eureka-server</module>
+        <module>service-registry</module>
         <module>api-gateway</module>
         <module>auth-service</module>
         <!-- others later -->
