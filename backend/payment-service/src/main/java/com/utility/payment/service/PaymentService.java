@@ -2,12 +2,15 @@ package com.utility.payment.service;
 
 import com.utility.payment.dto.ConfirmOtpRequest;
 import com.utility.payment.dto.InitiateOnlinePaymentRequest;
+import com.utility.payment.dto.OfflinePaymentRequest;
 import com.utility.payment.exception.ApiException;
 import com.utility.payment.feign.BillingClient;
 import com.utility.payment.model.Payment;
 import com.utility.payment.model.PaymentMode;
 import com.utility.payment.model.PaymentStatus;
 import com.utility.payment.repository.PaymentRepository;
+
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,7 @@ public class PaymentService {
 
     private final PaymentRepository repository;
     private final BillingClient billingClient;
+
 
     public Payment initiateOnline(InitiateOnlinePaymentRequest request) {
 
@@ -39,7 +43,7 @@ public class PaymentService {
 
         repository.save(payment);
 
-        System.out.println("OTP sent to email: " + otp); 
+        System.out.println("OTP sent to email: " + otp);
 
         return payment;
     }
@@ -47,7 +51,9 @@ public class PaymentService {
     public void confirmOtp(ConfirmOtpRequest request) {
 
         Payment payment = repository.findById(request.paymentId())
-                .orElseThrow(() -> new ApiException("Payment not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(() ->
+                        new ApiException("Payment not found", HttpStatus.NOT_FOUND)
+                );
 
         if (payment.getOtpExpiry().isBefore(Instant.now())) {
             payment.setStatus(PaymentStatus.FAILED);
@@ -62,24 +68,31 @@ public class PaymentService {
         }
 
         payment.setStatus(PaymentStatus.SUCCESS);
+        payment.setConfirmedAt(LocalDateTime.now());
         repository.save(payment);
 
         billingClient.markPaid(payment.getBillId());
-        System.out.println("NOW      = " + Instant.now());
-        System.out.println("EXPIRY   = " + payment.getOtpExpiry());
     }
 
-    public void offlinePayment(String billId, String consumerId, double amount) {
+   
+
+    public void offlinePayment(OfflinePaymentRequest request) {
 
         Payment payment = new Payment();
-        payment.setBillId(billId);
-        payment.setConsumerId(consumerId);
-        payment.setAmount(amount);
+        payment.setBillId(request.billId());
+        payment.setConsumerId(request.consumerId());
+        payment.setAmount(request.amount());
         payment.setMode(PaymentMode.OFFLINE);
         payment.setStatus(PaymentStatus.SUCCESS);
+        payment.setConfirmedAt(LocalDateTime.now());
         payment.setCreatedAt(LocalDateTime.now());
 
         repository.save(payment);
-        billingClient.markPaid(billId);
+
+        try {
+            billingClient.markPaid(request.billId());
+        } catch (FeignException.BadRequest e) {
+            throw new ApiException("Bill already paid", HttpStatus.BAD_REQUEST);
+        }
     }
 }

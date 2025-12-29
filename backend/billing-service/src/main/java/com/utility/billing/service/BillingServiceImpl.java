@@ -6,7 +6,6 @@ import com.utility.billing.exception.ApiException;
 import com.utility.billing.feign.MeterReadingClient;
 import com.utility.billing.model.Bill;
 import com.utility.billing.model.BillStatus;
-import com.utility.billing.model.TariffSlab;
 import com.utility.billing.repository.BillRepository;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
@@ -20,20 +19,20 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BillingServiceImpl implements BillingService {
 
-    private final BillRepository repository;
+    private final BillRepository billRepository;
     private final MeterReadingClient meterClient;
 
     @Override
     @CircuitBreaker(name = "meterReadingCB", fallbackMethod = "meterFallback")
     public BillResponse generateBill(GenerateBillRequest request) {
 
-    	long units = meterClient
-    	        .getLatest(request.getConnectionId())
-    	        .getConsumptionUnits();
+        long units = meterClient
+                .getLatest(request.getConnectionId())
+                .getConsumptionUnits();
 
-    	if (units <= 0) {
-    	    throw new ApiException("Invalid consumption units", HttpStatus.BAD_REQUEST);
-    	}
+        if (units <= 0) {
+            throw new ApiException("Invalid consumption units", HttpStatus.BAD_REQUEST);
+        }
 
         double energyCharge = calculateEnergyCharge(units);
         double fixedCharge = 50;
@@ -52,19 +51,45 @@ public class BillingServiceImpl implements BillingService {
         bill.setBillDate(LocalDate.now());
         bill.setDueDate(LocalDate.now().plusDays(15));
 
-        repository.save(bill);
+        billRepository.save(bill);
+
         return map(bill);
     }
-
-    public BillResponse meterFallback(GenerateBillRequest request, Throwable t) {
-        throw new ApiException("Meter service unavailable", HttpStatus.SERVICE_UNAVAILABLE);
+  
+       public BillResponse meterFallback(GenerateBillRequest request, Throwable ex) {
+        throw new ApiException(
+                "Meter service unavailable. Please try again later.",
+                HttpStatus.SERVICE_UNAVAILABLE
+        );
     }
 
+    
     @Override
     public List<BillResponse> getBillsByConsumer(String consumerId) {
-        return repository.findByConsumerId(consumerId).stream().map(this::map).toList();
+        return billRepository.findByConsumerId(consumerId)
+                .stream()
+                .map(this::map)
+                .toList();
     }
 
+    
+    @Override
+    public void markBillAsPaid(String billId) {
+
+        Bill bill = billRepository.findById(billId)
+                .orElseThrow(() ->
+                        new ApiException("Bill not found", HttpStatus.NOT_FOUND)
+                );
+
+        if (bill.getStatus() == BillStatus.PAID) {
+            throw new ApiException("Bill already paid", HttpStatus.BAD_REQUEST);
+        }
+
+        bill.setStatus(BillStatus.PAID);
+        billRepository.save(bill);
+    }
+
+    
     private double calculateEnergyCharge(long units) {
         if (units <= 100) return units * 2;
         if (units <= 300) return (100 * 2) + (units - 100) * 3;
@@ -72,14 +97,14 @@ public class BillingServiceImpl implements BillingService {
     }
 
     private BillResponse map(Bill bill) {
-        BillResponse r = new BillResponse();
-        r.setId(bill.getId());
-        r.setConsumerId(bill.getConsumerId());
-        r.setConnectionId(bill.getConnectionId());
-        r.setConsumptionUnits(bill.getConsumptionUnits());
-        r.setTotalAmount(bill.getTotalAmount());
-        r.setStatus(bill.getStatus());
-        r.setDueDate(bill.getDueDate());
-        return r;
+        BillResponse response = new BillResponse();
+        response.setId(bill.getId());
+        response.setConsumerId(bill.getConsumerId());
+        response.setConnectionId(bill.getConnectionId());
+        response.setConsumptionUnits(bill.getConsumptionUnits());
+        response.setTotalAmount(bill.getTotalAmount());
+        response.setStatus(bill.getStatus());
+        response.setDueDate(bill.getDueDate());
+        return response;
     }
 }

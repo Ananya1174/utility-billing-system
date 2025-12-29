@@ -10,4 +10,5 @@ public interface BillingService {
     BillResponse generateBill(GenerateBillRequest request);
 
     List<BillResponse> getBillsByConsumer(String consumerId);
+    void markBillAsPaid(String billId);
 }

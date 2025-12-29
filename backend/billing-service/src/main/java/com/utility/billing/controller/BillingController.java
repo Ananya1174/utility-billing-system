@@ -27,4 +27,9 @@ public class BillingController {
     public List<BillResponse> byConsumer(@PathVariable String consumerId) {
         return service.getBillsByConsumer(consumerId);
     }
+    @PutMapping("/{billId}/mark-paid")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void markBillAsPaid(@PathVariable String billId) {
+        service.markBillAsPaid(billId);
+    }
 }

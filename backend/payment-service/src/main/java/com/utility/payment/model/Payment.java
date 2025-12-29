@@ -23,6 +23,8 @@ public class Payment {
 
     private String otp;
     private Instant otpExpiry;
+    private String remarks;
 
     private LocalDateTime createdAt;
+    private LocalDateTime confirmedAt;
 }
