@@ -60,7 +60,8 @@ public class SecurityConfig {
 	            .requestMatchers(HttpMethod.POST, "/payments/offline")
 	                .hasRole("ACCOUNTS_OFFICER")
 
-	            
+	                .requestMatchers("/payments/bill/**", "/payments/outstanding/**")
+	                .hasAnyRole("CONSUMER", "ACCOUNTS_OFFICER")
 	            .requestMatchers("/payments/bill/**")
 	                .hasAnyRole("CONSUMER", "ACCOUNTS_OFFICER")
 

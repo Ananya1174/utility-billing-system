@@ -3,11 +3,14 @@ package com.utility.payment.controller;
 import com.utility.payment.dto.ConfirmOtpRequest;
 import com.utility.payment.dto.InitiateOnlinePaymentRequest;
 import com.utility.payment.dto.OfflinePaymentRequest;
+import com.utility.payment.dto.PaymentResponse;
+import com.utility.payment.dto.OutstandingResponse;
 import com.utility.payment.model.Payment;
 import com.utility.payment.service.PaymentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -54,5 +57,17 @@ public class PaymentController {
                         "status", "SUCCESS",
                         "message", "Offline payment recorded successfully"
                 ));
+    }
+    @GetMapping("/bill/{billId}")
+    public List<PaymentResponse> getPaymentsByBill(
+            @PathVariable String billId) {
+
+        return service.getPaymentsByBill(billId);
+    }
+    @GetMapping("/outstanding/{billId}")
+    public OutstandingResponse getOutstanding(
+            @PathVariable String billId) {
+
+        return service.getOutstanding(billId);
     }
 }

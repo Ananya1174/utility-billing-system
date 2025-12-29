@@ -3,12 +3,14 @@ package com.utility.payment.service;
 import com.utility.payment.dto.ConfirmOtpRequest;
 import com.utility.payment.dto.InitiateOnlinePaymentRequest;
 import com.utility.payment.dto.OfflinePaymentRequest;
+import com.utility.payment.dto.OutstandingResponse;
 import com.utility.payment.exception.ApiException;
 import com.utility.payment.feign.BillingClient;
 import com.utility.payment.model.Payment;
 import com.utility.payment.model.PaymentMode;
 import com.utility.payment.model.PaymentStatus;
 import com.utility.payment.repository.PaymentRepository;
+import com.utility.payment.dto.PaymentResponse;
 
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Random;
 
 @Service
@@ -94,5 +97,40 @@ public class PaymentService {
         } catch (FeignException.BadRequest e) {
             throw new ApiException("Bill already paid", HttpStatus.BAD_REQUEST);
         }
+    }
+    public List<PaymentResponse> getPaymentsByBill(String billId) {
+
+        return repository.findByBillId(billId)
+                .stream()
+                .map(p -> new PaymentResponse(
+                        p.getId(),
+                        p.getBillId(),
+                        p.getConsumerId(),
+                        p.getAmount(),
+                        p.getMode(),
+                        p.getStatus(),
+                        p.getCreatedAt(),
+                        p.getConfirmedAt()
+                ))
+                .toList();
+    }
+    public OutstandingResponse getOutstanding(String billId) {
+
+        var bill = billingClient.getBill(billId);
+
+        double totalPaid = repository.findByBillId(billId)
+                .stream()
+                .filter(p -> p.getStatus() == PaymentStatus.SUCCESS)
+                .mapToDouble(Payment::getAmount)
+                .sum();
+
+        double outstanding = bill.getTotalAmount() - totalPaid;
+
+        return new OutstandingResponse(
+                billId,
+                bill.getTotalAmount(),
+                totalPaid,
+                Math.max(outstanding, 0)
+        );
     }
 }

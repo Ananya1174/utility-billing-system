@@ -32,4 +32,8 @@ public class BillingController {
     public void markBillAsPaid(@PathVariable String billId) {
         service.markBillAsPaid(billId);
     }
+    @GetMapping("/{billId}")
+    public BillResponse getBillById(@PathVariable String billId) {
+        return service.getBillById(billId);
+    }
 }

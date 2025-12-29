@@ -107,4 +107,13 @@ public class BillingServiceImpl implements BillingService {
         response.setDueDate(bill.getDueDate());
         return response;
     }
+    @Override
+    public BillResponse getBillById(String billId) {
+
+        Bill bill = billRepository.findById(billId)
+                .orElseThrow(() ->
+                        new ApiException("Bill not found", HttpStatus.NOT_FOUND));
+
+        return map(bill);
+    }
 }
