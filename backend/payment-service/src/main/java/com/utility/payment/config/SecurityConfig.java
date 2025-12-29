@@ -60,11 +60,11 @@ public class SecurityConfig {
 	            .requestMatchers(HttpMethod.POST, "/payments/offline")
 	                .hasRole("ACCOUNTS_OFFICER")
 
-	                .requestMatchers("/payments/bill/**", "/payments/outstanding/**")
-	                .hasAnyRole("CONSUMER", "ACCOUNTS_OFFICER")
-	            .requestMatchers("/payments/bill/**")
+	                .requestMatchers(HttpMethod.GET, "/payments/bill/**")
 	                .hasAnyRole("CONSUMER", "ACCOUNTS_OFFICER")
 
+	                .requestMatchers(HttpMethod.GET, "/payments/outstanding/**")
+	                .hasAnyRole("CONSUMER", "ACCOUNTS_OFFICER")
 	            .anyRequest().authenticated()
 	        )
 	        .oauth2ResourceServer(oauth ->
