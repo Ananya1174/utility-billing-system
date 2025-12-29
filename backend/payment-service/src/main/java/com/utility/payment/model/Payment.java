@@ -4,10 +4,11 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Data
-@Document("payments")
+@Document(collection = "payments")
 public class Payment {
 
     @Id
@@ -15,14 +16,13 @@ public class Payment {
 
     private String billId;
     private String consumerId;
-
     private double amount;
 
     private PaymentMode mode;
     private PaymentStatus status;
 
     private String otp;
-    private LocalDateTime otpExpiry;
+    private Instant otpExpiry;
 
     private LocalDateTime createdAt;
 }

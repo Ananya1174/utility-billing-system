@@ -4,9 +4,12 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "billing-service")
-public interface BillingClient {
+@FeignClient(
+	    name = "billing-service",
+	    configuration = FeignSecurityConfig.class
+	)
+	public interface BillingClient {
 
-    @PutMapping("/bills/{billId}/mark-paid")
-    void markPaid(@PathVariable String billId);
-}
+	    @PutMapping("/bills/{billId}/mark-paid")
+	    void markPaid(@PathVariable String billId);
+	}
