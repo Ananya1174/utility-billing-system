@@ -16,6 +16,7 @@ public class Payment {
 
     private String billId;
     private String consumerId;
+
     private double amount;
 
     private PaymentMode mode;
@@ -23,7 +24,14 @@ public class Payment {
 
     private String otp;
     private Instant otpExpiry;
+
     private String remarks;
+
+    private String transactionId;
+    private String invoiceId;
+
+    private int billingMonth;
+    private int billingYear;
 
     private LocalDateTime createdAt;
     private LocalDateTime confirmedAt;

@@ -7,8 +7,13 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
 
-public interface PaymentRepository extends MongoRepository<Payment, String> {
-	boolean existsByBillIdAndStatus(String billId, PaymentStatus status);
+public interface PaymentRepository
+extends MongoRepository<Payment, String> {
 
-    List<Payment> findByBillId(String billId);
+boolean existsByBillIdAndStatus(
+    String billId,
+    PaymentStatus status
+);
+List<Payment> findByBillId(String billId);
+List<Payment> findByConsumerIdOrderByCreatedAtDesc(String consumerId);
 }
