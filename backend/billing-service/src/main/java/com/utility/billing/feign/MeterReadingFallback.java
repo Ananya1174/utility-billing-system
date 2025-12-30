@@ -10,6 +10,6 @@ public class MeterReadingFallback implements MeterReadingClient {
 
     @Override
     public MeterReadingResponse getLatest(String connectionId) {
-        throw new ApiException("Meter service unavailable", HttpStatus.SERVICE_UNAVAILABLE);
+        return null; // 👈 IMPORTANT
     }
 }

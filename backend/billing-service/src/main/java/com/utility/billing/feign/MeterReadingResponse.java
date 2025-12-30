@@ -1,8 +1,7 @@
 package com.utility.billing.feign;
 
 import lombok.Data;
-
-import java.time.LocalDateTime;
+import com.utility.billing.model.UtilityType;
 
 @Data
 public class MeterReadingResponse {
@@ -10,10 +9,14 @@ public class MeterReadingResponse {
     private String id;
     private String consumerId;
     private String connectionId;
-    private String utilityType;
+
+    private UtilityType utilityType;   
     private String meterNumber;
-    private int previousReading;
-    private int currentReading;
-    private int consumptionUnits;
-    private LocalDateTime readingDate;
+
+    private long previousReading;
+    private long currentReading;
+    private long consumptionUnits;
+
+    private int readingMonth;
+    private int readingYear;
 }

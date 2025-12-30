@@ -16,14 +16,22 @@ public class Bill {
     private String consumerId;
     private String connectionId;
 
+    private UtilityType utilityType;
+    private String tariffPlan;          
+
+    private int billingMonth;          
+    private int billingYear;           
+
     private long consumptionUnits;
+
     private double energyCharge;
     private double fixedCharge;
     private double tax;
+    private double penalty;            
     private double totalAmount;
 
     private BillStatus status;
-
+    
     private LocalDate billDate;
     private LocalDate dueDate;
 }

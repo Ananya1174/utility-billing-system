@@ -1,11 +1,32 @@
 package com.utility.billing.repository;
 
 import com.utility.billing.model.Bill;
+import com.utility.billing.model.BillStatus;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface BillRepository extends MongoRepository<Bill, String> {
 
     List<Bill> findByConsumerId(String consumerId);
+
+    Optional<Bill> findByConnectionIdAndBillingMonthAndBillingYearAndStatusNot(
+            String connectionId,
+            int billingMonth,
+            int billingYear,
+            BillStatus status
+    );
+
+    Optional<Bill> findTopByConnectionIdOrderByBillingYearDescBillingMonthDesc(
+            String connectionId
+    );
+
+    List<Bill> findByStatus(BillStatus status);
+
+    List<Bill> findByStatusAndDueDateBefore(
+            BillStatus status,
+            LocalDate date
+    );
 }
