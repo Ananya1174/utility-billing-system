@@ -13,6 +13,8 @@ public record PaymentResponse(
         double amount,
         PaymentMode mode,
         PaymentStatus status,
+        String transactionId,
+        String invoiceId,
         LocalDateTime createdAt,
         LocalDateTime confirmedAt
 ) {
@@ -24,6 +26,8 @@ public record PaymentResponse(
                 p.getAmount(),
                 p.getMode(),
                 p.getStatus(),
+                p.getTransactionId(),
+                p.getInvoiceId(),
                 p.getCreatedAt(),
                 p.getConfirmedAt()
         );

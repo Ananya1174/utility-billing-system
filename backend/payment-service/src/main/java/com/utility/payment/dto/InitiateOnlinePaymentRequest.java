@@ -5,6 +5,5 @@ import jakarta.validation.constraints.Positive;
 
 public record InitiateOnlinePaymentRequest(
         @NotBlank String billId,
-        @NotBlank String consumerId,
-        @Positive double amount
+        @NotBlank String consumerId
 ) {}
