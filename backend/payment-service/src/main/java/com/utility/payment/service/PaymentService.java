@@ -221,12 +221,15 @@ public class PaymentService {
 
     // ================= INVOICE =================
     private Invoice generateInvoice(Payment payment) {
+        BillResponse bill = billingClient.getBill(payment.getBillId());
 
         Invoice invoice = new Invoice();
         invoice.setInvoiceNumber("INV-" + System.currentTimeMillis());
         invoice.setBillId(payment.getBillId());
         invoice.setPaymentId(payment.getId());
         invoice.setConsumerId(payment.getConsumerId());
+        invoice.setBillingMonth(bill.getBillingMonth());
+        invoice.setBillingYear(bill.getBillingYear());
 
         invoice.setAmountPaid(payment.getAmount());
         invoice.setTax(0);

@@ -16,6 +16,7 @@ import com.lowagie.text.pdf.PdfWriter;
 import com.utility.payment.exception.ApiException;
 import com.utility.payment.model.Invoice;
 import com.utility.payment.repository.InvoiceRepository;
+import java.time.Month;
 
 import lombok.RequiredArgsConstructor;
 
@@ -53,6 +54,13 @@ public class InvoicePdfService {
             document.add(new Paragraph("Invoice Number: " + invoice.getInvoiceNumber(), textFont));
             document.add(new Paragraph(
                     "Invoice Date: " + invoice.getInvoiceDate().format(formatter),
+                    textFont
+            ));
+            document.add(new Paragraph(
+                    "Billing Period: " +
+                    Month.of(invoice.getBillingMonth()).name() +
+                    " " +
+                    invoice.getBillingYear(),
                     textFont
             ));
             document.add(new Paragraph("Bill ID: " + invoice.getBillId(), textFont));

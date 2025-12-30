@@ -17,6 +17,9 @@ public class Invoice {
     private String billId;
     private String paymentId;
     private String consumerId;
+    private int billingMonth;
+    private int billingYear;
+
 
     private double amountPaid;
     private double tax;
