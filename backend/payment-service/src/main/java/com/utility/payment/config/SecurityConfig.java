@@ -10,6 +10,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
@@ -17,62 +18,74 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 public class SecurityConfig {
 
-	@Bean
-	public JwtDecoder jwtDecoder(Environment env) {
+    @Bean
+    public JwtDecoder jwtDecoder(Environment env) {
 
-		String jwtSecret = env.getRequiredProperty("jwt.secret");
+        String jwtSecret = env.getRequiredProperty("jwt.secret");
+        SecretKey key = new SecretKeySpec(jwtSecret.getBytes(), "HmacSHA384");
 
-		SecretKey key = new SecretKeySpec(jwtSecret.getBytes(), "HmacSHA384");
+        return NimbusJwtDecoder
+                .withSecretKey(key)
+                .macAlgorithm(MacAlgorithm.HS384)
+                .build();
+    }
 
-		return NimbusJwtDecoder.withSecretKey(key)
-				.macAlgorithm(org.springframework.security.oauth2.jose.jws.MacAlgorithm.HS384).build();
-	}
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
 
-	@Bean
-	public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter converter =
+                new JwtGrantedAuthoritiesConverter();
 
-		JwtGrantedAuthoritiesConverter converter = new JwtGrantedAuthoritiesConverter();
+        converter.setAuthoritiesClaimName("role");
+        converter.setAuthorityPrefix("ROLE_");
 
-		converter.setAuthoritiesClaimName("role");
-		converter.setAuthorityPrefix("ROLE_");
+        JwtAuthenticationConverter jwtConverter =
+                new JwtAuthenticationConverter();
 
-		JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
+        jwtConverter.setJwtGrantedAuthoritiesConverter(converter);
+        return jwtConverter;
+    }
 
-		jwtConverter.setJwtGrantedAuthoritiesConverter(converter);
-		return jwtConverter;
-	}
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable())
 
-	    http
-	        .csrf(csrf -> csrf.disable())
-	        .authorizeHttpRequests(auth -> auth
+            .authorizeHttpRequests(auth -> auth
 
-	            
-	            .requestMatchers(HttpMethod.POST, "/payments/online/initiate")
-	                .hasRole("CONSUMER")
+                .requestMatchers(HttpMethod.POST,
+                        "/payments/online/initiate",
+                        "/payments/online/confirm")
+                    .hasRole("CONSUMER")
 
-	            .requestMatchers(HttpMethod.POST, "/payments/online/confirm")
-	                .hasRole("CONSUMER")
+                .requestMatchers(HttpMethod.POST,
+                        "/payments/offline")
+                    .hasRole("ACCOUNTS_OFFICER")
 
-	            
-	            .requestMatchers(HttpMethod.POST, "/payments/offline")
-	                .hasRole("ACCOUNTS_OFFICER")
+                .requestMatchers(HttpMethod.GET,
+                        "/payments/bill/**",
+                        "/payments/consumer/**")
+                    .hasAnyRole("CONSUMER", "ACCOUNTS_OFFICER")
 
-	                .requestMatchers(HttpMethod.GET, "/payments/bill/**")
-	                .hasAnyRole("CONSUMER", "ACCOUNTS_OFFICER")
+                .requestMatchers(HttpMethod.GET,
+                        "/payments/outstanding/**")
+                    .hasAnyRole("CONSUMER", "ACCOUNTS_OFFICER")
 
-	                .requestMatchers(HttpMethod.GET, "/payments/outstanding/**")
-	                .hasAnyRole("CONSUMER", "ACCOUNTS_OFFICER")
-	            .anyRequest().authenticated()
-	        )
-	        .oauth2ResourceServer(oauth ->
-	            oauth.jwt(jwt ->
-	                jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())
-	            )
-	        );
+                .requestMatchers(HttpMethod.GET,
+                        "/payments/invoice/**")
+                    .hasAnyRole("CONSUMER", "ACCOUNTS_OFFICER")
 
-	    return http.build();
-	}
+                .anyRequest().authenticated()
+            )
+
+            .oauth2ResourceServer(oauth ->
+                oauth.jwt(jwt ->
+                    jwt.jwtAuthenticationConverter(
+                            jwtAuthenticationConverter())
+                )
+            );
+
+        return http.build();
+    }
 }
