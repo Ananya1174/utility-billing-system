@@ -15,7 +15,7 @@
         <module>meter-reading-service</module>
         <module>billing-service</module>
         <module>payment-service</module>
-        <!-- others later -->
+        <module>notification-service</module>
     </modules>
 
     <properties>

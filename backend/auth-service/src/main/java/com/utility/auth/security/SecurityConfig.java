@@ -57,8 +57,16 @@ public class SecurityConfig {
 
 		http.csrf(csrf -> csrf.disable())
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authorizeHttpRequests(auth -> auth.requestMatchers("/auth/register", "/auth/login",
-						"/auth/forgot-password", "/auth/reset-password").permitAll().anyRequest().authenticated())
+				.authorizeHttpRequests(auth -> auth
+					    .requestMatchers(
+					        "/auth/login",
+					        "/auth/forgot-password",
+					        "/auth/reset-password",
+					        "/auth/account-requests"
+					    ).permitAll()
+
+					    .anyRequest().authenticated()
+					)
 				.authenticationProvider(authenticationProvider())
 				.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 

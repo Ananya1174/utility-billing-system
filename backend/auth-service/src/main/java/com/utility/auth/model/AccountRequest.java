@@ -30,5 +30,5 @@ public class AccountRequest {
     private LocalDateTime createdAt;
     private LocalDateTime reviewedAt;
 
-    private String reviewedBy; // admin username (optional)
+    private String reviewedBy; 
 }
