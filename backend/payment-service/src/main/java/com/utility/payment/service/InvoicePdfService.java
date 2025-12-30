@@ -1,6 +1,7 @@
 package com.utility.payment.service;
 
 import java.io.ByteArrayOutputStream;
+import java.time.format.DateTimeFormatter;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -8,6 +9,8 @@ import org.springframework.stereotype.Service;
 import com.lowagie.text.Document;
 import com.lowagie.text.Font;
 import com.lowagie.text.Paragraph;
+import com.lowagie.text.Phrase;
+import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import com.utility.payment.exception.ApiException;
@@ -26,8 +29,7 @@ public class InvoicePdfService {
 
         Invoice invoice = invoiceRepository.findByPaymentId(paymentId)
                 .orElseThrow(() ->
-                        new ApiException("Invoice not found",
-                                HttpStatus.NOT_FOUND));
+                        new ApiException("Invoice not found", HttpStatus.NOT_FOUND));
 
         try {
             Document document = new Document();
@@ -36,37 +38,41 @@ public class InvoicePdfService {
             PdfWriter.getInstance(document, out);
             document.open();
 
-            Font title = new Font(Font.HELVETICA, 18, Font.BOLD);
-            Font text = new Font(Font.HELVETICA, 12);
+            Font titleFont = new Font(Font.HELVETICA, 18, Font.BOLD);
+            Font headerFont = new Font(Font.HELVETICA, 12, Font.BOLD);
+            Font textFont = new Font(Font.HELVETICA, 12);
 
-            document.add(new Paragraph("UTILITY BILL INVOICE", title));
+            // -------- TITLE --------
+            document.add(new Paragraph("UTILITY BILL INVOICE", titleFont));
             document.add(new Paragraph(" "));
 
-            document.add(new Paragraph("Invoice Number: " + invoice.getInvoiceNumber(), text));
-            document.add(new Paragraph("Invoice Date: " + invoice.getInvoiceDate(), text));
-            document.add(new Paragraph("Bill ID: " + invoice.getBillId(), text));
-            document.add(new Paragraph("Payment ID: " + invoice.getPaymentId(), text));
-            document.add(new Paragraph("Consumer ID: " + invoice.getConsumerId(), text));
+            DateTimeFormatter formatter =
+                    DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm");
+
+            // -------- BASIC INFO --------
+            document.add(new Paragraph("Invoice Number: " + invoice.getInvoiceNumber(), textFont));
+            document.add(new Paragraph(
+                    "Invoice Date: " + invoice.getInvoiceDate().format(formatter),
+                    textFont
+            ));
+            document.add(new Paragraph("Bill ID: " + invoice.getBillId(), textFont));
+            document.add(new Paragraph("Payment ID: " + invoice.getPaymentId(), textFont));
+            document.add(new Paragraph("Consumer ID: " + invoice.getConsumerId(), textFont));
 
             document.add(new Paragraph(" "));
 
+            // -------- TABLE --------
             PdfPTable table = new PdfPTable(2);
             table.setWidthPercentage(100);
+            table.setWidths(new float[]{3f, 2f});
 
-            table.addCell("Description");
-            table.addCell("Amount");
+            addHeaderCell(table, "Description", headerFont);
+            addHeaderCell(table, "Amount", headerFont);
 
-            table.addCell("Amount Paid");
-            table.addCell(String.valueOf(invoice.getAmountPaid()));
-
-            table.addCell("Tax");
-            table.addCell(String.valueOf(invoice.getTax()));
-
-            table.addCell("Penalty");
-            table.addCell(String.valueOf(invoice.getPenalty()));
-
-            table.addCell("Total Amount");
-            table.addCell(String.valueOf(invoice.getTotalAmount()));
+            addRow(table, "Amount Paid", invoice.getAmountPaid());
+            addRow(table, "Tax", invoice.getTax());
+            addRow(table, "Penalty", invoice.getPenalty());
+            addRow(table, "Total Amount", invoice.getTotalAmount());
 
             document.add(table);
             document.close();
@@ -79,5 +85,18 @@ public class InvoicePdfService {
                     HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
+    }
+
+    // ---------- helpers ----------
+
+    private void addHeaderCell(PdfPTable table, String text, Font font) {
+        PdfPCell cell = new PdfPCell(new Phrase(text, font));
+        cell.setPadding(8);
+        table.addCell(cell);
+    }
+
+    private void addRow(PdfPTable table, String label, double value) {
+        table.addCell(label);
+        table.addCell(String.format("%.2f", value));
     }
 }
