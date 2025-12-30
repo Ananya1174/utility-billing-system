@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.utility.auth.config.RabbitMQConfig;
 import com.utility.auth.dto.event.AccountApprovedEvent;
+import com.utility.auth.dto.event.AccountRejectedEvent;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,6 +20,13 @@ public class NotificationPublisher {
         rabbitTemplate.convertAndSend(
                 RabbitMQConfig.EXCHANGE,
                 RabbitMQConfig.ACCOUNT_ROUTING_KEY,
+                event
+        );
+    }
+    public void publishAccountRejected(AccountRejectedEvent event) {
+        rabbitTemplate.convertAndSend(
+                RabbitMQConfig.EXCHANGE,
+                RabbitMQConfig.ACCOUNT_REJECTED_KEY,
                 event
         );
     }

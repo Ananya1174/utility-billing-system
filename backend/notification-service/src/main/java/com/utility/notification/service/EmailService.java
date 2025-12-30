@@ -38,4 +38,24 @@ public class EmailService {
 
         mailSender.send(message);
     }
+    public void sendRejectionEmail(String to) {
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject("Account Request Update");
+
+        message.setText("""
+                Hello,
+
+                Your account request has been reviewed.
+                Unfortunately, it was not approved at this time.
+
+                Please contact support for further assistance.
+
+                Regards,
+                Utility Billing System
+                """);
+
+        mailSender.send(message);
+    }
 }

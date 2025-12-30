@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.utility.auth.dto.event.AccountApprovedEvent;
+import com.utility.auth.dto.event.AccountRejectedEvent;
 import com.utility.auth.dto.request.AccountRequestDto;
 import com.utility.auth.dto.request.AccountRequestReviewDto;
 import com.utility.auth.model.AccountRequest;
@@ -70,6 +71,11 @@ public class AccountRequestService {
             request.setReviewedBy(adminUsername);
 
             accountRequestRepository.save(request);
+            notificationPublisher.publishAccountRejected(
+                    AccountRejectedEvent.builder()
+                            .email(request.getEmail())
+                            .build()
+            );
             return;
         }
 
@@ -84,6 +90,7 @@ public class AccountRequestService {
                     .password(passwordEncoder.encode(rawPassword))
                     .role(Role.CONSUMER)
                     .active(true)
+                    .passwordChangeRequired(true)
                     .build();
 
             userRepository.save(user);

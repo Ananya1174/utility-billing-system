@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 
 import com.utility.notification.config.RabbitMQConfig;
 import com.utility.notification.dto.AccountApprovedEvent;
+import com.utility.notification.dto.AccountRejectedEvent;
+
 import com.utility.notification.service.EmailService;
 
 import lombok.RequiredArgsConstructor;
@@ -25,5 +27,12 @@ public class AccountNotificationListener {
         );
 
         System.out.println(" Credentials email sent to " + event.getEmail());
+    }
+    @RabbitListener(queues = RabbitMQConfig.REJECT_QUEUE)
+    public void handleAccountRejected(AccountRejectedEvent event) {
+
+        emailService.sendRejectionEmail(event.getEmail());
+
+        System.out.println("📧 Rejection email sent to " + event.getEmail());
     }
 }
