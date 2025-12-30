@@ -13,14 +13,19 @@ public class MeterReading {
 
     @Id
     private String id;
+
     private String consumerId;
     private String connectionId;
     private UtilityType utilityType;
     private String meterNumber;
+
     private long previousReading;
     private long currentReading;
     private long consumptionUnits;
-    private String readingMonth;
+
+    private int readingMonth;   
+    private int readingYear;    
+
     private LocalDate readingDate;
     private LocalDateTime createdAt;
 }

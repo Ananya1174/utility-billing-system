@@ -8,9 +8,24 @@ import java.util.Optional;
 
 public interface MeterReadingRepository extends MongoRepository<MeterReading, String> {
 
-    Optional<MeterReading> findTopByConnectionIdOrderByCreatedAtDesc(String connectionId);
+    Optional<MeterReading> findTopByConnectionIdOrderByReadingYearDescReadingMonthDesc(
+            String connectionId
+    );
+
+    boolean existsByConnectionIdAndReadingMonthAndReadingYear(
+            String connectionId,
+            int readingMonth,
+            int readingYear
+    );
 
     List<MeterReading> findByConsumerId(String consumerId);
 
-    List<MeterReading> findByReadingMonth(String readingMonth);
+    Optional<MeterReading> findByConnectionIdAndReadingMonthAndReadingYear(
+            String connectionId,
+            int readingMonth,
+            int readingYear
+    );
+    List<MeterReading>
+    findByReadingMonthAndReadingYear(int readingMonth, int readingYear);
+    List<MeterReading> findByConnectionId(String connectionId);
 }

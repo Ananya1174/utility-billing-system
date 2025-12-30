@@ -2,6 +2,7 @@ package com.utility.meter.controller;
 
 import com.utility.meter.dto.CreateMeterReadingRequest;
 import com.utility.meter.dto.MeterReadingResponse;
+import com.utility.meter.exception.ApiException;
 import com.utility.meter.service.MeterReadingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,22 +24,67 @@ public class MeterReadingController {
     public ResponseEntity<MeterReadingResponse> add(
             @Valid @RequestBody CreateMeterReadingRequest request) {
 
-        MeterReadingResponse response = service.addReading(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(service.addReading(request));
     }
 
     @GetMapping("/consumer/{consumerId}")
-    public List<MeterReadingResponse> byConsumer(@PathVariable String consumerId) {
-        return service.getByConsumer(consumerId);
+    public ResponseEntity<List<MeterReadingResponse>> byConsumer(
+            @PathVariable String consumerId) {
+
+        List<MeterReadingResponse> readings =
+                service.getByConsumer(consumerId);
+
+        if (readings.isEmpty()) {
+            throw new ApiException(
+                    "No meter readings found for consumer",
+                    HttpStatus.NOT_FOUND
+            );
+        }
+
+        return ResponseEntity.ok(readings);
     }
 
-    @GetMapping("/month/{month}")
-    public List<MeterReadingResponse> byMonth(@PathVariable String month) {
-        return service.getByMonth(month);
+    @GetMapping("/month")
+    public ResponseEntity<List<MeterReadingResponse>> byMonth(
+            @RequestParam int month,
+            @RequestParam int year) {
+
+        List<MeterReadingResponse> readings =
+                service.getByMonth(month, year);
+
+        if (readings.isEmpty()) {
+            throw new ApiException(
+                    "No meter readings found for the given month",
+                    HttpStatus.NOT_FOUND
+            );
+        }
+
+        return ResponseEntity.ok(readings);
     }
 
     @GetMapping("/latest/{connectionId}")
-    public MeterReadingResponse latest(@PathVariable String connectionId) {
+    public MeterReadingResponse latest(
+            @PathVariable String connectionId) {
+
         return service.getLatest(connectionId);
+    }
+
+    @GetMapping("/connection/{connectionId}")
+    public ResponseEntity<List<MeterReadingResponse>> byConnection(
+            @PathVariable String connectionId) {
+
+        List<MeterReadingResponse> readings =
+                service.getByConnection(connectionId);
+
+        if (readings.isEmpty()) {
+            throw new ApiException(
+                    "No meter readings found for connection",
+                    HttpStatus.NOT_FOUND
+            );
+        }
+
+        return ResponseEntity.ok(readings);
     }
 }

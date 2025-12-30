@@ -1,6 +1,7 @@
 package com.utility.meter.dto;
 
 import com.utility.meter.model.UtilityType;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -23,4 +24,11 @@ public class CreateMeterReadingRequest {
 
     @Min(0)
     private long currentReading;
+
+    @Min(1)
+    @Max(12)
+    private int readingMonth;   
+
+    @Min(2000)
+    private int readingYear;    
 }
