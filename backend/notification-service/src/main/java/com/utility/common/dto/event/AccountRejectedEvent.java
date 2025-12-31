@@ -1,10 +1,11 @@
-package com.utility.notification.dto;
+package com.utility.common.dto.event;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-@Builder
+@NoArgsConstructor   
 public class AccountRejectedEvent {
     private String email;
 }

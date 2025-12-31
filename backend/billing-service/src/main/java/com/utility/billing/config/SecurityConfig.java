@@ -77,6 +77,8 @@ public class SecurityConfig {
 
                 .requestMatchers(HttpMethod.GET, "/tariffs/plans/active")
                     .hasAnyRole("ADMIN", "BILLING_OFFICER")
+                 .requestMatchers(HttpMethod.GET, "/tariffs")
+                    .hasAnyRole("ADMIN", "BILLING_OFFICER", "CONSUMER")
 
                 /* ================= BILL GENERATION ================= */
                 .requestMatchers(HttpMethod.POST, "/bills")

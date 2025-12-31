@@ -4,8 +4,9 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import com.utility.auth.config.RabbitMQConfig;
-import com.utility.auth.dto.event.AccountApprovedEvent;
-import com.utility.auth.dto.event.AccountRejectedEvent;
+import com.utility.common.dto.event.AccountApprovedEvent;
+import com.utility.common.dto.event.AccountRejectedEvent;
+import com.utility.common.dto.event.ConsumerApprovedEvent;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +28,13 @@ public class NotificationPublisher {
         rabbitTemplate.convertAndSend(
                 RabbitMQConfig.EXCHANGE,
                 RabbitMQConfig.ACCOUNT_REJECTED_KEY,
+                event
+        );
+    }
+    public void publishConsumerApproved(ConsumerApprovedEvent event) {
+    	rabbitTemplate.convertAndSend(
+                RabbitMQConfig.EXCHANGE,          
+                RabbitMQConfig.CONSUMER_APPROVED_KEY,
                 event
         );
     }

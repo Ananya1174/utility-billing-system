@@ -21,27 +21,30 @@ public class UtilityConnectionService {
     private final ConnectionRepository connectionRepository;
     private final ConsumerRepository consumerRepository;
 
-    public List<ConnectionResponseDto> getConnectionsByUsername(String username) {
+    public List<ConnectionResponseDto> getConnectionsByUserId(String userId) {
 
-        Consumer consumer = consumerRepository.findByEmail(username)
+        Consumer consumer = consumerRepository.findById(userId)
                 .orElseThrow(() ->
-                        new ApiException(HttpStatus.NOT_FOUND, "Consumer not found")
-                );
+                        new ApiException(HttpStatus.NOT_FOUND, "Consumer not found"));
 
-        return connectionRepository.findByConsumerId(consumer.getId())
+        return connectionRepository
+                .findByConsumerId(consumer.getId())
                 .stream()
-                .map(this::map)
+                .map(this::mapToDto)
                 .toList();
     }
 
-    private ConnectionResponseDto map(UtilityConnection c) {
-        return new ConnectionResponseDto(
-                c.getId(),
-                c.getUtilityType(),
-                c.getMeterNumber(),
-                c.getTariffPlanCode(),
-                c.isActive()
-        );
+    private ConnectionResponseDto mapToDto(UtilityConnection connection) {
+
+        ConnectionResponseDto dto = new ConnectionResponseDto();
+        dto.setId(connection.getId());
+        dto.setUtilityType(connection.getUtilityType());
+        dto.setMeterNumber(connection.getMeterNumber());
+        dto.setTariffPlan(connection.getTariffPlanCode());
+        dto.setActive(connection.isActive());
+        dto.setActivatedAt(connection.getActivatedAt());
+
+        return dto;
     }
     public ConnectionResponseDto getConnectionById(String connectionId) {
 
@@ -61,6 +64,5 @@ public class UtilityConnectionService {
             );
         }
 
-        return map(connection);
-    }
+        return mapToDto(connection);    }
 }

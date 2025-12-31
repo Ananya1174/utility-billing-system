@@ -10,5 +10,7 @@ public interface ConsumerRepository extends MongoRepository<Consumer, String> {
     boolean existsByEmail(String email);
     boolean existsByMobileNumber(String mobileNumber);
     Optional<Consumer> findByEmail(String email);
+    boolean existsById(String Id);
+
 
 }

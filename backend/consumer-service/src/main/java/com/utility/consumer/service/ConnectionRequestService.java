@@ -65,7 +65,7 @@ public class ConnectionRequestService {
         ConnectionRequest request = new ConnectionRequest();
         request.setConsumerId(consumerId);
         request.setUtilityType(dto.getUtilityType());
-        request.setTariffPlanCode(dto.getTariffPlanCode());
+        request.setTariffPlanCode(dto.getTariffPlan());
         request.setStatus(ConnectionRequestStatus.PENDING);
         request.setRequestedAt(LocalDateTime.now());
 
@@ -79,7 +79,7 @@ public class ConnectionRequestService {
     public void approveRequest(
             String requestId,
             ApproveConnectionRequestDto dto,
-            String adminUsername
+            String reviewedBy
     ) {
 
         ConnectionRequest request =
@@ -111,7 +111,7 @@ public class ConnectionRequestService {
 
         request.setStatus(ConnectionRequestStatus.APPROVED);
         request.setReviewedAt(LocalDateTime.now());
-        request.setReviewedBy(adminUsername);
+        request.setReviewedBy(reviewedBy);
 
         requestRepo.save(request);
     }
@@ -119,7 +119,7 @@ public class ConnectionRequestService {
     public void rejectRequest(
             String requestId,
             String reason,
-            String adminUsername
+            String reviewedBy
     ) {
 
         ConnectionRequest request =
@@ -134,7 +134,7 @@ public class ConnectionRequestService {
 
         request.setStatus(ConnectionRequestStatus.REJECTED);
         request.setReviewedAt(LocalDateTime.now());
-        request.setReviewedBy(adminUsername);
+        request.setReviewedBy(reviewedBy);
         request.setRejectionReason(reason);
 
         requestRepo.save(request);

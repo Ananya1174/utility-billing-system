@@ -3,6 +3,7 @@ package com.utility.billing.service;
 import com.utility.billing.dto.BillResponse;
 import com.utility.billing.dto.GenerateBillRequest;
 import com.utility.billing.exception.ApiException;
+import com.utility.billing.feign.ConsumerClient;
 import com.utility.billing.feign.MeterReadingClient;
 import com.utility.billing.feign.MeterReadingResponse;
 import com.utility.billing.model.Bill;
@@ -10,10 +11,13 @@ import com.utility.billing.model.BillStatus;
 import com.utility.billing.model.TariffSlab;
 import com.utility.billing.repository.BillRepository;
 import com.utility.billing.repository.TariffSlabRepository;
+
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -24,50 +28,55 @@ public class BillingService {
     private final BillRepository billRepository;
     private final MeterReadingClient meterClient;
     private final TariffSlabRepository slabRepository;
-    
+    private final ConsumerClient consumerClient;
 
+    // ============================
+    // METER SERVICE (CB ENABLED)
+    // ============================
     @CircuitBreaker(name = "meterReadingCB", fallbackMethod = "meterFallback")
     public MeterReadingResponse fetchLatestMeterReading(String connectionId) {
         return meterClient.getLatest(connectionId);
     }
 
-    // ✅ FALLBACK
     public MeterReadingResponse meterFallback(String connectionId, Throwable ex) {
-        return null; // IMPORTANT – handled in business logic
+        return null; // handled in business logic
     }
+
+    // ============================
+    // BILL GENERATION
+    // ============================
     public BillResponse generateBill(GenerateBillRequest request) {
-    	var lastBillOpt =
+
+        // 1️⃣ Check previous bill status
+        var lastBillOpt =
                 billRepository.findTopByConnectionIdOrderByBillingYearDescBillingMonthDesc(
                         request.getConnectionId()
                 );
 
-        if (lastBillOpt.isPresent()) {
-            Bill lastBill = lastBillOpt.get();
-
-            // ❌ unpaid bill exists → STOP
-            if (lastBill.getStatus() != BillStatus.PAID) {
-                throw new ApiException(
-                        "Unpaid bill already exists for this connection",
-                        HttpStatus.BAD_REQUEST
-                );
-            }
+        if (lastBillOpt.isPresent()
+                && lastBillOpt.get().getStatus() != BillStatus.PAID) {
+            throw new ApiException(
+                    "Unpaid bill already exists for this connection",
+                    HttpStatus.BAD_REQUEST
+            );
         }
 
-        // ✅ 2. Call meter service ONLY NOW
-        var reading = meterClient.getLatest(request.getConnectionId());
+        // 2️⃣ Fetch latest meter reading (CB protected)
+        var reading = fetchLatestMeterReading(request.getConnectionId());
 
         if (reading == null) {
             throw new ApiException(
-                "Meter reading not available for next billing period",
-                HttpStatus.BAD_REQUEST
+                    "Meter reading not available for next billing period",
+                    HttpStatus.BAD_REQUEST
             );
         }
+
         int billingMonth = reading.getReadingMonth();
         int billingYear = reading.getReadingYear();
 
-        // ✅ 3. Ensure reading is for NEW period
+        // 3️⃣ Validate billing period progression
         if (lastBillOpt.isPresent()) {
-            Bill lastBill = lastBillOpt.get();
+            var lastBill = lastBillOpt.get();
 
             if (
                 billingYear < lastBill.getBillingYear() ||
@@ -81,8 +90,7 @@ public class BillingService {
             }
         }
 
-
-        // 2️⃣ Prevent duplicate unpaid bill for same month
+        // 4️⃣ Prevent duplicate unpaid bill for same month
         billRepository
                 .findByConnectionIdAndBillingMonthAndBillingYearAndStatusNot(
                         request.getConnectionId(),
@@ -99,15 +107,36 @@ public class BillingService {
 
         long units = reading.getConsumptionUnits();
         if (units <= 0) {
-            throw new ApiException("Invalid consumption units", HttpStatus.BAD_REQUEST);
+            throw new ApiException(
+                    "Invalid consumption units",
+                    HttpStatus.BAD_REQUEST
+            );
         }
 
-        // 3️⃣ Fetch tariff slabs (DB driven)
-        String tariffPlan = "DOMESTIC"; // later from Consumer Service
+        // 5️⃣ Fetch APPROVED connection from Consumer Service
+        var connection =
+                consumerClient.getConnectionById(request.getConnectionId());
+
+        if (connection == null || !connection.isActive()) {
+            throw new ApiException(
+                    "Connection not active or not found",
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
+        // 6️⃣ Safety check – utility consistency
+        if (!connection.getUtilityType().equals(reading.getUtilityType())) {
+            throw new ApiException(
+                    "Utility type mismatch between meter and connection",
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
+        // 7️⃣ Fetch tariff slabs
         List<TariffSlab> slabs =
                 slabRepository.findByUtilityTypeAndPlanCodeOrderByMinUnitsAsc(
-                        reading.getUtilityType(),  
-                        tariffPlan
+                        connection.getUtilityType(),
+                        connection.getTariffPlanCode()
                 );
 
         if (slabs.isEmpty()) {
@@ -117,18 +146,20 @@ public class BillingService {
             );
         }
 
-        // 4️⃣ Calculate charges
+        // 8️⃣ Calculate charges
         double energyCharge = calculateFromSlabs(units, slabs);
         double fixedCharge = 50;
         double tax = energyCharge * 0.05;
 
+        // 9️⃣ Create bill
         Bill bill = new Bill();
-        bill.setConsumerId(request.getConsumerId());
+        bill.setConsumerId(connection.getConsumerId()); // ✅ NEVER trust client
         bill.setConnectionId(request.getConnectionId());
+        bill.setUtilityType(connection.getUtilityType());
+        bill.setTariffPlan(connection.getTariffPlanCode());
+
         bill.setBillingMonth(billingMonth);
         bill.setBillingYear(billingYear);
-        bill.setUtilityType(reading.getUtilityType()); 
-        bill.setTariffPlan(tariffPlan);               
 
         bill.setConsumptionUnits(units);
         bill.setEnergyCharge(energyCharge);
@@ -142,10 +173,13 @@ public class BillingService {
         bill.setDueDate(LocalDate.now().plusDays(15));
 
         billRepository.save(bill);
+
         return map(bill);
     }
 
-    // 🔹 slab calculation
+    // ============================
+    // SLAB CALCULATION
+    // ============================
     private double calculateFromSlabs(long units, List<TariffSlab> slabs) {
 
         double amount = 0;
@@ -165,16 +199,19 @@ public class BillingService {
         return amount;
     }
 
-    // ---------------- OVERDUE LOGIC ----------------
+    // ============================
+    // OVERDUE
+    // ============================
     public List<BillResponse> getOverdueBills() {
-
         return billRepository.findByStatus(BillStatus.OVERDUE)
                 .stream()
                 .map(this::map)
                 .toList();
     }
 
-    // ---------------- PAYMENT ----------------
+    // ============================
+    // PAYMENT
+    // ============================
     public void markBillAsPaid(String billId) {
 
         Bill bill = billRepository.findById(billId)
@@ -183,23 +220,26 @@ public class BillingService {
                 );
 
         if (bill.getStatus() == BillStatus.PAID) {
-            throw new ApiException("Bill already paid", HttpStatus.BAD_REQUEST);
+            throw new ApiException(
+                    "Bill already paid",
+                    HttpStatus.BAD_REQUEST
+            );
         }
 
-        // ✅ Freeze bill state
         bill.setStatus(BillStatus.PAID);
-
-        // ✅ Finalize total (includes penalty if any)
         bill.setTotalAmount(
                 bill.getEnergyCharge()
-                + bill.getFixedCharge()
-                + bill.getTax()
-                + bill.getPenalty()
+                        + bill.getFixedCharge()
+                        + bill.getTax()
+                        + bill.getPenalty()
         );
 
         billRepository.save(bill);
     }
 
+    // ============================
+    // FETCH
+    // ============================
     public BillResponse getBillById(String billId) {
         return billRepository.findById(billId)
                 .map(this::map)
@@ -220,16 +260,9 @@ public class BillingService {
         return bills.stream().map(this::map).toList();
     }
 
-    public BillResponse meterFallback(
-            GenerateBillRequest request,
-            Throwable ex
-    ) {
-        throw new ApiException(
-                "Meter service unavailable",
-                HttpStatus.SERVICE_UNAVAILABLE
-        );
-    }
-
+    // ============================
+    // RESPONSE MAPPER
+    // ============================
     private BillResponse map(Bill bill) {
 
         BillResponse r = new BillResponse();
@@ -237,17 +270,16 @@ public class BillingService {
         r.setConsumerId(bill.getConsumerId());
         r.setConnectionId(bill.getConnectionId());
 
-        r.setUtilityType(bill.getUtilityType());     
-        r.setTariffPlan(bill.getTariffPlan());       
-        r.setBillingMonth(bill.getBillingMonth());   
-        r.setBillingYear(bill.getBillingYear());    
-        r.setPenalty(bill.getPenalty());             
-        r.setPayableAmount(                         
-                bill.getTotalAmount() + bill.getPenalty()
-        );
+        r.setUtilityType(bill.getUtilityType());
+        r.setTariffPlan(bill.getTariffPlan());
+        r.setBillingMonth(bill.getBillingMonth());
+        r.setBillingYear(bill.getBillingYear());
 
         r.setConsumptionUnits(bill.getConsumptionUnits());
+        r.setPenalty(bill.getPenalty());
         r.setTotalAmount(bill.getTotalAmount());
+        r.setPayableAmount(bill.getTotalAmount() + bill.getPenalty());
+
         r.setStatus(bill.getStatus());
         r.setDueDate(bill.getDueDate());
 

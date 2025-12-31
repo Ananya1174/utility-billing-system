@@ -13,7 +13,6 @@ public class TariffSlabController {
 
     private final TariffSlabRepository repository;
 
-    // ➕ Add slab
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public TariffSlab create(@RequestBody TariffSlab slab) {

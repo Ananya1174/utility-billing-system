@@ -1,4 +1,4 @@
-package com.utility.notification.dto;
+package com.utility.common.dto.event;
 
 import lombok.Data;
 

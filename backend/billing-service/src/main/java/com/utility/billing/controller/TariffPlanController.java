@@ -1,8 +1,11 @@
 package com.utility.billing.controller;
 
+import com.utility.billing.dto.TariffResponseDto;
 import com.utility.billing.model.TariffPlan;
 import com.utility.billing.model.UtilityType;
 import com.utility.billing.repository.TariffPlanRepository;
+import com.utility.billing.service.TariffQueryService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +19,7 @@ import java.util.Map;
 public class TariffPlanController {
 
     private final TariffPlanRepository repository;
+
 
     // ---------------- CREATE PLAN (ADMIN) ----------------
     @PostMapping
@@ -58,12 +62,5 @@ public class TariffPlanController {
         return repository.findByActiveTrue();
     }
 
-    // ✅ ---------------- NEW API (FRONTEND USE) ----------------
-    // GET /tariffs/plans?utilityType=ELECTRICITY
-    @GetMapping
-    public List<TariffPlan> getPlansByUtility(
-            @RequestParam UtilityType utilityType) {
-
-        return repository.findByUtilityTypeAndActiveTrue(utilityType);
-    }
+    
 }

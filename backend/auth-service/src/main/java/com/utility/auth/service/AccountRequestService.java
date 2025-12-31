@@ -7,8 +7,6 @@ import java.util.UUID;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.utility.auth.dto.event.AccountApprovedEvent;
-import com.utility.auth.dto.event.AccountRejectedEvent;
 import com.utility.auth.dto.request.AccountRequestDto;
 import com.utility.auth.dto.request.AccountRequestReviewDto;
 import com.utility.auth.model.AccountRequest;
@@ -17,6 +15,9 @@ import com.utility.auth.model.Role;
 import com.utility.auth.model.User;
 import com.utility.auth.repository.AccountRequestRepository;
 import com.utility.auth.repository.UserRepository;
+import com.utility.common.dto.event.AccountApprovedEvent;
+import com.utility.common.dto.event.AccountRejectedEvent;
+import com.utility.common.dto.event.ConsumerApprovedEvent;
 
 import lombok.RequiredArgsConstructor;
 
@@ -71,14 +72,13 @@ public class AccountRequestService {
             request.setReviewedBy(adminUsername);
 
             accountRequestRepository.save(request);
-            notificationPublisher.publishAccountRejected(
-                    AccountRejectedEvent.builder()
-                            .email(request.getEmail())
-                            .build()
-            );
+
+            AccountRejectedEvent event = new AccountRejectedEvent();
+            event.setEmail(request.getEmail());
+
+            notificationPublisher.publishAccountRejected(event);
             return;
         }
-
         if ("APPROVE".equalsIgnoreCase(dto.getDecision())) {
 
             String username = generateUsername(request.getEmail());
@@ -100,7 +100,8 @@ public class AccountRequestService {
             request.setReviewedBy(adminUsername);
             accountRequestRepository.save(request);
 
-                        notificationPublisher.publishAccountApproved(
+            /* 📧 email notification */
+            notificationPublisher.publishAccountApproved(
                     AccountApprovedEvent.builder()
                             .email(request.getEmail())
                             .username(username)
@@ -108,6 +109,17 @@ public class AccountRequestService {
                             .role("CONSUMER")
                             .build()
             );
+
+            /* 🔔 consumer creation event */
+            notificationPublisher.publishConsumerApproved(
+            	    ConsumerApprovedEvent.builder()
+            	        .id(user.getUserId())
+            	        .fullName(request.getName())
+            	        .email(request.getEmail())
+            	        .mobileNumber(request.getPhone())
+            	        .address(request.getAddress())
+            	        .build()
+            	);
 
             return;
         }

@@ -1,5 +1,6 @@
 package com.utility.consumer.controller;
 
+import java.security.Principal;
 import java.util.List;
 
 import jakarta.validation.Valid;
@@ -43,9 +44,9 @@ public class ConnectionRequestController {
     public void approve(
             @PathVariable String id,
             @Valid @RequestBody ApproveConnectionRequestDto dto,
-            @RequestHeader("X-Admin-Username") String admin) {
-
-        requestService.approveRequest(id, dto, admin);
+            Principal principal
+    ) {
+        requestService.approveRequest(id, dto, principal.getName());
     }
 
     @PutMapping("/{id}/reject")
@@ -53,8 +54,8 @@ public class ConnectionRequestController {
     public void reject(
             @PathVariable String id,
             @RequestParam String reason,
-            @RequestHeader("X-Admin-Username") String admin) {
-
-        requestService.rejectRequest(id, reason, admin);
+            Principal principal
+    ) {
+        requestService.rejectRequest(id, reason, principal.getName());
     }
 }

@@ -12,5 +12,5 @@ public class CreateConnectionRequestDto {
     private UtilityType utilityType;
 
     @NotBlank
-    private String tariffPlanCode;
+    private String tariffPlan;
 }

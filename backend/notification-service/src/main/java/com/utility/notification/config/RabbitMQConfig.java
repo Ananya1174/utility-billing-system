@@ -10,30 +10,50 @@ import org.springframework.amqp.support.converter.MessageConverter;
 public class RabbitMQConfig {
 
     public static final String EXCHANGE = "notification.exchange";
+
     public static final String ACCOUNT_QUEUE = "account.notification.queue";
-    public static final String REJECT_QUEUE = "account.reject.queue";
+    public static final String REJECT_QUEUE  = "account.reject.queue";
+
     public static final String ACCOUNT_ROUTING_KEY = "account.approved";
     public static final String ACCOUNT_REJECTED_KEY = "account.rejected";
+
+    // ---------- Message Converter ----------
     @Bean
     public MessageConverter jsonMessageConverter() {
         return new Jackson2JsonMessageConverter();
     }
 
+    // ---------- Exchange ----------
     @Bean
     public DirectExchange exchange() {
         return new DirectExchange(EXCHANGE);
     }
 
+    // ---------- Queues ----------
     @Bean
     public Queue accountQueue() {
-        return new Queue(ACCOUNT_QUEUE);
+        return QueueBuilder.durable(ACCOUNT_QUEUE).build();
     }
 
+    @Bean
+    public Queue rejectQueue() {
+        return QueueBuilder.durable(REJECT_QUEUE).build();
+    }
+
+    // ---------- Bindings ----------
     @Bean
     public Binding accountBinding() {
         return BindingBuilder
                 .bind(accountQueue())
                 .to(exchange())
                 .with(ACCOUNT_ROUTING_KEY);
+    }
+
+    @Bean
+    public Binding rejectBinding() {
+        return BindingBuilder
+                .bind(rejectQueue())
+                .to(exchange())
+                .with(ACCOUNT_REJECTED_KEY);
     }
 }

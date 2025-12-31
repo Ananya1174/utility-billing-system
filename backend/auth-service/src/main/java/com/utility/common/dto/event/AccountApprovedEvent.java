@@ -1,4 +1,4 @@
-package com.utility.auth.dto.event;
+package com.utility.common.dto.event;
 
 import lombok.Builder;
 import lombok.Data;

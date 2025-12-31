@@ -3,10 +3,9 @@ package com.utility.notification.listener;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
+import com.utility.common.dto.event.AccountApprovedEvent;
+import com.utility.common.dto.event.AccountRejectedEvent;
 import com.utility.notification.config.RabbitMQConfig;
-import com.utility.notification.dto.AccountApprovedEvent;
-import com.utility.notification.dto.AccountRejectedEvent;
-
 import com.utility.notification.service.EmailService;
 
 import lombok.RequiredArgsConstructor;

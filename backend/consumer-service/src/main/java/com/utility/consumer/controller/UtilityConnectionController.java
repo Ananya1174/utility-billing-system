@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.*;
 
 import com.utility.consumer.dto.response.ConnectionResponseDto;
 import com.utility.consumer.service.UtilityConnectionService;
-
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -22,10 +23,14 @@ public class UtilityConnectionController {
     // ---------------- CONSUMER DASHBOARD ----------------
     @GetMapping
     @PreAuthorize("hasRole('CONSUMER')")
-    public List<ConnectionResponseDto> getMyConnections(Principal principal) {
+    public List<ConnectionResponseDto> getMyConnections() {
 
-        String username = principal.getName();
-        return connectionService.getConnectionsByUsername(username);
+        Authentication auth =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        String userId = auth.getName(); 
+
+        return connectionService.getConnectionsByUserId(userId);
     }
 
     // ---------------- BILLING SERVICE ----------------
