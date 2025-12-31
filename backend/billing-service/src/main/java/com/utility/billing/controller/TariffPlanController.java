@@ -1,6 +1,7 @@
 package com.utility.billing.controller;
 
 import com.utility.billing.model.TariffPlan;
+import com.utility.billing.model.UtilityType;
 import com.utility.billing.repository.TariffPlanRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ public class TariffPlanController {
 
     private final TariffPlanRepository repository;
 
+    // ---------------- CREATE PLAN (ADMIN) ----------------
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public TariffPlan create(@RequestBody TariffPlan plan) {
@@ -30,7 +32,8 @@ public class TariffPlanController {
         return repository.save(plan);
     }
 
-        @PutMapping("/{id}/deactivate")
+    // ---------------- DEACTIVATE PLAN (ADMIN) ----------------
+    @PutMapping("/{id}/deactivate")
     public Map<String, String> deactivate(@PathVariable String id) {
 
         TariffPlan plan = repository.findById(id)
@@ -49,8 +52,18 @@ public class TariffPlanController {
         );
     }
 
+    // ---------------- GET ALL ACTIVE PLANS ----------------
     @GetMapping("/active")
     public List<TariffPlan> activePlans() {
         return repository.findByActiveTrue();
+    }
+
+    // ✅ ---------------- NEW API (FRONTEND USE) ----------------
+    // GET /tariffs/plans?utilityType=ELECTRICITY
+    @GetMapping
+    public List<TariffPlan> getPlansByUtility(
+            @RequestParam UtilityType utilityType) {
+
+        return repository.findByUtilityTypeAndActiveTrue(utilityType);
     }
 }

@@ -21,4 +21,7 @@ public interface TariffPlanRepository
     );
 
     List<TariffPlan> findByActiveTrue();
+    List<TariffPlan> findByUtilityTypeAndActiveTrue(
+            UtilityType utilityType
+    );
 }

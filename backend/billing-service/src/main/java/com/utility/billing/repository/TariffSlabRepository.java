@@ -12,6 +12,6 @@ public interface TariffSlabRepository
 
     List<TariffSlab> findByUtilityTypeAndPlanCodeOrderByMinUnitsAsc(
     	    UtilityType utilityType,
-            String tariffPlan
+            String planCode
     );
 }

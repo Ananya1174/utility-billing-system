@@ -24,6 +24,7 @@ public class BillingService {
     private final BillRepository billRepository;
     private final MeterReadingClient meterClient;
     private final TariffSlabRepository slabRepository;
+    
 
     @CircuitBreaker(name = "meterReadingCB", fallbackMethod = "meterFallback")
     public MeterReadingResponse fetchLatestMeterReading(String connectionId) {
@@ -240,8 +241,8 @@ public class BillingService {
         r.setTariffPlan(bill.getTariffPlan());       
         r.setBillingMonth(bill.getBillingMonth());   
         r.setBillingYear(bill.getBillingYear());    
-        r.setPenalty(bill.getPenalty());              // ✅
-        r.setPayableAmount(                           // ✅ calculated view
+        r.setPenalty(bill.getPenalty());             
+        r.setPayableAmount(                         
                 bill.getTotalAmount() + bill.getPenalty()
         );
 
