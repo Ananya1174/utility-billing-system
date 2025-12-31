@@ -1,16 +1,15 @@
 package com.utility.consumer.controller;
 
-import java.security.Principal;
 import java.util.List;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import com.utility.consumer.dto.response.ConnectionResponseDto;
 import com.utility.consumer.service.UtilityConnectionService;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -25,17 +24,17 @@ public class UtilityConnectionController {
     @PreAuthorize("hasRole('CONSUMER')")
     public List<ConnectionResponseDto> getMyConnections() {
 
-        Authentication auth =
+        Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
-
-        String userId = auth.getName(); 
+        
+        String userId = authentication.getName();
 
         return connectionService.getConnectionsByUserId(userId);
     }
 
     // ---------------- BILLING SERVICE ----------------
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('BILLING')")
+    @PreAuthorize("hasRole('BILLING_OFFICER')")
     public ConnectionResponseDto getConnectionById(
             @PathVariable String id) {
 

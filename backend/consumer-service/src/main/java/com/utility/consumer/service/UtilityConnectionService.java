@@ -33,7 +33,6 @@ public class UtilityConnectionService {
                 .map(this::mapToDto)
                 .toList();
     }
-
     private ConnectionResponseDto mapToDto(UtilityConnection connection) {
 
         ConnectionResponseDto dto = new ConnectionResponseDto();
