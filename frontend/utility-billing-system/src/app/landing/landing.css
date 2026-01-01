@@ -1,0 +1,74 @@
+.page {
+  font-family: 'Segoe UI', sans-serif;
+  color: #333;
+}
+
+.hero {
+  background: #f5f9ff;
+  padding: 80px 20px;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  color: #1e3a8a;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  margin: 15px 0 30px;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.section {
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.section.light {
+  background: #ffffff;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.card, .feature {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.cta {
+  background: #e0ecff;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.btn {
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.primary {
+  background: #2563eb;
+  color: white;
+  border: none;
+}
+
+.outline {
+  background: transparent;
+  border: 2px solid #2563eb;
+  color: #2563eb;
+}
