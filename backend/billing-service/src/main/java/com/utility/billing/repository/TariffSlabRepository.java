@@ -11,7 +11,7 @@ public interface TariffSlabRepository
         extends MongoRepository<TariffSlab, String> {
 
     List<TariffSlab> findByUtilityTypeAndPlanCodeOrderByMinUnitsAsc(
-    	    UtilityType utilityType,
+    		UtilityType utilityType,
             String planCode
     );
 }

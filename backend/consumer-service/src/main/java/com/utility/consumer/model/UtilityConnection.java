@@ -24,7 +24,7 @@ public class UtilityConnection {
     private String meterNumber;
 
     // Reference to billing tariff plan
-    private String tariffPlanCode;
+    private String tariffPlan;
 
     private boolean active;
 

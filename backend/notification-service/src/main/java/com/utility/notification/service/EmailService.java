@@ -4,6 +4,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import com.utility.common.dto.event.BillGeneratedEvent;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -55,6 +57,44 @@ public class EmailService {
                 Regards,
                 Utility Billing System
                 """);
+
+        mailSender.send(message);
+    }
+ // ---------------- BILL GENERATED ----------------
+    public void sendBillEmail(String to, BillGeneratedEvent event) {
+
+        if (to == null || to.isBlank()) {
+            throw new IllegalArgumentException("Email is missing in BillGeneratedEvent");
+        }
+
+        SimpleMailMessage message = new SimpleMailMessage();
+
+        message.setFrom("charliektest11@gmail.com");
+        message.setTo(to);
+        message.setSubject("Your Utility Bill Has Been Generated");
+
+        message.setText("""
+                Hello,
+
+                Your utility bill has been generated successfully.
+
+                Bill ID      : %s
+                Utility Type : %s
+                Tariff Plan  : %s
+                Amount       : ₹%.2f
+                Due Date     : %s
+
+                Please pay before the due date to avoid penalties.
+
+                Regards,
+                Utility Billing System
+                """.formatted(
+                    event.getBillId(),
+                    event.getUtilityType(),
+                    event.getTariffPlan(),
+                    event.getAmount(),
+                    event.getDueDate()
+                ));
 
         mailSender.send(message);
     }

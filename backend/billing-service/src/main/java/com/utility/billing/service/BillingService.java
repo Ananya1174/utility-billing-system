@@ -1,8 +1,11 @@
 package com.utility.billing.service;
 
 import com.utility.billing.dto.BillResponse;
+import lombok.extern.slf4j.Slf4j;
 import com.utility.billing.dto.GenerateBillRequest;
+import com.utility.billing.event.BillEventPublisher;
 import com.utility.billing.exception.ApiException;
+import com.utility.billing.feign.ConnectionClient;
 import com.utility.billing.feign.ConsumerClient;
 import com.utility.billing.feign.MeterReadingClient;
 import com.utility.billing.feign.MeterReadingResponse;
@@ -11,6 +14,7 @@ import com.utility.billing.model.BillStatus;
 import com.utility.billing.model.TariffSlab;
 import com.utility.billing.repository.BillRepository;
 import com.utility.billing.repository.TariffSlabRepository;
+import com.utility.common.dto.event.BillGeneratedEvent;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BillingService {
@@ -29,6 +33,9 @@ public class BillingService {
     private final MeterReadingClient meterClient;
     private final TariffSlabRepository slabRepository;
     private final ConsumerClient consumerClient;
+    private final BillEventPublisher billEventPublisher;
+    private final ConnectionClient connectionClient;
+
 
     // ============================
     // METER SERVICE (CB ENABLED)
@@ -115,7 +122,7 @@ public class BillingService {
 
         // 5️⃣ Fetch APPROVED connection from Consumer Service
         var connection =
-                consumerClient.getConnectionById(request.getConnectionId());
+                connectionClient.getConnectionById(request.getConnectionId());
 
         if (connection == null || !connection.isActive()) {
             throw new ApiException(
@@ -131,20 +138,21 @@ public class BillingService {
                     HttpStatus.BAD_REQUEST
             );
         }
-
+        
+       
         // 7️⃣ Fetch tariff slabs
         List<TariffSlab> slabs =
                 slabRepository.findByUtilityTypeAndPlanCodeOrderByMinUnitsAsc(
                         connection.getUtilityType(),
-                        connection.getTariffPlanCode()
+                        connection.getTariffPlan()
                 );
-
         if (slabs.isEmpty()) {
             throw new ApiException(
                     "Tariff slabs not configured",
                     HttpStatus.INTERNAL_SERVER_ERROR
             );
         }
+        
 
         // 8️⃣ Calculate charges
         double energyCharge = calculateFromSlabs(units, slabs);
@@ -153,10 +161,10 @@ public class BillingService {
 
         // 9️⃣ Create bill
         Bill bill = new Bill();
-        bill.setConsumerId(connection.getConsumerId()); // ✅ NEVER trust client
+        bill.setConsumerId(request.getConsumerId()); 
         bill.setConnectionId(request.getConnectionId());
         bill.setUtilityType(connection.getUtilityType());
-        bill.setTariffPlan(connection.getTariffPlanCode());
+        bill.setTariffPlan(connection.getTariffPlan());
 
         bill.setBillingMonth(billingMonth);
         bill.setBillingYear(billingYear);
@@ -171,8 +179,25 @@ public class BillingService {
         bill.setStatus(BillStatus.DUE);
         bill.setBillDate(LocalDate.now());
         bill.setDueDate(LocalDate.now().plusDays(15));
+        Bill savedBill = billRepository.save(bill);
 
-        billRepository.save(bill);
+        try {
+            var consumer = consumerClient.getConsumerById(request.getConsumerId());
+
+            BillGeneratedEvent event = new BillGeneratedEvent();
+            event.setBillId(savedBill.getId());
+            event.setConsumerId(savedBill.getConsumerId());
+            event.setEmail(consumer.getEmail());
+            event.setUtilityType(savedBill.getUtilityType().name());
+            event.setTariffPlan(savedBill.getTariffPlan());
+            event.setAmount(savedBill.getTotalAmount());
+            event.setDueDate(savedBill.getDueDate().toString());
+            billEventPublisher.publish(event);
+
+        } catch (Exception e) {
+            log.error("Bill generated but email notification failed", e);
+        }
+
 
         return map(bill);
     }

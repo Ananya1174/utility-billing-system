@@ -103,7 +103,7 @@ public class ConnectionRequestService {
         connection.setConsumerId(request.getConsumerId());
         connection.setUtilityType(request.getUtilityType());
         connection.setMeterNumber(dto.getMeterNumber());
-        connection.setTariffPlanCode(request.getTariffPlanCode());
+        connection.setTariffPlan(request.getTariffPlanCode());
         connection.setActive(true);
         connection.setActivatedAt(LocalDateTime.now());
 

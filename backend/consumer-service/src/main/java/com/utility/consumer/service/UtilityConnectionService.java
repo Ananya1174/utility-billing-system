@@ -39,7 +39,7 @@ public class UtilityConnectionService {
         dto.setId(connection.getId());
         dto.setUtilityType(connection.getUtilityType());
         dto.setMeterNumber(connection.getMeterNumber());
-        dto.setTariffPlan(connection.getTariffPlanCode());
+        dto.setTariffPlan(connection.getTariffPlan());
         dto.setActive(connection.isActive());
         dto.setActivatedAt(connection.getActivatedAt());
 
@@ -55,6 +55,7 @@ public class UtilityConnectionService {
                                         "Connection not found"
                                 )
                         );
+   
 
         if (!connection.isActive()) {
             throw new ApiException(

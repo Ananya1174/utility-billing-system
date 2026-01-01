@@ -16,6 +16,21 @@ public class RabbitMQConfig {
 
     public static final String ACCOUNT_ROUTING_KEY = "account.approved";
     public static final String ACCOUNT_REJECTED_KEY = "account.rejected";
+    public static final String BILL_QUEUE = "bill.notification.queue";
+    public static final String BILL_ROUTING_KEY = "bill.generated";
+
+    @Bean
+    public Queue billQueue() {
+        return QueueBuilder.durable(BILL_QUEUE).build();
+    }
+
+    @Bean
+    public Binding billBinding() {
+        return BindingBuilder
+                .bind(billQueue())
+                .to(exchange())
+                .with(BILL_ROUTING_KEY);
+    }
 
     // ---------- Message Converter ----------
     @Bean

@@ -1,6 +1,8 @@
 package com.utility.billing.model;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.FieldType;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -14,7 +16,8 @@ public class TariffSlab {
 
     @Id
     private String id;
-
+    
+    @Field(targetType = FieldType.STRING)   // ✅ ADD THIS
     private UtilityType utilityType;
     private String planCode;        
 

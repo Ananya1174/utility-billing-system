@@ -46,10 +46,10 @@ public class MeterReadingController {
         return ResponseEntity.ok(readings);
     }
 
-    @GetMapping("/month/{year}-{month}")
+    @GetMapping("/month")
     public ResponseEntity<List<MeterReadingResponse>> byMonth(
-    		@PathVariable int year,
-            @PathVariable int month) {
+            @RequestParam int month,
+            @RequestParam int year) {
 
         List<MeterReadingResponse> readings =
                 service.getByMonth(month, year);

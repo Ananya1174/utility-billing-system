@@ -1,18 +1,18 @@
 package com.utility.billing.feign;
-
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+
 @FeignClient(
 	    name = "consumer-service",
-	    contextId = "consumerClient",
-	    path = "/consumers"
+	    contextId = "connectionClient",
+	    path = "/connections"
 	)
-	public interface ConsumerClient {
+	public interface ConnectionClient {
 
 	    @GetMapping("/{id}")
-	    ConsumerResponse getConsumerById(
+	    ConsumerConnectionResponse getConnectionById(
 	            @PathVariable String id
 	    );
 	}

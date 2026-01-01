@@ -8,7 +8,8 @@ public class ConsumerConnectionResponse {
 
     private String id;
     private String consumerId;
+    private String email;          
     private UtilityType utilityType;
-    private String tariffPlanCode;
+    private String tariffPlan;
     private boolean active;
 }
