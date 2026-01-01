@@ -1,6 +1,7 @@
 package com.utility.billing.event;
 
 import com.utility.billing.config.RabbitConfig;
+import com.utility.common.dto.event.BillDueReminderEvent;
 import com.utility.common.dto.event.BillGeneratedEvent;
 
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,13 @@ public class BillEventPublisher {
                 RabbitConfig.BILL_ROUTING_KEY,
                 event
         );
+    }
+    public void publishDueReminder(BillDueReminderEvent event) {
 
-        System.out.println("BillGenerated event sent → " + event.getBillId());
+        rabbitTemplate.convertAndSend(
+                RabbitConfig.EXCHANGE,
+                "bill.due.reminder",
+                event
+        );
     }
 }

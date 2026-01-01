@@ -12,6 +12,8 @@ public class RabbitConfig {
     // 🔔 MUST MATCH notification-service
     public static final String EXCHANGE = "notification.exchange";
     public static final String BILL_ROUTING_KEY = "bill.generated";
+    public static final String BILL_REMINDER_KEY = "bill.due.reminder";
+    
 
     @Bean
     public Jackson2JsonMessageConverter jsonMessageConverter() {

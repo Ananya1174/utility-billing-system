@@ -4,6 +4,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import com.utility.common.dto.event.BillDueReminderEvent;
 import com.utility.common.dto.event.BillGeneratedEvent;
 
 import lombok.RequiredArgsConstructor;
@@ -92,6 +93,38 @@ public class EmailService {
                     event.getBillId(),
                     event.getUtilityType(),
                     event.getTariffPlan(),
+                    event.getAmount(),
+                    event.getDueDate()
+                ));
+
+        mailSender.send(message);
+    }
+    public void sendPaymentReminderEmail(
+            String to,
+            BillDueReminderEvent event) {
+
+        SimpleMailMessage message = new SimpleMailMessage();
+
+        message.setTo(to);
+        message.setSubject("⏰ Payment Due Reminder – Utility Bill");
+
+        message.setText("""
+                Hello,
+
+                This is a reminder that your utility bill payment is due soon.
+
+                Bill ID      : %s
+                Utility Type : %s
+                Amount       : ₹%.2f
+                Due Date     : %s
+
+                Please make the payment before the due date to avoid penalties.
+
+                Regards,
+                Utility Billing System
+                """.formatted(
+                    event.getBillId(),
+                    event.getUtilityType(),
                     event.getAmount(),
                     event.getDueDate()
                 ));

@@ -26,6 +26,8 @@ public class SecurityConfig {
             )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/actuator/**").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.GET, "/consumers/**").permitAll()
+
                 .anyRequest().authenticated()
             )
             .addFilterBefore(

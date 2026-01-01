@@ -29,4 +29,9 @@ public interface BillRepository extends MongoRepository<Bill, String> {
             BillStatus status,
             LocalDate date
     );
+    List<Bill> findByStatusAndDueDateBetween(
+            BillStatus status,
+            LocalDate start,
+            LocalDate end
+    );
 }

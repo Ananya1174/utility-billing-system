@@ -18,7 +18,21 @@ public class RabbitMQConfig {
     public static final String ACCOUNT_REJECTED_KEY = "account.rejected";
     public static final String BILL_QUEUE = "bill.notification.queue";
     public static final String BILL_ROUTING_KEY = "bill.generated";
+    public static final String BILL_REMINDER_QUEUE = "bill.reminder.queue";
+    public static final String BILL_REMINDER_KEY   = "bill.due.reminder";
 
+    @Bean
+    public Queue billReminderQueue() {
+        return QueueBuilder.durable(BILL_REMINDER_QUEUE).build();
+    }
+
+    @Bean
+    public Binding billReminderBinding() {
+        return BindingBuilder
+                .bind(billReminderQueue())
+                .to(exchange())
+                .with(BILL_REMINDER_KEY);
+    }
     @Bean
     public Queue billQueue() {
         return QueueBuilder.durable(BILL_QUEUE).build();
