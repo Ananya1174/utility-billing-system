@@ -1,11 +1,21 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-landing',
-  imports: [],
+  standalone: true,
   templateUrl: './landing.html',
-  styleUrl: './landing.css',
+  styleUrls: ['./landing.css']
 })
-export class Landing {
+export class LandingComponent {
 
+  constructor(private router: Router) {}
+
+  goToCreateAccount() {
+    this.router.navigate(['/create-account']);
+  }
+
+  goToLogin() {
+    this.router.navigate(['/login']);
+  }
 }

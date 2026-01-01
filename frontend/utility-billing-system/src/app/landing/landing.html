@@ -1,61 +1,198 @@
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-container">
+    <div class="logo">
+      ⚡ UtilityBilling
+    </div>
+
+    <div class="nav-actions">
+      <button class="btn ghost" (click)="goToLogin()">Login</button>
+      <button class="btn primary" (click)="goToCreateAccount()">Create Account</button>
+    </div>
+  </div>
+</nav>
+
 <div class="page">
 
   <!-- HERO -->
-  <section class="hero">
-    <h1>Utility Billing Management System</h1>
-    <p class="subtitle">
-      A modern platform to manage utility services, billing, and payments efficiently.
-    </p>
+  <section class="hero fade-in">
+    <div class="hero-content">
+      <h1>Utility Billing Management System</h1>
+      <p class="subtitle">
+        A smart and unified platform to manage electricity, water, gas,
+        and internet services with clarity and ease.
+      </p>
+      <p class="hero-note">
+        Designed for households and administrators to simplify everyday utility management.
+      </p>
 
-    <div class="actions">
-      <button class="btn primary" (click)="goToRegister()">Create Account</button>
-      <button class="btn outline" (click)="goToLogin()">Login</button>
+      <div class="actions">
+        <button class="btn primary" (click)="goToCreateAccount()">Create Account</button>
+        <button class="btn outline" (click)="goToLogin()">Login</button>
+      </div>
     </div>
-  </section>
 
-  <!-- ABOUT -->
-  <section class="section light">
-    <h2>About the System</h2>
-    <p>
-      The Utility Billing Management System simplifies the management of electricity,
-      water, gas, and internet services by providing secure access, automated billing,
-      and transparent reporting for all stakeholders.
-    </p>
+    <!-- HERO ILLUSTRATION -->
+    <div class="hero-illustration">
+      <img src="assets/hero-illustration.svg" alt="Utility Management Illustration">
+    </div>
   </section>
 
   <!-- UTILITIES -->
-  <section class="section">
-    <h2>Utilities We Support</h2>
+ <!-- UTILITIES -->
+<section class="utilities-row">
+  <h2>Utilities We Support</h2>
+  <p class="section-subtitle">
+    Essential services managed together in one unified platform.
+  </p>
 
-    <div class="grid">
-      <div class="card">⚡ <h3>Electricity</h3><p>Meter-based billing with tariff slabs.</p></div>
-      <div class="card">💧 <h3>Water</h3><p>Usage-based billing with monthly tracking.</p></div>
-      <div class="card">🔥 <h3>Gas</h3><p>Automated billing with slab tariffs.</p></div>
-      <div class="card">🌐 <h3>Internet</h3><p>Plan-based billing with fixed charges.</p></div>
+  <div class="utilities-container">
+
+    <div class="utility-box">
+      <span class="icon">⚡</span>
+      <h3>Electricity</h3>
+      <p>
+        Monitor electricity consumption, track usage trends,
+        and view detailed monthly bills.
+      </p>
     </div>
-  </section>
 
-  <!-- FEATURES -->
-  <section class="section light">
-    <h2>Key Features</h2>
-
-    <div class="grid">
-      <div class="feature">🔐 Secure Authentication</div>
-      <div class="feature">📄 Automated Billing</div>
-      <div class="feature">📊 Reports & Dashboards</div>
-      <div class="feature">🧾 Invoice Tracking</div>
-      <div class="feature">⚙️ Tariff Management</div>
-      <div class="feature">👥 Role-Based Access</div>
+    <div class="utility-box">
+      <span class="icon">💧</span>
+      <h3>Water</h3>
+      <p>
+        Track water usage with transparent, usage-based billing
+        and clear monthly summaries.
+      </p>
     </div>
-  </section>
 
-  <!-- CTA -->
-  <section class="cta">
-    <h2>Start Managing Utilities Smarter</h2>
-    <div class="actions">
-      <button class="btn primary" (click)="goToRegister()">Create Account</button>
-      <button class="btn outline" (click)="goToLogin()">Login</button>
+    <div class="utility-box">
+      <span class="icon">🔥</span>
+      <h3>Gas</h3>
+      <p>
+        Automated gas billing with accurate consumption insights
+        for better energy management.
+      </p>
     </div>
-  </section>
 
-</div>
+    <div class="utility-box">
+      <span class="icon">🌐</span>
+      <h3>Internet</h3>
+      <p>
+        Manage internet subscriptions, plans, and monthly charges
+        with complete clarity.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+  
+
+  <!-- WHAT THIS PLATFORM OFFERS -->
+<section class="offers">
+
+  <div class="offer-row">
+    <div class="offer-image">
+      <img src="/assets/offer-dashboard.svg" alt="Dashboard overview">
+    </div>
+    <div class="offer-text">
+      <h2>All Your Utilities, One Dashboard</h2>
+      <p>
+        View electricity, water, gas, and internet services together.
+        No switching between platforms — everything is available in one place.
+      </p>
+    </div>
+  </div>
+
+  <div class="offer-row reverse">
+    <div class="offer-image">
+      <img src="/assets/offer-billing.svg" alt="Billing insights">
+    </div>
+    <div class="offer-text">
+      <h2>Clear & Transparent Billing</h2>
+      <p>
+        Understand exactly what you are paying for with detailed bills,
+        monthly summaries, and complete billing history.
+      </p>
+    </div>
+  </div>
+
+  <div class="offer-row">
+    <div class="offer-image">
+      <img src="/assets/offer-management.svg" alt="Service management">
+    </div>
+    <div class="offer-text">
+      <h2>Simple Service Management</h2>
+      <p>
+        Easily manage profiles, utility connections, and service details
+        without complexity.
+      </p>
+    </div>
+  </div>
+
+</section>
+
+  <!-- BENEFITS -->
+<section class="benefits-modern fade-in">
+  <h2>How It Helps You</h2>
+  <p class="section-subtitle">
+    Designed to make everyday utility management simple and stress-free.
+  </p>
+
+  <div class="benefits-grid">
+
+    <div class="benefit-card">
+      <span class="benefit-icon">⏱️</span>
+      <h3>Save Time</h3>
+      <p>
+        Spend less time understanding bills and more time focusing on what matters.
+      </p>
+    </div>
+
+    <div class="benefit-card">
+      <span class="benefit-icon">📄</span>
+      <h3>No Billing Surprises</h3>
+      <p>
+        Access clear and transparent billing details with complete breakdowns.
+      </p>
+    </div>
+
+    <div class="benefit-card">
+      <span class="benefit-icon">🗂️</span>
+      <h3>Everything in One Place</h3>
+      <p>
+        Keep all your utility services organized securely in a single platform.
+      </p>
+    </div>
+
+    <div class="benefit-card">
+      <span class="benefit-icon">🌍</span>
+      <h3>Access Anywhere</h3>
+      <p>
+        View your utility data anytime, from any device, with ease.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+  <section class="cta fade-in">
+  <h2>Take Control of Your Utility Services</h2>
+  <p class="cta-note">Simple. Transparent. Reliable.</p>
+
+  <div class="cta-actions">
+    <button class="btn cta-primary" (click)="goToCreateAccount()">
+      Create Account
+    </button>
+    <button class="btn cta-secondary" (click)="goToLogin()">
+      Login
+    </button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p>© 2026 Utility Billing Management System</p>
+  <p>Built for smarter and simpler utility management</p>
+</footer>
