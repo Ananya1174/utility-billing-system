@@ -2,11 +2,11 @@ package com.utility.payment.feign;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Configuration
 public class FeignSecurityConfig {
@@ -16,17 +16,19 @@ public class FeignSecurityConfig {
 
         return (RequestTemplate template) -> {
 
-            Authentication authentication =
-                    SecurityContextHolder.getContext().getAuthentication();
+            ServletRequestAttributes attributes =
+                    (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 
-            if (authentication instanceof JwtAuthenticationToken jwtAuth) {
+            if (attributes == null) {
+                return;
+            }
 
-                String token = jwtAuth.getToken().getTokenValue();
+            HttpServletRequest request = attributes.getRequest();
 
-                template.header(
-                        "Authorization",
-                        "Bearer " + token
-                );
+            String authHeader = request.getHeader("Authorization");
+
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                template.header("Authorization", authHeader);
             }
         };
     }

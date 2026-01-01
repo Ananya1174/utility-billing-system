@@ -301,7 +301,9 @@ public class BillingService {
         r.setBillingYear(bill.getBillingYear());
 
         r.setConsumptionUnits(bill.getConsumptionUnits());
+        r.setTax(bill.getTax());
         r.setPenalty(bill.getPenalty());
+
         r.setTotalAmount(bill.getTotalAmount());
         r.setPayableAmount(bill.getTotalAmount() + bill.getPenalty());
 

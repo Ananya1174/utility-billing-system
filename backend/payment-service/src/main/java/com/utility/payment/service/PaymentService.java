@@ -60,6 +60,8 @@ public class PaymentService {
         payment.setOtp(otp);
         payment.setOtpExpiry(Instant.now().plusSeconds(300));
         payment.setTransactionId(UUID.randomUUID().toString());
+        payment.setBillingMonth(bill.getBillingMonth());
+        payment.setBillingYear(bill.getBillingYear());
         payment.setCreatedAt(LocalDateTime.now());
 
         repository.save(payment);
@@ -135,6 +137,8 @@ public class PaymentService {
         payment.setStatus(PaymentStatus.SUCCESS);
         payment.setRemarks(request.remarks());
         payment.setTransactionId(UUID.randomUUID().toString());
+        payment.setBillingMonth(bill.getBillingMonth());
+        payment.setBillingYear(bill.getBillingYear());
         payment.setCreatedAt(LocalDateTime.now());
         payment.setConfirmedAt(LocalDateTime.now());
 
@@ -230,10 +234,10 @@ public class PaymentService {
         invoice.setConsumerId(payment.getConsumerId());
         invoice.setBillingMonth(bill.getBillingMonth());
         invoice.setBillingYear(bill.getBillingYear());
-
+        
         invoice.setAmountPaid(payment.getAmount());
-        invoice.setTax(0);
-        invoice.setPenalty(0);
+        invoice.setTax(bill.getTax());
+        invoice.setPenalty(bill.getPenalty());
         invoice.setTotalAmount(payment.getAmount());
         invoice.setInvoiceDate(LocalDateTime.now());
 
