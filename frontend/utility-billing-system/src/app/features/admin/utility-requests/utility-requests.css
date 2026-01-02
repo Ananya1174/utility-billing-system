@@ -1,0 +1,38 @@
+.requests-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.requests-table th,
+.requests-table td {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+.mono {
+  font-family: monospace;
+  font-size: 12px;
+  color: #555;
+}
+
+.approve-form {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.reject-btn {
+  background: #e53935;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  margin-left: 6px;
+  cursor: pointer;
+}
+
+.cancel {
+  background: #aaa;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+}

@@ -1,0 +1,55 @@
+<h2>Utility Connection Requests</h2>
+<p>Review and approve consumer utility connection requests</p>
+
+<table class="requests-table">
+  <thead>
+    <tr>
+      <th>Request ID</th>
+      <th>Consumer ID</th>
+      <th>Utility</th>
+      <th>Tariff Plan</th>
+      <th>Requested At</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let r of requests">
+      <td class="mono">{{ r.id }}</td>
+      <td class="mono">{{ r.consumerId }}</td>
+      <td>{{ r.utilityType }}</td>
+      <td>{{ r.tariffPlanCode }}</td>
+      <td>{{ r.requestedAt | date:'medium' }}</td>
+
+      <td>
+        <!-- APPROVE -->
+        <button
+          *ngIf="approvingRequestId !== r.id"
+          (click)="startApprove(r.id)">
+          Approve
+        </button>
+
+        <!-- APPROVE FORM -->
+        <div *ngIf="approvingRequestId === r.id" class="approve-form">
+          <input
+            type="text"
+            placeholder="Meter Number"
+            [(ngModel)]="meterNumber" />
+          <button (click)="approve(r.id)">Confirm</button>
+          <button class="cancel" (click)="approvingRequestId = null">
+            Cancel
+          </button>
+        </div>
+
+        <!-- REJECT -->
+        <button class="reject-btn" (click)="reject(r.id)">
+          Reject
+        </button>
+      </td>
+    </tr>
+
+    <tr *ngIf="requests.length === 0">
+      <td colspan="6">No pending utility requests</td>
+    </tr>
+  </tbody>
+</table>
