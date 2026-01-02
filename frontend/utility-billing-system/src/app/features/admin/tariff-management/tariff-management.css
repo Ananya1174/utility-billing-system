@@ -1,0 +1,53 @@
+.filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.add-btn {
+  margin-left: auto;
+}
+
+.add-plan {
+  background: #f5f5f5;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.plans-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.plans-table th,
+.plans-table td {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+.mono {
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.active {
+  color: green;
+  font-weight: 600;
+}
+
+.inactive {
+  color: red;
+  font-weight: 600;
+}
+
+.deactivate {
+  background: #e53935;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+}
+
+.inactive-note {
+  color: #888;
+  font-style: italic;
+}
