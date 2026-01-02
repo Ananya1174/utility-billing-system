@@ -1,0 +1,12 @@
+.search {
+  margin-bottom: 16px;
+}
+
+.tabs button {
+  margin-right: 8px;
+}
+
+.mono {
+  font-family: monospace;
+  font-size: 12px;
+}

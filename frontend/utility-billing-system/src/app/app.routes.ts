@@ -1,36 +1,75 @@
 import { Routes } from '@angular/router';
 
 import { LandingComponent } from './landing/landing';
-import { LoginComponent } from './auth/login/login';
-import { Home } from './features/pages/home/home';
-import { CreateAccountComponent } from './auth/create-account/create-account';
-
-import { ProfileComponent } from './profile/profile/profile';
-import { ChangePasswordComponent } from './profile/change-password/change-password';
+import { LoginComponent } from './core/auth/login/login';
+import { Home } from './shared/home/home';
+import { CreateAccountComponent } from './core/auth/create-account/create-account';
+import { UserManagementComponent } from './features/admin/user-management/user-management';
+import { ProfileComponent } from './shared/profile/profile/profile';
+import { ChangePasswordComponent } from './shared/profile/change-password/change-password';
+import { AccountRequestsComponent } from './features/admin/account-requests/account-requests';
+import { ForcePasswordChangeGuard } from './core/guards/force-password-change-guard';
+import { TariffManagementComponent } from './features/admin/tariff-management/tariff-management';
+import { UtilityRequestsComponent } from './features/admin/utility-requests/utility-requests';
+import { BillingPaymentsComponent } from './features/admin/billing-payments/billing-payments';
 export const routes: Routes = [
 
-  // Landing
+  // ---------------- Landing ----------------
   { path: '', component: LandingComponent },
 
-  // Auth
+  // ---------------- Auth ----------------
   { path: 'login', component: LoginComponent },
   { path: 'create-account', component: CreateAccountComponent },
+  {
+    path: 'admin/account-requests',
+    component: AccountRequestsComponent
+  },
+  {
+    path: 'admin/users',
+    component: UserManagementComponent
+  },
+  {
+    path: 'admin/utility-requests',
+    component: UtilityRequestsComponent
+  },
+  {
+    path: 'admin/tariffs',
+    component: TariffManagementComponent
+  },
+  {
+    path: 'admin/billing',
+    component: BillingPaymentsComponent
+  },
 
-  // Home (ALL ROLES)
-  { path: 'home', component: Home },
+  // ---------------- Forced Password Change ----------------
+  {
+    path: 'change-password',
+    component: ChangePasswordComponent
+  },
 
-  // Profile (COMMON)
+  // ---------------- Home (ALL ROLES but guarded) ----------------
+  {
+    path: 'home',
+    component: Home,
+    canActivate: [ForcePasswordChangeGuard]
+  },
+
+  // ---------------- Profile (COMMON) ----------------
   {
     path: 'profile',
     component: ProfileComponent,
+    canActivate: [ForcePasswordChangeGuard],
     children: [
-      { path: 'change-password', component: ChangePasswordComponent },
+      {
+        path: 'change-password',
+        component: ChangePasswordComponent
+      },
 
-      // future-ready
+      // future-ready default
       { path: '', redirectTo: 'change-password', pathMatch: 'full' }
     ]
   },
 
-  // Fallback
+  // ---------------- Fallback ----------------
   { path: '**', redirectTo: '' }
 ];

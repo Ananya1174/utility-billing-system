@@ -1,12 +1,11 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Navbar } from '../../../shared/navbar/navbar';
-import { AccountRequestsComponent } from "../../admin/account-requests/account-requests";
+import { Navbar } from '../navbar/navbar';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, Navbar, AccountRequestsComponent],
+  imports: [CommonModule, Navbar],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })

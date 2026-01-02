@@ -1,0 +1,88 @@
+<h2>Billing & Payments</h2>
+<p>View bills, payments, outstanding balances, and invoices</p>
+
+<!-- CONSUMER SEARCH -->
+<div class="search">
+    <input type="text" placeholder="Enter Consumer ID" [(ngModel)]="consumerId" />
+    <button (click)="loadData()">Load</button>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+    <button (click)="activeTab='BILLS'">Bills</button>
+    <button (click)="activeTab='PAYMENTS'">Payments</button>
+
+    <button [disabled]="!selectedBill" (click)="activeTab='OUTSTANDING'">
+        Outstanding
+    </button>
+
+    <button [disabled]="!invoice" (click)="activeTab='INVOICE'">
+        Invoice
+    </button>
+</div>
+
+
+<!-- BILLS -->
+<div *ngIf="activeTab==='BILLS'">
+    <table>
+        <tr>
+            <th>Bill ID</th>
+            <th>Utility</th>
+            <th>Month</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+        <tr *ngFor="let b of bills">
+            <td class="mono">{{ b.id }}</td>
+            <td>{{ b.utilityType }}</td>
+            <td>{{ b.billingMonth }}/{{ b.billingYear }}</td>
+            <td>{{ b.payableAmount }}</td>
+            <td>{{ b.status }}</td>
+            <td>
+                <button (click)="viewBill(b.id)">View</button>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<!-- PAYMENTS -->
+<div *ngIf="activeTab==='PAYMENTS'">
+    <table>
+        <tr>
+            <th>Payment ID</th>
+            <th>Bill ID</th>
+            <th>Amount</th>
+            <th>Mode</th>
+            <th>Status</th>
+            <th>Invoice</th>
+        </tr>
+        <tr *ngFor="let p of payments">
+            <td class="mono">{{ p.paymentId }}</td>
+            <td class="mono">{{ p.billId }}</td>
+            <td>{{ p.amount }}</td>
+            <td>{{ p.mode }}</td>
+            <td>{{ p.status }}</td>
+            <td>
+                <button (click)="viewInvoice(p.paymentId)">View</button>
+                <button *ngIf="p.invoiceId" (click)="downloadInvoice(p.paymentId)">
+                    Download
+                </button>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<!-- OUTSTANDING -->
+<div *ngIf="activeTab==='OUTSTANDING' && outstanding">
+    <p><b>Total:</b> {{ outstanding.totalAmount }}</p>
+    <p><b>Paid:</b> {{ outstanding.totalPaid }}</p>
+    <p><b>Outstanding:</b> {{ outstanding.outstandingAmount }}</p>
+</div>
+
+<!-- INVOICE -->
+<div *ngIf="activeTab==='INVOICE' && invoice">
+    <p><b>Invoice No:</b> {{ invoice.invoiceNumber }}</p>
+    <p><b>Amount:</b> {{ invoice.totalAmount }}</p>
+    <p><b>Date:</b> {{ invoice.invoiceDate | date }}</p>
+</div>

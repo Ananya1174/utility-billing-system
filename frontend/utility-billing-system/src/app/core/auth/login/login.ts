@@ -38,13 +38,22 @@ export class LoginComponent {
 
         localStorage.setItem('token', res.accessToken);
         localStorage.setItem('role', res.role);
-
         localStorage.setItem(
           'passwordChangeRequired',
           String(res.passwordChangeRequired)
         );
 
-        this.router.navigate(['/home']);
+        // 🔐 FORCE CONSUMER PASSWORD CHANGE
+        if (
+          res.role === 'CONSUMER' &&
+          res.passwordChangeRequired === true
+        ) {
+          this.router.navigate(['/change-password'], {
+            queryParams: { firstLogin: true }
+          });
+        } else {
+          this.router.navigate(['/home']);
+        }
       },
       error: () => {
         this.errorMessage = 'Invalid username or password';

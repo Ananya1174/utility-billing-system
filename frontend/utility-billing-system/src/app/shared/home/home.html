@@ -1,0 +1,130 @@
+<app-navbar></app-navbar>
+
+<div class="home-container">
+
+  <!-- COMMON WELCOME -->
+  <section class="welcome">
+    <h1>Welcome Back 👋</h1>
+    <p *ngIf="role === 'CONSUMER'">
+      Manage all your utility services from one place.
+    </p>
+    <p *ngIf="role === 'ADMIN'">
+      Manage system operations and approvals.
+    </p>
+  </section>
+
+  <!-- CONSUMER HOME -->
+  <ng-container *ngIf="role === 'CONSUMER'">
+    <section class="summary">
+      <div class="summary-card">Active Utilities</div>
+      <div class="summary-card">Pending Bills</div>
+      <div class="summary-card">Last Payment</div>
+      <div class="summary-card">Notifications</div>
+    </section>
+
+    <section class="main-sections">
+      <div class="section-card">
+        <h3>My Utilities</h3>
+        <p>View and manage electricity, water, gas, and internet services.</p>
+      </div>
+
+      <div class="section-card">
+        <h3>Billing & Payments</h3>
+        <p>Check bills, payment history, and upcoming dues.</p>
+      </div>
+
+      <div class="section-card">
+        <h3>Reports</h3>
+        <p>Track monthly consumption and expenses.</p>
+      </div>
+    </section>
+  </ng-container>
+
+  <!-- ADMIN HOME -->
+<ng-container *ngIf="role === 'ADMIN'">
+
+  <!-- SUMMARY / ANALYTICS -->
+  <section class="summary admin-summary">
+    <div class="summary-card">
+      <h3>Pending Account Requests</h3>
+      <p>Users awaiting approval</p>
+    </div>
+
+    <div class="summary-card">
+      <h3>Pending Utility Requests</h3>
+      <p>Connections awaiting meter assignment</p>
+    </div>
+
+    <div class="summary-card">
+      <h3>Active Tariff Plans</h3>
+      <p>Currently available plans</p>
+    </div>
+
+    <div class="summary-card">
+      <h3>Unpaid Bills</h3>
+      <p>Outstanding consumer dues</p>
+    </div>
+  </section>
+
+  <!-- QUICK NAVIGATION -->
+  <section class="main-sections admin-main">
+
+    <div class="section-card">
+      <h3>Account Requests</h3>
+      <p>Approve or reject new user registrations.</p>
+    </div>
+
+    <div class="section-card">
+      <h3>Utility Connection Requests</h3>
+      <p>Approve utility connections and assign meters.</p>
+    </div>
+
+    <div class="section-card">
+      <h3>Tariff Management</h3>
+      <p>Manage tariff plans and slabs.</p>
+    </div>
+
+    <div class="section-card">
+      <h3>Billing & Payments</h3>
+      <p>View bills, payments, and invoices.</p>
+    </div>
+
+    <div class="section-card">
+      <h3>Reports</h3>
+      <p>Revenue and consumption analytics.</p>
+    </div>
+
+  </section>
+  <section class="main-sections admin-main">
+
+    <div class="section-card">
+      <h3>Account Requests</h3>
+      <p>Approve or reject new user registrations.</p>
+    </div>
+
+    <div class="section-card">
+      <h3>Utility Connection Requests</h3>
+      <p>Approve utility connections and assign meters.</p>
+    </div>
+
+    <div class="section-card">
+      <h3>Tariff Management</h3>
+      <p>Manage tariff plans and slabs.</p>
+    </div>
+
+    <div class="section-card">
+      <h3>Billing & Payments</h3>
+      <p>View bills, payments, and invoices.</p>
+    </div>
+
+    <div class="section-card">
+      <h3>Reports</h3>
+      <p>Revenue and consumption analytics.</p>
+    </div>
+
+  </section>
+
+
+</ng-container>
+
+</div>

@@ -16,7 +16,7 @@ export class AuthService {
     `${this.baseUrl}/change-password`,
     payload,
     {
-      responseType: 'text'   
+      responseType: 'text'  
     }
   );
 }
