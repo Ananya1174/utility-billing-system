@@ -1,0 +1,63 @@
+<h2>User Management</h2>
+<p>Manage all system users</p>
+
+<!-- TABS -->
+<div class="tabs">
+  <button (click)="setTab('ALL')" [class.active]="activeTab === 'ALL'">
+    All Users
+  </button>
+  <button (click)="setTab('CONSUMER')" [class.active]="activeTab === 'CONSUMER'">
+    Consumers
+  </button>
+  <button (click)="setTab('BILLING_OFFICER')" [class.active]="activeTab === 'BILLING_OFFICER'">
+    Billing Officers
+  </button>
+  <button (click)="setTab('ACCOUNTS_OFFICER')" [class.active]="activeTab === 'ACCOUNTS_OFFICER'">
+    Accounts Officers
+  </button>
+</div>
+
+<!-- USERS TABLE -->
+<table class="users-table">
+  <thead>
+    <tr>
+      <th>User ID</th>
+      <th>Username</th>
+      <th>Email</th>
+      <th>Role</th>
+      <th>Status</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let user of filteredUsers">
+      <td class="mono">{{ user.userId }}</td>
+      <td>{{ user.username }}</td>
+      <td>{{ user.email }}</td>
+      <td>{{ user.role }}</td>
+      <td>
+        <span
+          [class.active]="user.status === 'ACTIVE'"
+          [class.inactive]="user.status !== 'ACTIVE'">
+          {{ user.status }}
+        </span>
+      </td>
+      <td>
+  <!-- Show delete ONLY if user is ACTIVE -->
+  <button
+    *ngIf="user.status === 'ACTIVE'"
+    class="delete-btn"
+    (click)="deleteUser(user.userId)">
+    Delete
+  </button>
+
+
+</td>
+    </tr>
+
+    <tr *ngIf="filteredUsers.length === 0">
+      <td colspan="6">No users found</td>
+    </tr>
+  </tbody>
+</table>
