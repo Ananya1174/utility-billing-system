@@ -1,0 +1,47 @@
+<div class="admin-page">
+
+  <h2>Pending Account Requests</h2>
+
+  <p *ngIf="loading">Loading requests...</p>
+
+  <table *ngIf="requests.length > 0">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Address</th>
+        <th>Requested On</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+
+
+    <tbody>
+      <tr *ngFor="let req of requests">
+        <td>{{ req.name }}</td>
+        <td>{{ req.email }}</td>
+        <td>{{ req.phone }}</td>
+        <td>{{ req.address }}</td>
+        <td>{{ req.createdAt | date:'medium' }}</td>
+        <td class="actions">
+          <button class="approve"
+            (click)="reviewRequest(req.requestId, 'APPROVE')">
+            Approve
+          </button>
+          <button class="reject"
+            (click)="reviewRequest(req.requestId, 'REJECT')">
+            Reject
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  
+  <p *ngIf="!loading && requests.length === 0">
+    No pending account requests 🎉
+  </p>
+
+</div>

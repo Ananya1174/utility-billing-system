@@ -1,0 +1,70 @@
+<div class="create-account-container">
+  <h2>Create Account</h2>
+  <p class="subtitle">
+    Submit your details to request access to the Utility Billing System.
+  </p>
+
+  <form [formGroup]="accountForm" (ngSubmit)="submitRequest()">
+
+    <!-- Name -->
+    <input
+      type="text"
+      placeholder="Full Name"
+      formControlName="name"
+    />
+    <small class="error"
+      *ngIf="f['name'].touched && f['name'].invalid">
+      Name is required
+    </small>
+
+    <!-- Email -->
+    <input
+      type="email"
+      placeholder="Email Address"
+      formControlName="email"
+    />
+    <small class="error"
+      *ngIf="f['email'].touched && f['email'].invalid">
+      Enter a valid email address
+    </small>
+
+    <!-- Phone -->
+    <input
+      type="text"
+      placeholder="Phone Number"
+      maxlength="10"
+      formControlName="phone"
+    />
+    <small class="error"
+      *ngIf="f['phone'].touched && f['phone'].invalid">
+      Phone number must be exactly 10 digits
+    </small>
+
+    <!-- Address -->
+    <textarea
+      placeholder="Address"
+      formControlName="address">
+    </textarea>
+    <small class="error"
+      *ngIf="f['address'].touched && f['address'].invalid">
+      Address is required
+    </small>
+
+    <!-- GLOBAL ERROR / SUCCESS -->
+    <p class="error" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </p>
+
+    <p class="success" *ngIf="successMessage">
+      {{ successMessage }}
+    </p>
+
+    <!-- Submit -->
+    <button
+      type="submit"
+      [disabled]="accountForm.invalid">
+      Submit Request
+    </button>
+
+  </form>
+</div>

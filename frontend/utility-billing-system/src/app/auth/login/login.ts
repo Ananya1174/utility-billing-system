@@ -30,22 +30,25 @@ export class LoginComponent {
   }
 
   login() {
-    if (this.loginForm.invalid) return;
+  if (this.loginForm.invalid) return;
 
-    this.http.post<any>(this.LOGIN_URL, this.loginForm.value)
-      .subscribe({
-        next: (res) => {
-          // Usually JWT token comes like this
-          localStorage.setItem('token', res.token);
+  this.http.post<any>(this.LOGIN_URL, this.loginForm.value)
+    .subscribe({
+      next: (res) => {
 
-          // Optional: save user details if backend returns them
-          // localStorage.setItem('user', JSON.stringify(res));
+        localStorage.setItem('token', res.accessToken);
+        localStorage.setItem('role', res.role);
 
-          this.router.navigate(['/dashboard']);
-        },
-        error: (err) => {
-          this.errorMessage = 'Invalid username or password';
-        }
-      });
-  }
+        localStorage.setItem(
+          'passwordChangeRequired',
+          String(res.passwordChangeRequired)
+        );
+
+        this.router.navigate(['/home']);
+      },
+      error: () => {
+        this.errorMessage = 'Invalid username or password';
+      }
+    });
+}
 }
