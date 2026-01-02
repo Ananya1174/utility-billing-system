@@ -116,11 +116,7 @@ public class ConnectionRequestService {
         requestRepo.save(request);
     }
 
-    public void rejectRequest(
-            String requestId,
-            String reason,
-            String reviewedBy
-    ) {
+    public void rejectRequest(String requestId, String reviewedBy) {
 
         ConnectionRequest request =
                 requestRepo.findByIdAndStatus(
@@ -135,8 +131,8 @@ public class ConnectionRequestService {
         request.setStatus(ConnectionRequestStatus.REJECTED);
         request.setReviewedAt(LocalDateTime.now());
         request.setReviewedBy(reviewedBy);
-        request.setRejectionReason(reason);
 
         requestRepo.save(request);
     }
+
 }

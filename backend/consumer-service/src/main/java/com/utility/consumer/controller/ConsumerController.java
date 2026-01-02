@@ -43,6 +43,7 @@ public class ConsumerController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<ConsumerResponseDTO>> getAll() {
         return ResponseEntity.ok(consumerService.getAllConsumers());
     }

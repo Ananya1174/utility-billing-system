@@ -11,6 +11,6 @@ public class ChangePasswordRequestDto {
     private String oldPassword;
 
     @NotBlank(message = "New password is required")
-    @Size(min = 8, message = "Password must be at least 8 characters")
+    @Size(min = 12, message = "Password must be at least 12 characters")
     private String newPassword;
 }

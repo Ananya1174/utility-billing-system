@@ -27,7 +27,8 @@ import com.utility.auth.dto.response.UserResponseDto;
 import com.utility.auth.model.Role;
 import com.utility.auth.model.User;
 import com.utility.auth.service.AuthService;
-
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -85,13 +86,22 @@ public class AuthController {
     }
     @PutMapping("/change-password")
     public ResponseEntity<String> changePassword(
-            @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody ChangePasswordRequestDto request) {
 
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || authentication.getPrincipal() == null) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        String userId = authentication.getPrincipal().toString(); // 👈 userId from JWT
+
         authService.changePassword(
-                userDetails.getUsername(),
+                userId,
                 request.getOldPassword(),
-                request.getNewPassword());
+                request.getNewPassword()
+        );
 
         return ResponseEntity.ok("Password updated successfully");
     }

@@ -51,11 +51,12 @@ public class ConnectionRequestController {
 
     @PutMapping("/{id}/reject")
     @PreAuthorize("hasRole('ADMIN')")
+    @ResponseStatus(HttpStatus.OK)
     public void reject(
             @PathVariable String id,
-            @RequestParam String reason,
             Principal principal
     ) {
-        requestService.rejectRequest(id, reason, principal.getName());
+        requestService.rejectRequest(id, principal.getName());
     }
+
 }

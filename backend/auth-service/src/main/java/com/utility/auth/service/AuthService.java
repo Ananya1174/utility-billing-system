@@ -3,10 +3,14 @@ package com.utility.auth.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.authentication.BadCredentialsException;
+
 
 import com.utility.auth.dto.response.LoginResponseDto;
 import com.utility.auth.dto.response.UserResponseDto;
@@ -17,6 +21,8 @@ import com.utility.auth.model.User;
 import com.utility.auth.repository.PasswordResetTokenRepository;
 import com.utility.auth.repository.UserRepository;
 import com.utility.auth.security.JwtUtil;
+import com.utility.auth.security.PasswordPolicyValidator;
+
 
 import lombok.RequiredArgsConstructor;
 
@@ -57,11 +63,12 @@ public class AuthService {
                 new UsernamePasswordAuthenticationToken(username, password));
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+        		.orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
+
 
         String token = jwtUtil.generateToken(
-                user.getUserId(),              // ✅ userId
-                user.getUsername(),        // or email
+                user.getUserId(),             
+                user.getUsername(),     
                 user.getRole().name()
         );
 
@@ -106,6 +113,7 @@ public class AuthService {
                 || resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
             throw new IllegalStateException("Reset token is expired or already used");
         }
+        PasswordPolicyValidator.validate(newPassword);
 
         User user = userRepository.findByEmail(resetToken.getEmail())
                 .orElseThrow(() ->
@@ -120,13 +128,23 @@ public class AuthService {
         passwordResetTokenRepository.save(resetToken);
     }
 
-    public void changePassword(String username, String oldPassword, String newPassword) {
+    public void changePassword(String userId, String oldPassword, String newPassword) {
 
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
-            throw new IllegalArgumentException("Old password is incorrect");
+        	throw new ResponseStatusException(
+        	        HttpStatus.BAD_REQUEST,
+        	        "Old password is incorrect"
+        	    );
+        }
+
+        PasswordPolicyValidator.validate(newPassword);
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            throw new IllegalArgumentException(
+                "New password must be different from old password"
+            );
         }
 
         user.setPassword(passwordEncoder.encode(newPassword));
@@ -169,7 +187,7 @@ public class AuthService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        user.setActive(false); // SOFT DELETE
+        user.setActive(false); 
         user.setUpdatedAt(LocalDateTime.now());
 
         userRepository.save(user);

@@ -79,14 +79,11 @@ public class AccountRequestController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/review")
     public ResponseEntity<String> reviewRequest(
-            @Valid @RequestBody AccountRequestReviewDto dto,
-            @AuthenticationPrincipal UserDetails admin) {
+            @Valid @RequestBody AccountRequestReviewDto dto) {
 
-        accountRequestService.reviewAccountRequest(
-                dto,
-                admin.getUsername()
-        );
+        accountRequestService.reviewAccountRequest(dto);
 
         return ResponseEntity.ok("Account request reviewed successfully");
     }
+
 }

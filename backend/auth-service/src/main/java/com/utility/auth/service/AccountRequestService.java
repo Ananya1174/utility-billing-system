@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.utility.auth.dto.request.AccountRequestDto;
 import com.utility.auth.dto.request.AccountRequestReviewDto;
+import com.utility.auth.exception.UserAlreadyExistsException;
 import com.utility.auth.model.AccountRequest;
 import com.utility.auth.model.AccountRequestStatus;
 import com.utility.auth.model.Role;
@@ -29,11 +30,13 @@ public class AccountRequestService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final NotificationPublisher notificationPublisher;
-    
+
     public AccountRequest createAccountRequest(AccountRequestDto dto) {
 
         if (accountRequestRepository.existsByEmail(dto.getEmail())) {
-            throw new RuntimeException("Account request already exists for this email");
+        	throw new UserAlreadyExistsException(
+        	        "Account request already exists for this email"
+        	    );
         }
 
         AccountRequest request = AccountRequest.builder()
@@ -48,15 +51,12 @@ public class AccountRequestService {
         return accountRequestRepository.save(request);
     }
 
-    
     public List<AccountRequest> getPendingRequests() {
         return accountRequestRepository.findByStatus(AccountRequestStatus.PENDING);
     }
 
-   
-    public void reviewAccountRequest(
-            AccountRequestReviewDto dto,
-            String adminUsername) {
+    // ✅ UPDATED METHOD (adminUsername removed)
+    public void reviewAccountRequest(AccountRequestReviewDto dto) {
 
         AccountRequest request = accountRequestRepository.findById(dto.getRequestId())
                 .orElseThrow(() -> new RuntimeException("Account request not found"));
@@ -65,11 +65,12 @@ public class AccountRequestService {
             throw new RuntimeException("Request already reviewed");
         }
 
+        // ---------- REJECT ----------
         if ("REJECT".equalsIgnoreCase(dto.getDecision())) {
 
             request.setStatus(AccountRequestStatus.REJECTED);
             request.setReviewedAt(LocalDateTime.now());
-            request.setReviewedBy(adminUsername);
+            request.setReviewedBy("ADMIN"); // ✅ fixed value
 
             accountRequestRepository.save(request);
 
@@ -79,6 +80,8 @@ public class AccountRequestService {
             notificationPublisher.publishAccountRejected(event);
             return;
         }
+
+        // ---------- APPROVE ----------
         if ("APPROVE".equalsIgnoreCase(dto.getDecision())) {
 
             String username = generateUsername(request.getEmail());
@@ -97,10 +100,10 @@ public class AccountRequestService {
 
             request.setStatus(AccountRequestStatus.APPROVED);
             request.setReviewedAt(LocalDateTime.now());
-            request.setReviewedBy(adminUsername);
+            request.setReviewedBy("ADMIN"); // ✅ fixed value
             accountRequestRepository.save(request);
 
-            /* 📧 email notification */
+            // 📧 account approved email
             notificationPublisher.publishAccountApproved(
                     AccountApprovedEvent.builder()
                             .email(request.getEmail())
@@ -110,16 +113,16 @@ public class AccountRequestService {
                             .build()
             );
 
-            /* 🔔 consumer creation event */
+            // 🔔 consumer creation event
             notificationPublisher.publishConsumerApproved(
-            	    ConsumerApprovedEvent.builder()
-            	        .id(user.getUserId())
-            	        .fullName(request.getName())
-            	        .email(request.getEmail())
-            	        .mobileNumber(request.getPhone())
-            	        .address(request.getAddress())
-            	        .build()
-            	);
+                    ConsumerApprovedEvent.builder()
+                            .id(user.getUserId())
+                            .fullName(request.getName())
+                            .email(request.getEmail())
+                            .mobileNumber(request.getPhone())
+                            .address(request.getAddress())
+                            .build()
+            );
 
             return;
         }
