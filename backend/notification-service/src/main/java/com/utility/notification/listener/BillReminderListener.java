@@ -18,7 +18,7 @@ public class BillReminderListener {
     public void handleBillReminder(BillDueReminderEvent event) {
 
         if (event.getEmail() == null || event.getEmail().isBlank()) {
-            return; // safety check
+            return;
         }
         System.out.println("REMINDER EMAIL TO → " + event.getEmail());
         emailService.sendPaymentReminderEmail(
