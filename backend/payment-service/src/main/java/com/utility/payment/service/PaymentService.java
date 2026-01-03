@@ -1,8 +1,11 @@
 package com.utility.payment.service;
 
+import com.utility.common.dto.event.PaymentOtpEvent;
+import com.utility.payment.config.RabbitMQConfig;
 import com.utility.payment.dto.*;
 import com.utility.payment.exception.ApiException;
 import com.utility.payment.feign.BillingClient;
+import com.utility.payment.feign.ConsumerClient;
 import com.utility.payment.model.Invoice;
 import com.utility.payment.model.Payment;
 import com.utility.payment.model.PaymentMode;
@@ -11,6 +14,8 @@ import com.utility.payment.repository.InvoiceRepository;
 import com.utility.payment.repository.PaymentRepository;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +32,8 @@ public class PaymentService {
 	private final PaymentRepository repository;
 	private final BillingClient billingClient;
 	private final InvoiceRepository invoiceRepository;
+	private final ConsumerClient consumerClient;
+    private final RabbitTemplate rabbitTemplate; 
 
 	public PaymentResponse initiateOnline(InitiateOnlinePaymentRequest request) {
 
@@ -35,6 +42,18 @@ public class PaymentService {
 		if ("PAID".equalsIgnoreCase(bill.getStatus())) {
 			throw new ApiException("Bill already paid", HttpStatus.BAD_REQUEST);
 		}
+		boolean hasPending =
+			    repository.existsByBillIdAndStatus(
+			        request.billId(),
+			        PaymentStatus.INITIATED
+			    );
+
+			if (hasPending) {
+			    throw new ApiException(
+			        "OTP already sent. Please confirm the existing payment",
+			        HttpStatus.BAD_REQUEST
+			    );
+			}
 
 		double totalPaid = repository.findByBillId(request.billId()).stream()
 				.filter(p -> p.getStatus() == PaymentStatus.SUCCESS).mapToDouble(Payment::getAmount).sum();
@@ -63,6 +82,20 @@ public class PaymentService {
 		repository.save(payment);
 
 		System.out.println("OTP: " + otp);
+		ConsumerResponse consumer =
+		        consumerClient.getConsumerById(request.consumerId());
+
+		String email = consumer.getEmail();
+		PaymentOtpEvent event = new PaymentOtpEvent();
+		event.setEmail(email);
+		event.setOtp(otp);
+		event.setValidMinutes(5);
+
+		rabbitTemplate.convertAndSend(
+		    RabbitMQConfig.EXCHANGE,
+		    RabbitMQConfig.PAYMENT_OTP_ROUTING_KEY,
+		    event
+		);
 
 		return PaymentResponse.from(payment, bill, null);
 	}
@@ -83,13 +116,14 @@ public class PaymentService {
 		}
 
 		if (!payment.getOtp().equals(request.otp())) {
-			payment.setStatus(PaymentStatus.FAILED);
-			repository.save(payment);
 			throw new ApiException("Invalid OTP", HttpStatus.BAD_REQUEST);
 		}
 
 		payment.setStatus(PaymentStatus.SUCCESS);
 		payment.setConfirmedAt(LocalDateTime.now());
+		payment.setOtp(null);
+		payment.setOtpExpiry(null);
+
 		repository.save(payment);
 
 		billingClient.markPaid(payment.getBillId());
