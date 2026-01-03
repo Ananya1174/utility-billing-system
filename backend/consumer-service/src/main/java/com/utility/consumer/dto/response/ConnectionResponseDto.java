@@ -16,6 +16,7 @@ public class ConnectionResponseDto {
 
     private String id;
     private UtilityType utilityType;
+    private String consumerId;
     private String meterNumber;
     private String tariffPlan;
     private boolean active;

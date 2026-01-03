@@ -33,10 +33,19 @@ public class UtilityConnectionService {
                 .map(this::mapToDto)
                 .toList();
     }
+    public List<ConnectionResponseDto> getAllConnections() {
+
+        return connectionRepository.findAll()
+                .stream()
+                .filter(UtilityConnection::isActive)
+                .map(this::mapToDto)
+                .toList();
+    }
     private ConnectionResponseDto mapToDto(UtilityConnection connection) {
 
         ConnectionResponseDto dto = new ConnectionResponseDto();
         dto.setId(connection.getId());
+        dto.setConsumerId(connection.getConsumerId());
         dto.setUtilityType(connection.getUtilityType());
         dto.setMeterNumber(connection.getMeterNumber());
         dto.setTariffPlan(connection.getTariffPlan());

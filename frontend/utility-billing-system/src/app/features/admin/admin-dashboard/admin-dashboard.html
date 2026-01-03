@@ -1,0 +1,57 @@
+<app-navbar></app-navbar>
+
+<div class="dashboard-container">
+  <h2>Admin Dashboard</h2>
+  ...
+</div>
+<div class="dashboard-container">
+
+  <h2>Admin Dashboard</h2>
+
+  <!-- SUMMARY CARDS -->
+  <div class="cards">
+    <div class="card">
+      <h4>Monthly Revenue</h4>
+      <p>₹ {{ revenueSummary?.totalRevenue }}</p>
+    </div>
+
+    <div class="card">
+      <h4>Outstanding Amount</h4>
+      <p>₹ {{ outstandingSummary?.outstandingAmount }}</p>
+    </div>
+
+    <div class="card">
+      <h4>Total Bills</h4>
+      <p>{{ billsSummary?.totalBills }}</p>
+    </div>
+
+    <div class="card">
+      <h4>Pending Utility Requests</h4>
+      <p>{{ pendingRequestsCount }}</p>
+    </div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="charts">
+
+    <div class="chart">
+      <h4>Consumption by Utility</h4>
+      <ul>
+        <li *ngFor="let c of consumptionData">
+          {{ c.utilityType }} : {{ c.totalUnits }} units
+        </li>
+      </ul>
+    </div>
+
+    <div class="chart">
+      <h4>Revenue by Payment Mode</h4>
+      <ul>
+        <li *ngFor="let r of revenueByMode">
+          {{ r.mode }} : ₹ {{ r.amount }}
+        </li>
+      </ul>
+    </div>
+
+  </div>
+
+</div>

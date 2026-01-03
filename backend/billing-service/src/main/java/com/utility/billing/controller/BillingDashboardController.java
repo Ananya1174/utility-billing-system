@@ -6,6 +6,8 @@ import com.utility.billing.dto.dashboard.BillsSummaryDto;
 import com.utility.billing.dto.dashboard.ConsumerBillingSummaryDto;
 import com.utility.billing.dto.dashboard.ConsumptionSummaryDto;
 import com.utility.billing.service.BillingDashboardService;
+import com.utility.billing.service.BillingService;
+
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -13,11 +15,12 @@ import java.util.List;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/dashboard")
+@RequestMapping("/dashboard/billing")
 @RequiredArgsConstructor
 public class BillingDashboardController {
 
 	private final BillingDashboardService dashboardService;
+	private final BillingService billingService;
 
 	@GetMapping("/bills-summary")
 	public BillsSummaryDto billsSummary(@RequestParam int month, @RequestParam int year) {
@@ -37,13 +40,13 @@ public class BillingDashboardController {
 		return dashboardService.getAverageConsumption(month, year);
 	}
 
-	@GetMapping("/billing/consumer-summary")
+	@GetMapping("/consumer-summary")
 	public List<ConsumerBillingSummaryDto> consumerBillingSummary(@RequestParam int month, @RequestParam int year) {
 
 		return dashboardService.getConsumerBillingSummary(month, year);
 	}
 
-	@GetMapping("/billing/consumer/{consumerId}")
+	@GetMapping("/consumer/{consumerId}")
 	public List<BillResponse> consumerBillingHistory(@PathVariable String consumerId) {
 
 		return dashboardService.getConsumerBillingHistory(consumerId);
@@ -53,5 +56,9 @@ public class BillingDashboardController {
 	public List<ConsumptionSummaryDto> consumptionReport(@RequestParam int month, @RequestParam int year) {
 
 		return dashboardService.getConsumptionSummary(month, year);
+	}
+	@GetMapping("/total-billed")
+	public double getTotalBilled() {
+	    return billingService.getTotalBilledAmount();
 	}
 }

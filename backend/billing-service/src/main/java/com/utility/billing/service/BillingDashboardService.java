@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class BillingDashboardService {
 
     private final BillRepository billRepository;
+    private final BillingService billingService;
 
     /* ================= DASHBOARD ================= */
 
@@ -107,13 +108,8 @@ public class BillingDashboardService {
                 .toList();
     }
 
-    public List<BillResponse> getConsumerBillingHistory(
-            String consumerId) {
-
-        return billRepository.findByConsumerId(consumerId)
-                .stream()
-                .map(this::map)
-                .toList();
+    public List<BillResponse> getConsumerBillingHistory(String consumerId) {
+        return billingService.getBillsByConsumer(consumerId);
     }
 
     /* ================= MAPPER ================= */

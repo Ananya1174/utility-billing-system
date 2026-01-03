@@ -5,11 +5,9 @@
 
   <ul class="navbar-links">
 
-    <!-- COMMON -->
-    <li><a routerLink="/home">Home</a></li>
-
     <!-- CONSUMER -->
     <ng-container *ngIf="isConsumer()">
+      <li><a routerLink="/home">Home</a></li>
       <li><a routerLink="/utilities">My Utilities</a></li>
       <li><a routerLink="/bills">Bills</a></li>
       <li><a routerLink="/payments">Payments</a></li>
@@ -18,6 +16,7 @@
 
     <!-- ADMIN -->
     <ng-container *ngIf="isAdmin()">
+       <li><a routerLink="/admin/dashboard">Dashboard</a></li>
       <li><a routerLink="/admin/account-requests">Account Requests</a></li>
       <li><a routerLink="/admin/users">Users</a></li>
       <li><a routerLink="/admin/utility-requests">Utility Requests</a></li>
@@ -27,12 +26,14 @@
     </ng-container>
 
     <!-- BILLING OFFICER -->
+     <li><a routerLink="/home">Home</a></li>
     <ng-container *ngIf="isBillingOfficer()">
       <li><a routerLink="/billing/generate">Generate Bills</a></li>
       <li><a routerLink="/billing/reports">Reports</a></li>
     </ng-container>
 
     <!-- ACCOUNTS OFFICER -->
+     <li><a routerLink="/home">Home</a></li>
     <ng-container *ngIf="isAccountsOfficer()">
       <li><a routerLink="/accounts/payments">Payments</a></li>
       <li><a routerLink="/accounts/reports">Reports</a></li>

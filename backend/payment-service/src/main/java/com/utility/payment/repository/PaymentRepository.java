@@ -24,4 +24,5 @@ List<Payment> findByBillingMonthAndBillingYear(
 );
 
 List<Payment> findByBillingYear(int billingYear);
+boolean existsByBillId(String billId);
 }

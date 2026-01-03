@@ -13,7 +13,7 @@ import com.utility.consumer.service.ConsumerDashboardService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/consumer/dashboard")
+@RequestMapping("/consumers/dashboard")
 @RequiredArgsConstructor
 public class ConsumerDashboardController {
 

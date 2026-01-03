@@ -43,14 +43,17 @@ export class LoginComponent {
           String(res.passwordChangeRequired)
         );
 
-        // 🔐 FORCE CONSUMER PASSWORD CHANGE
-        if (
-          res.role === 'CONSUMER' &&
-          res.passwordChangeRequired === true
-        ) {
+        // FORCE PASSWORD CHANGE (CONSUMER ONLY)
+        if (res.role === 'CONSUMER' && res.passwordChangeRequired) {
           this.router.navigate(['/change-password'], {
             queryParams: { firstLogin: true }
           });
+          return;
+        }
+
+        // ROLE BASED REDIRECT
+        if (res.role === 'ADMIN') {
+          this.router.navigate(['/admin/dashboard']);
         } else {
           this.router.navigate(['/home']);
         }

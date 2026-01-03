@@ -1,6 +1,7 @@
 package com.utility.payment.service;
 
 import com.utility.common.dto.event.PaymentOtpEvent;
+import com.utility.payment.model.BillStatus;
 import com.utility.payment.config.RabbitMQConfig;
 import com.utility.payment.dto.*;
 import com.utility.payment.exception.ApiException;
@@ -39,7 +40,7 @@ public class PaymentService {
 
 		BillResponse bill = billingClient.getBill(request.billId());
 
-		if ("PAID".equalsIgnoreCase(bill.getStatus())) {
+		if (bill.getStatus() == BillStatus.PAID)  {
 			throw new ApiException("Bill already paid", HttpStatus.BAD_REQUEST);
 		}
 		boolean hasPending =
@@ -93,7 +94,7 @@ public class PaymentService {
 
 		rabbitTemplate.convertAndSend(
 		    RabbitMQConfig.EXCHANGE,
-		    RabbitMQConfig.PAYMENT_OTP_ROUTING_KEY,
+		    RabbitMQConfig.PAYMENT_OTP_KEY,
 		    event
 		);
 
@@ -138,7 +139,7 @@ public class PaymentService {
 
 		BillResponse bill = billingClient.getBill(request.billId());
 
-		if ("PAID".equalsIgnoreCase(bill.getStatus())) {
+		if (bill.getStatus() == BillStatus.PAID)  {
 			throw new ApiException("Bill already paid", HttpStatus.BAD_REQUEST);
 		}
 
@@ -227,6 +228,7 @@ public class PaymentService {
 		invoice.setConsumerId(payment.getConsumerId());
 		invoice.setBillingMonth(bill.getBillingMonth());
 		invoice.setBillingYear(bill.getBillingYear());
+		invoice.setEnergyCharge(bill.getEnergyCharge());
 
 		invoice.setAmountPaid(payment.getAmount());
 		invoice.setTax(bill.getTax());

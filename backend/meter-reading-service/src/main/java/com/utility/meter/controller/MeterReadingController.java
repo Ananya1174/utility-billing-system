@@ -87,4 +87,5 @@ public class MeterReadingController {
 
         return ResponseEntity.ok(readings);
     }
+    
 }

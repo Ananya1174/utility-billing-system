@@ -45,12 +45,33 @@ public class SecurityConfig {
                 /* ================= BILL GENERATION ================= */
                 .requestMatchers(HttpMethod.POST, "/bills")
                     .hasRole("BILLING_OFFICER")
+                    .requestMatchers(HttpMethod.GET, "/bills")
+                    .permitAll()
 
                 /* ================= BILL VIEW ================= */
                 .requestMatchers(HttpMethod.GET, "/bills/**")
                     .hasAnyRole("CONSUMER", "ACCOUNTS_OFFICER", "BILLING_OFFICER","ADMIN")
                     .requestMatchers(HttpMethod.GET, "/bills")
                     .hasAnyRole("ADMIN", "BILLING_OFFICER")
+                    /* ================= DASHBOARD ================= */
+
+                    .requestMatchers(HttpMethod.GET, "/dashboard/bills-summary")
+                        .hasRole("ADMIN")
+
+                    .requestMatchers(HttpMethod.GET, "/dashboard/consumption-summary")
+                        .hasRole("ADMIN")
+
+                    .requestMatchers(HttpMethod.GET, "/dashboard/consumption-average")
+                        .hasRole("ADMIN")
+
+                    .requestMatchers(HttpMethod.GET, "/dashboard/consumption/utility")
+                        .hasRole("ADMIN")
+
+                    .requestMatchers(HttpMethod.GET, "/dashboard/billing/consumer-summary")
+                        .hasRole("ADMIN")
+
+                    .requestMatchers(HttpMethod.GET, "/dashboard/billing/consumer/*")
+                        .hasAnyRole("ADMIN", "BILLING_OFFICER")
 
                 .anyRequest().authenticated()
             )

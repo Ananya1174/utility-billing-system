@@ -83,7 +83,7 @@ public class InvoicePdfService {
 			addHeader(amountTable, "Description");
 			addHeader(amountTable, "Amount (₹)");
 
-			addAmountRow(amountTable, "Amount Paid", invoice.getAmountPaid());
+			addAmountRow(amountTable, "Energy Charge", invoice.getEnergyCharge());
 			addAmountRow(amountTable, "Tax", invoice.getTax());
 			addAmountRow(amountTable, "Penalty", invoice.getPenalty());
 

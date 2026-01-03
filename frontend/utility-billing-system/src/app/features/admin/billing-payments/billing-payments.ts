@@ -77,7 +77,7 @@ export class BillingPaymentsComponent {
   downloadInvoice(paymentId: string) {
 
   this.http.get(
-    `${this.invoiceBaseUrl}/payments/invoice/${paymentId}/download`,
+    `${this.baseUrl}/payments/invoice/${paymentId}/download`,
     {
       responseType: 'blob',  
       observe: 'response'

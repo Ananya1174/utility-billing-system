@@ -36,4 +36,8 @@ public class UtilityConnectionController {
 
 		return connectionService.getConnectionById(id);
 	}
+	@GetMapping("/internal/all")
+	public List<ConnectionResponseDto> getAllConnections() {
+	    return connectionService.getAllConnections();
+	}
 }

@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -77,8 +78,9 @@ public class PaymentController {
 
 		byte[] pdf = invoicePdfService.generateInvoicePdf(paymentId);
 
-		return ResponseEntity.ok()
+		return ResponseEntity.ok().contentType(MediaType.APPLICATION_PDF)
 				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=invoice-" + paymentId + ".pdf")
-				.header(HttpHeaders.CONTENT_TYPE, "application/pdf").body(pdf);
+				.body(pdf);
 	}
+	
 }

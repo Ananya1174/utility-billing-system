@@ -19,7 +19,8 @@ public class BillResponse {
     private int billingMonth;
     private int billingYear;
     private double penalty; 
-    private double tax;       
+    private double tax; 
+    private double energyCharge;
 
     private long consumptionUnits;
     private double totalAmount;

@@ -19,6 +19,7 @@ public class Invoice {
     private String consumerId;
     private int billingMonth;
     private int billingYear;
+    private double energyCharge;
 
 
     private double amountPaid;

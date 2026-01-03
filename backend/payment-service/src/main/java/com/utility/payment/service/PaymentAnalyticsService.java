@@ -1,6 +1,7 @@
 package com.utility.payment.service;
 
 import com.utility.payment.dto.dashboard.*;
+import com.utility.payment.feign.BillingClient;
 import com.utility.payment.model.Payment;
 import com.utility.payment.model.PaymentMode;
 import com.utility.payment.model.PaymentStatus;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 public class PaymentAnalyticsService {
 
     private final PaymentRepository paymentRepository;
+    private final BillingClient billingClient;
 
     /* ================= DASHBOARD ================= */
 
@@ -48,11 +50,15 @@ public class PaymentAnalyticsService {
                 .mapToDouble(Payment::getAmount)
                 .sum();
 
+        double totalBilled = billingClient.getTotalBilled();
+
+        double outstanding = Math.max(totalBilled - totalPaid, 0);
+
         // Billing service owns total billed
         return new OutstandingSummaryDto(
-                0,
+        		totalBilled,
                 totalPaid,
-                0
+                outstanding
         );
     }
 

@@ -224,6 +224,12 @@ public class BillingService {
 	            .map(this::map)
 	            .toList();
 	}
+	public double getTotalBilledAmount() {
+	    return billRepository.findAll()
+	            .stream()
+	            .mapToDouble(Bill::getTotalAmount)
+	            .sum();
+	}
 
 	private BillResponse map(Bill bill) {
 
@@ -236,6 +242,7 @@ public class BillingService {
 		r.setTariffPlan(bill.getTariffPlan());
 		r.setBillingMonth(bill.getBillingMonth());
 		r.setBillingYear(bill.getBillingYear());
+		r.setEnergyCharge(bill.getEnergyCharge());
 
 		r.setConsumptionUnits(bill.getConsumptionUnits());
 		r.setTax(bill.getTax());

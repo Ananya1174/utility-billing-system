@@ -12,6 +12,7 @@ import { ForcePasswordChangeGuard } from './core/guards/force-password-change-gu
 import { TariffManagementComponent } from './features/admin/tariff-management/tariff-management';
 import { UtilityRequestsComponent } from './features/admin/utility-requests/utility-requests';
 import { BillingPaymentsComponent } from './features/admin/billing-payments/billing-payments';
+import { AdminDashboardComponent } from './features/admin/admin-dashboard/admin-dashboard';
 export const routes: Routes = [
 
   // ---------------- Landing ----------------
@@ -40,6 +41,20 @@ export const routes: Routes = [
     path: 'admin/billing',
     component: BillingPaymentsComponent
   },
+  {
+  path: 'admin',
+  children: [
+    {
+      path: 'dashboard',
+      component: AdminDashboardComponent
+    },
+    {
+      path: '',
+      redirectTo: 'dashboard',
+      pathMatch: 'full'
+    }
+  ]
+},
 
   // ---------------- Forced Password Change ----------------
   {
