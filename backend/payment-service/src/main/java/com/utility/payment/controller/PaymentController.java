@@ -20,94 +20,65 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PaymentController {
 
-    private final PaymentService paymentService;
-    private final InvoiceService invoiceService;
-    private final InvoicePdfService invoicePdfService;
+	private final PaymentService paymentService;
+	private final InvoiceService invoiceService;
+	private final InvoicePdfService invoicePdfService;
 
-    // ================= ONLINE PAYMENT =================
+	@PostMapping("/online/initiate")
+	@ResponseStatus(HttpStatus.CREATED)
+	public PaymentResponse initiateOnline(@Valid @RequestBody InitiateOnlinePaymentRequest request) {
 
-    @PostMapping("/online/initiate")
-    @ResponseStatus(HttpStatus.CREATED)
-    public PaymentResponse initiateOnline(
-            @Valid @RequestBody InitiateOnlinePaymentRequest request) {
+		return paymentService.initiateOnline(request);
+	}
 
-        return paymentService.initiateOnline(request);
-    }
+	@PostMapping("/online/confirm")
+	public ResponseEntity<Map<String, String>> confirmOnline(@Valid @RequestBody ConfirmOtpRequest request) {
 
-    @PostMapping("/online/confirm")
-    public ResponseEntity<Map<String, String>> confirmOnline(
-            @Valid @RequestBody ConfirmOtpRequest request) {
+		paymentService.confirmOtp(request);
 
-        paymentService.confirmOtp(request);
+		return ResponseEntity.ok(Map.of("status", "SUCCESS", "message", "Payment confirmed successfully"));
+	}
 
-        return ResponseEntity.ok(Map.of(
-                "status", "SUCCESS",
-                "message", "Payment confirmed successfully"
-        ));
-    }
+	@PostMapping("/offline")
+	@ResponseStatus(HttpStatus.CREATED)
+	public Map<String, String> offlinePayment(@Valid @RequestBody OfflinePaymentRequest request) {
 
-    // ================= OFFLINE PAYMENT =================
+		paymentService.offlinePayment(request);
 
-    @PostMapping("/offline")
-    @ResponseStatus(HttpStatus.CREATED)
-    public Map<String, String> offlinePayment(
-            @Valid @RequestBody OfflinePaymentRequest request) {
+		return Map.of("status", "SUCCESS", "message", "Offline payment recorded successfully");
+	}
 
-        paymentService.offlinePayment(request);
+	@GetMapping("/bill/{billId}")
+	public List<PaymentResponse> getPaymentsByBill(@PathVariable String billId) {
 
-        return Map.of(
-                "status", "SUCCESS",
-                "message", "Offline payment recorded successfully"
-        );
-    }
+		return paymentService.getPaymentsByBill(billId);
+	}
 
-    // ================= PAYMENT HISTORY =================
+	@GetMapping("/consumer/{consumerId}")
+	public List<PaymentResponse> getPaymentsByConsumer(@PathVariable String consumerId) {
 
-    // 🔹 Payments for a bill
-    @GetMapping("/bill/{billId}")
-    public List<PaymentResponse> getPaymentsByBill(
-            @PathVariable String billId) {
+		return paymentService.getPaymentsByConsumer(consumerId);
+	}
 
-        return paymentService.getPaymentsByBill(billId);
-    }
+	@GetMapping("/outstanding/{billId}")
+	public OutstandingResponse outstanding(@PathVariable String billId) {
 
-    // 🔹 Payments for a consumer
-    @GetMapping("/consumer/{consumerId}")
-    public List<PaymentResponse> getPaymentsByConsumer(
-            @PathVariable String consumerId) {
+		return paymentService.getOutstanding(billId);
+	}
 
-        return paymentService.getPaymentsByConsumer(consumerId);
-    }
+	@GetMapping("/invoice/{paymentId}")
+	public Invoice getInvoice(@PathVariable String paymentId) {
 
-    // ================= OUTSTANDING =================
+		return invoiceService.getInvoiceByPaymentId(paymentId);
+	}
 
-    @GetMapping("/outstanding/{billId}")
-    public OutstandingResponse outstanding(
-            @PathVariable String billId) {
+	@GetMapping("/invoice/{paymentId}/download")
+	public ResponseEntity<byte[]> downloadInvoice(@PathVariable String paymentId) {
 
-        return paymentService.getOutstanding(billId);
-    }
+		byte[] pdf = invoicePdfService.generateInvoicePdf(paymentId);
 
-    // ================= INVOICE =================
-
-    // 🔹 View invoice details
-    @GetMapping("/invoice/{paymentId}")
-    public Invoice getInvoice(@PathVariable String paymentId) {
-
-        return invoiceService.getInvoiceByPaymentId(paymentId);
-    }
-
-    // 🔹 Download invoice PDF
-    @GetMapping("/invoice/{paymentId}/download")
-    public ResponseEntity<byte[]> downloadInvoice(
-            @PathVariable String paymentId) {
-
-        byte[] pdf = invoicePdfService.generateInvoicePdf(paymentId);
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=invoice-" + paymentId + ".pdf")
-                .header(HttpHeaders.CONTENT_TYPE, "application/pdf")
-                .body(pdf);
-    }
+		return ResponseEntity.ok()
+				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=invoice-" + paymentId + ".pdf")
+				.header(HttpHeaders.CONTENT_TYPE, "application/pdf").body(pdf);
+	}
 }
