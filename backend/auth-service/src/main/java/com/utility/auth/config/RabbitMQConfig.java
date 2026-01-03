@@ -13,7 +13,7 @@ public class RabbitMQConfig {
     public static final String ACCOUNT_ROUTING_KEY = "account.approved";
     public static final String ACCOUNT_REJECTED_KEY = "account.rejected";
     public static final String CONSUMER_APPROVED_KEY = "consumer.approved";
-  
+    public static final String PASSWORD_RESET_KEY = "password.reset";
 
 
 
