@@ -37,23 +37,43 @@ public class SecurityConfig {
 
             .authorizeHttpRequests(auth -> auth
 
-                // ---------- PAYMENT APIs ----------
-                .requestMatchers(HttpMethod.POST,
+                /* ================= CONSUMER PAYMENTS ================= */
+                .requestMatchers(
+                        HttpMethod.POST,
                         "/payments/online/initiate",
-                        "/payments/online/confirm")
-                    .hasRole("CONSUMER")
+                        "/payments/online/confirm"
+                ).hasRole("CONSUMER")
 
-                .requestMatchers(HttpMethod.POST,
-                        "/payments/offline")
-                    .hasRole("ACCOUNTS_OFFICER")
+                /* ================= OFFLINE PAYMENTS ================= */
+                .requestMatchers(
+                        HttpMethod.POST,
+                        "/payments/offline"
+                ).hasRole("ACCOUNTS_OFFICER")
 
-                .requestMatchers(HttpMethod.GET,
+                /* ================= PAYMENT VIEW ================= */
+                .requestMatchers(
+                        HttpMethod.GET,
                         "/payments/bill/**",
                         "/payments/consumer/**",
                         "/payments/outstanding/**",
-                        "/payments/invoice/**")
-                    .hasAnyRole("CONSUMER", "ACCOUNTS_OFFICER")
+                        "/payments/invoice/**"
+                ).hasAnyRole("CONSUMER", "ACCOUNTS_OFFICER", "ADMIN")
 
+                /* ================= PAYMENT DASHBOARD (CARDS & CHARTS) ================= */
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/dashboard/payments/revenue-summary",
+                        "/dashboard/payments/outstanding-summary"
+                ).hasAnyRole("ADMIN", "ACCOUNTS_OFFICER")
+
+                /* ================= PAYMENT REPORTS ================= */
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/dashboard/payments/revenue-by-mode",
+                        "/dashboard/payments/consumer-summary"
+                ).hasRole("ADMIN")
+
+                /* ================= FALLBACK ================= */
                 .anyRequest().authenticated()
             )
 
