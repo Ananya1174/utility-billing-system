@@ -10,28 +10,24 @@ import java.util.Optional;
 
 public interface BillRepository extends MongoRepository<Bill, String> {
 
-    List<Bill> findByConsumerId(String consumerId);
+	List<Bill> findByConsumerId(String consumerId);
 
-    Optional<Bill> findByConnectionIdAndBillingMonthAndBillingYearAndStatusNot(
-            String connectionId,
-            int billingMonth,
-            int billingYear,
-            BillStatus status
-    );
+	Optional<Bill> findByConnectionIdAndBillingMonthAndBillingYearAndStatusNot(String connectionId, int billingMonth,
+			int billingYear, BillStatus status);
 
-    Optional<Bill> findTopByConnectionIdOrderByBillingYearDescBillingMonthDesc(
-            String connectionId
-    );
+	Optional<Bill> findTopByConnectionIdOrderByBillingYearDescBillingMonthDesc(String connectionId);
 
-    List<Bill> findByStatus(BillStatus status);
+	List<Bill> findByStatus(BillStatus status);
 
-    List<Bill> findByStatusAndDueDateBefore(
-            BillStatus status,
-            LocalDate date
-    );
-    List<Bill> findByStatusAndDueDateBetween(
-            BillStatus status,
-            LocalDate start,
-            LocalDate end
-    );
+	List<Bill> findByStatusAndDueDateBefore(BillStatus status, LocalDate date);
+
+	List<Bill> findByStatusAndDueDateBetween(BillStatus status, LocalDate start, LocalDate end);
+
+	long countByBillingMonthAndBillingYear(int month, int year);
+
+	long countByBillingMonthAndBillingYearAndStatus(int month, int year, BillStatus status);
+
+	List<Bill> findByBillingMonthAndBillingYear(int month, int year);
+
+	List<Bill> findByConsumerIdAndBillingMonthAndBillingYear(String consumerId, int month, int year);
 }
