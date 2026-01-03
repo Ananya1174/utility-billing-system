@@ -14,7 +14,6 @@ public class TariffQueryController {
 
     private final TariffQueryService tariffQueryService;
 
-    // GET /tariffs?utilityType=ELECTRICITY
     @GetMapping
     public TariffResponseDto getTariffsByUtility(
             @RequestParam UtilityType utilityType

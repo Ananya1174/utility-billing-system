@@ -18,49 +18,38 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class TariffPlanController {
 
-    private final TariffPlanRepository repository;
+	private final TariffPlanRepository repository;
 
+	@PostMapping
+	@ResponseStatus(HttpStatus.CREATED)
+	public TariffPlan create(@RequestBody TariffPlan plan) {
 
-    // ---------------- CREATE PLAN (ADMIN) ----------------
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public TariffPlan create(@RequestBody TariffPlan plan) {
+		if (repository.existsByUtilityTypeAndPlanCode(plan.getUtilityType(), plan.getPlanCode())) {
+			throw new RuntimeException("Tariff plan already exists");
+		}
 
-        if (repository.existsByUtilityTypeAndPlanCode(
-                plan.getUtilityType(),
-                plan.getPlanCode())) {
-            throw new RuntimeException("Tariff plan already exists");
-        }
+		plan.setActive(true);
+		return repository.save(plan);
+	}
 
-        plan.setActive(true);
-        return repository.save(plan);
-    }
+	@PutMapping("/{id}/deactivate")
+	public Map<String, String> deactivate(@PathVariable String id) {
 
-    // ---------------- DEACTIVATE PLAN (ADMIN) ----------------
-    @PutMapping("/{id}/deactivate")
-    public Map<String, String> deactivate(@PathVariable String id) {
+		TariffPlan plan = repository.findById(id).orElseThrow(() -> new RuntimeException("Tariff plan not found"));
 
-        TariffPlan plan = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Tariff plan not found"));
+		if (!plan.isActive()) {
+			return Map.of("message", "Tariff plan already inactive");
+		}
 
-        if (!plan.isActive()) {
-            return Map.of("message", "Tariff plan already inactive");
-        }
+		plan.setActive(false);
+		repository.save(plan);
 
-        plan.setActive(false);
-        repository.save(plan);
+		return Map.of("message", "Tariff plan " + plan.getPlanCode() + " deactivated successfully");
+	}
 
-        return Map.of(
-            "message",
-            "Tariff plan " + plan.getPlanCode() + " deactivated successfully"
-        );
-    }
+	@GetMapping("/active")
+	public List<TariffPlan> activePlans() {
+		return repository.findByActiveTrue();
+	}
 
-    // ---------------- GET ALL ACTIVE PLANS ----------------
-    @GetMapping("/active")
-    public List<TariffPlan> activePlans() {
-        return repository.findByActiveTrue();
-    }
-
-    
 }
