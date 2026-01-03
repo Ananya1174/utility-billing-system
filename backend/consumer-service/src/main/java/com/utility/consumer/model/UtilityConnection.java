@@ -13,20 +13,18 @@ import lombok.Data;
 @Data
 public class UtilityConnection {
 
-    @Id
-    private String id;
+	@Id
+	private String id;
 
-    private String consumerId;
+	private String consumerId;
 
-    private UtilityType utilityType;
+	private UtilityType utilityType;
 
-    // Assigned ONLY after admin approval
-    private String meterNumber;
+	private String meterNumber;
 
-    // Reference to billing tariff plan
-    private String tariffPlan;
+	private String tariffPlan;
 
-    private boolean active;
+	private boolean active;
 
-    private LocalDateTime activatedAt;
+	private LocalDateTime activatedAt;
 }

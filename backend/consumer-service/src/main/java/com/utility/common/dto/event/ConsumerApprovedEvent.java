@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class ConsumerApprovedEvent {
-	 private String id;          // userId
+	 private String id;         
 	    private String fullName;
 	    private String email;
 	    private String mobileNumber;

@@ -22,13 +22,12 @@ public class ConsumerApprovedListener {
     	)
     public void handleConsumerApproved(ConsumerApprovedEvent event) {
 
-        // idempotency check
-        if (consumerRepository.existsById(event.getId())) {
+                if (consumerRepository.existsById(event.getId())) {
             return;
         }
 
         Consumer consumer = new Consumer();
-        consumer.setId(event.getId()); // SAME AS AUTH USER ID
+        consumer.setId(event.getId()); 
         consumer.setFullName(event.getFullName());
         consumer.setEmail(event.getEmail());
         consumer.setMobileNumber(event.getMobileNumber());

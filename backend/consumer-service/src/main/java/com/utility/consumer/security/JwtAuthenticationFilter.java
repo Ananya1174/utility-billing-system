@@ -17,44 +17,36 @@ import io.jsonwebtoken.Claims;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtUtil jwtUtil;
+	private final JwtUtil jwtUtil;
 
-    public JwtAuthenticationFilter(JwtUtil jwtUtil) {
-        this.jwtUtil = jwtUtil;
-    }
+	public JwtAuthenticationFilter(JwtUtil jwtUtil) {
+		this.jwtUtil = jwtUtil;
+	}
 
-    @Override
-    protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain)
-            throws ServletException, IOException {
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+			throws ServletException, IOException {
 
-        String authHeader = request.getHeader("Authorization");
+		String authHeader = request.getHeader("Authorization");
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+		if (authHeader != null && authHeader.startsWith("Bearer ")) {
 
-            String token = authHeader.substring(7);
+			String token = authHeader.substring(7);
 
-            if (jwtUtil.isTokenValid(token)) {
+			if (jwtUtil.isTokenValid(token)) {
 
-                Claims claims = jwtUtil.extractClaims(token);
+				Claims claims = jwtUtil.extractClaims(token);
 
-                // ✅ THIS IS THE IMPORTANT FIX
-                String userId = claims.get("userId", String.class);
-                String role = claims.get("role", String.class);
+				String userId = claims.get("userId", String.class);
+				String role = claims.get("role", String.class);
 
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                userId,   // 👈 principal = consumerId
-                                null,
-                                List.of(new SimpleGrantedAuthority("ROLE_" + role))
-                        );
+				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userId,
+						null, List.of(new SimpleGrantedAuthority("ROLE_" + role)));
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
-        }
+				SecurityContextHolder.getContext().setAuthentication(authentication);
+			}
+		}
 
-        filterChain.doFilter(request, response);
-    }
+		filterChain.doFilter(request, response);
+	}
 }

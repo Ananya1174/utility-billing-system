@@ -17,27 +17,23 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UtilityConnectionController {
 
-    private final UtilityConnectionService connectionService;
+	private final UtilityConnectionService connectionService;
 
-    // ---------------- CONSUMER DASHBOARD ----------------
-    @GetMapping
-    @PreAuthorize("hasRole('CONSUMER')")
-    public List<ConnectionResponseDto> getMyConnections() {
+	@GetMapping
+	@PreAuthorize("hasRole('CONSUMER')")
+	public List<ConnectionResponseDto> getMyConnections() {
 
-        Authentication authentication =
-                SecurityContextHolder.getContext().getAuthentication();
-        
-        String userId = authentication.getName();
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        return connectionService.getConnectionsByUserId(userId);
-    }
+		String userId = authentication.getName();
 
-    // ---------------- BILLING SERVICE ----------------
-    @GetMapping("/{id}")
-    @PreAuthorize("hasRole('BILLING_OFFICER')")
-    public ConnectionResponseDto getConnectionById(
-            @PathVariable String id) {
+		return connectionService.getConnectionsByUserId(userId);
+	}
 
-        return connectionService.getConnectionById(id);
-    }
+	@GetMapping("/{id}")
+	@PreAuthorize("hasRole('BILLING_OFFICER')")
+	public ConnectionResponseDto getConnectionById(@PathVariable String id) {
+
+		return connectionService.getConnectionById(id);
+	}
 }

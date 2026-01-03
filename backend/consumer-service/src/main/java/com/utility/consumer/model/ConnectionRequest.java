@@ -21,15 +21,14 @@ public class ConnectionRequest {
 
     private UtilityType utilityType;
 
-    // 🔑 Reference to billing tariff plan (STRING, not enum)
+   
     private String tariffPlanCode;
 
-    private ConnectionRequestStatus status; // PENDING / APPROVED / REJECTED
+    private ConnectionRequestStatus status; 
 
     private LocalDateTime requestedAt;
     private LocalDateTime reviewedAt;
 
-    // Admin info
     private String reviewedBy;
     private String rejectionReason;
 }
