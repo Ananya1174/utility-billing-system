@@ -157,4 +157,32 @@ public class EmailService {
 
         mailSender.send(message);
     }
+    public void sendPaymentOtpEmail(
+            String to,
+            String otp,
+            int validMinutes) {
+
+        SimpleMailMessage message = new SimpleMailMessage();
+
+        message.setTo(to);
+        message.setSubject("OTP for Online Payment Verification");
+
+        message.setText("""
+                Hello,
+
+                Your One-Time Password (OTP) for confirming the online payment is:
+
+                OTP: %s
+
+                This OTP is valid for %d minutes.
+                Please do NOT share this OTP with anyone.
+
+                If you did not initiate this payment, please ignore this email.
+
+                Regards,
+                Utility Billing System
+                """.formatted(otp, validMinutes));
+
+        mailSender.send(message);
+    }
 }

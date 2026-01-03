@@ -22,6 +22,20 @@ public class RabbitMQConfig {
 	public static final String BILL_REMINDER_KEY = "bill.due.reminder";
 	public static final String PASSWORD_RESET_QUEUE = "password.reset.queue";
 	public static final String PASSWORD_RESET_KEY   = "password.reset";
+	public static final String PAYMENT_OTP_QUEUE = "payment.otp.queue";
+	public static final String PAYMENT_OTP_KEY   = "payment.otp.generated";
+	@Bean
+	public Queue paymentOtpQueue() {
+	    return QueueBuilder.durable(PAYMENT_OTP_QUEUE).build();
+	}
+
+	@Bean
+	public Binding paymentOtpBinding() {
+	    return BindingBuilder
+	            .bind(paymentOtpQueue())
+	            .to(exchange())
+	            .with(PAYMENT_OTP_KEY);
+	}
 	@Bean
 	public Queue passwordResetQueue() {
 	    return QueueBuilder.durable(PASSWORD_RESET_QUEUE).build();
