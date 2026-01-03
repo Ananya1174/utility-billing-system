@@ -47,7 +47,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             List.of(new SimpleGrantedAuthority("ROLE_" + role))
                     );
 
-            // 🔥 VERY IMPORTANT
             authentication.setDetails(token);
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
