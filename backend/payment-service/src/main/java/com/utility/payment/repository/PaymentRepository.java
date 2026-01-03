@@ -16,4 +16,12 @@ boolean existsByBillIdAndStatus(
 );
 List<Payment> findByBillId(String billId);
 List<Payment> findByConsumerIdOrderByCreatedAtDesc(String consumerId);
+List<Payment> findByStatus(PaymentStatus status);
+
+List<Payment> findByBillingMonthAndBillingYear(
+        int billingMonth,
+        int billingYear
+);
+
+List<Payment> findByBillingYear(int billingYear);
 }
