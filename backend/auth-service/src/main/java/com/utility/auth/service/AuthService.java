@@ -2,6 +2,7 @@ package com.utility.auth.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,7 +23,7 @@ import com.utility.auth.repository.PasswordResetTokenRepository;
 import com.utility.auth.repository.UserRepository;
 import com.utility.auth.security.JwtUtil;
 import com.utility.auth.security.PasswordPolicyValidator;
-
+import com.utility.common.dto.event.PasswordResetEvent;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,6 +37,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final NotificationPublisher notificationPublisher;
 
     // ---------------- REGISTER (ADMIN ONLY) ----------------
     public User registerUser(User user) {
@@ -83,45 +85,52 @@ public class AuthService {
     // ---------------- FORGOT PASSWORD ----------------
     public void forgotPassword(String email) {
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        userRepository.findByEmail(email).ifPresent(user -> {
+            List<PasswordResetToken> oldTokens =
+                    passwordResetTokenRepository.findByEmailAndUsedFalse(email);
 
-        String token = java.util.UUID.randomUUID().toString();
+            oldTokens.forEach(t -> t.setUsed(true));
+            passwordResetTokenRepository.saveAll(oldTokens);
 
-        PasswordResetToken resetToken = PasswordResetToken.builder()
-                .email(user.getEmail())
-                .token(token)
-                .expiryDate(LocalDateTime.now().plusMinutes(30))
-                .used(false)
-                .build();
+            String token = UUID.randomUUID().toString();
 
-        passwordResetTokenRepository.save(resetToken);
+            PasswordResetToken resetToken = PasswordResetToken.builder()
+                    .email(email)
+                    .token(token)
+                    .expiryDate(LocalDateTime.now().plusMinutes(15))
+                    .used(false)
+                    .build();
 
-        // Later → publish event to RabbitMQ
-        System.out.println("Password reset token: " + token);
+            passwordResetTokenRepository.save(resetToken);
+
+            PasswordResetEvent event = new PasswordResetEvent();
+            event.setEmail(email);
+            event.setResetToken(token);
+
+            notificationPublisher.publishPasswordReset(event);
+        });
     }
-
     // ---------------- RESET PASSWORD ----------------
     public void resetPassword(String token, String newPassword) {
 
         PasswordResetToken resetToken =
                 passwordResetTokenRepository.findByToken(token)
                         .orElseThrow(() ->
-                                new ResourceNotFoundException("Invalid reset token"));
+                                new IllegalArgumentException("Invalid or expired reset token"));
 
         if (Boolean.TRUE.equals(resetToken.getUsed())
                 || resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            throw new IllegalStateException("Reset token is expired or already used");
+            throw new IllegalArgumentException("Invalid or expired reset token");
         }
+
         PasswordPolicyValidator.validate(newPassword);
 
         User user = userRepository.findByEmail(resetToken.getEmail())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         user.setPassword(passwordEncoder.encode(newPassword));
+        user.setPasswordChangeRequired(false);   
         user.setUpdatedAt(LocalDateTime.now());
-
         userRepository.save(user);
 
         resetToken.setUsed(true);

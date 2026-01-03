@@ -25,9 +25,7 @@ public class AccountRequestController {
 
     private final AccountRequestService accountRequestService;
 
-    /**
-     * PUBLIC – Consumer submits account request
-     */
+  
     @PostMapping
     public ResponseEntity<AccountRequestResponseDto> createRequest(
             @Valid @RequestBody AccountRequestDto dto) {
@@ -49,9 +47,7 @@ public class AccountRequestController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    /**
-     * ADMIN – View all pending account requests
-     */
+  
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/pending")
     public ResponseEntity<List<AccountRequestResponseDto>> getPendingRequests() {
@@ -73,9 +69,7 @@ public class AccountRequestController {
         return ResponseEntity.ok(responses);
     }
 
-    /**
-     * ADMIN – Approve / Reject account request
-     */
+    
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/review")
     public ResponseEntity<String> reviewRequest(

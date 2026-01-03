@@ -120,8 +120,8 @@ public class AuthController {
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/users/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable String userId) {
-
+        System.out.println("Deleting user with ID: " + userId);
         authService.deleteUser(userId);
-        return ResponseEntity.noContent().build(); 
+        return ResponseEntity.noContent().build();
     }
 }

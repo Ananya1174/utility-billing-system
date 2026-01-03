@@ -26,117 +26,86 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AccountRequestService {
 
-    private final AccountRequestRepository accountRequestRepository;
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final NotificationPublisher notificationPublisher;
+	private final AccountRequestRepository accountRequestRepository;
+	private final UserRepository userRepository;
+	private final PasswordEncoder passwordEncoder;
+	private final NotificationPublisher notificationPublisher;
 
-    public AccountRequest createAccountRequest(AccountRequestDto dto) {
+	public AccountRequest createAccountRequest(AccountRequestDto dto) {
 
-        if (accountRequestRepository.existsByEmail(dto.getEmail())) {
-        	throw new UserAlreadyExistsException(
-        	        "Account request already exists for this email"
-        	    );
-        }
+		if (accountRequestRepository.existsByEmail(dto.getEmail())) {
+			throw new UserAlreadyExistsException("Account request already exists for this email");
+		}
 
-        AccountRequest request = AccountRequest.builder()
-                .name(dto.getName())
-                .email(dto.getEmail())
-                .phone(dto.getPhone())
-                .address(dto.getAddress())
-                .status(AccountRequestStatus.PENDING)
-                .createdAt(LocalDateTime.now())
-                .build();
+		AccountRequest request = AccountRequest.builder().name(dto.getName()).email(dto.getEmail())
+				.phone(dto.getPhone()).address(dto.getAddress()).status(AccountRequestStatus.PENDING)
+				.createdAt(LocalDateTime.now()).build();
 
-        return accountRequestRepository.save(request);
-    }
+		return accountRequestRepository.save(request);
+	}
 
-    public List<AccountRequest> getPendingRequests() {
-        return accountRequestRepository.findByStatus(AccountRequestStatus.PENDING);
-    }
+	public List<AccountRequest> getPendingRequests() {
+		return accountRequestRepository.findByStatus(AccountRequestStatus.PENDING);
+	}
 
-    // ✅ UPDATED METHOD (adminUsername removed)
-    public void reviewAccountRequest(AccountRequestReviewDto dto) {
+	public void reviewAccountRequest(AccountRequestReviewDto dto) {
 
-        AccountRequest request = accountRequestRepository.findById(dto.getRequestId())
-                .orElseThrow(() -> new RuntimeException("Account request not found"));
+		AccountRequest request = accountRequestRepository.findById(dto.getRequestId())
+				.orElseThrow(() -> new RuntimeException("Account request not found"));
 
-        if (request.getStatus() != AccountRequestStatus.PENDING) {
-            throw new RuntimeException("Request already reviewed");
-        }
+		if (request.getStatus() != AccountRequestStatus.PENDING) {
+			throw new RuntimeException("Request already reviewed");
+		}
 
-        // ---------- REJECT ----------
-        if ("REJECT".equalsIgnoreCase(dto.getDecision())) {
+		if ("REJECT".equalsIgnoreCase(dto.getDecision())) {
 
-            request.setStatus(AccountRequestStatus.REJECTED);
-            request.setReviewedAt(LocalDateTime.now());
-            request.setReviewedBy("ADMIN"); // ✅ fixed value
+			request.setStatus(AccountRequestStatus.REJECTED);
+			request.setReviewedAt(LocalDateTime.now());
+			request.setReviewedBy("ADMIN");
 
-            accountRequestRepository.save(request);
+			accountRequestRepository.save(request);
 
-            AccountRejectedEvent event = new AccountRejectedEvent();
-            event.setEmail(request.getEmail());
+			AccountRejectedEvent event = new AccountRejectedEvent();
+			event.setEmail(request.getEmail());
 
-            notificationPublisher.publishAccountRejected(event);
-            return;
-        }
+			notificationPublisher.publishAccountRejected(event);
+			return;
+		}
 
-        // ---------- APPROVE ----------
-        if ("APPROVE".equalsIgnoreCase(dto.getDecision())) {
+		if ("APPROVE".equalsIgnoreCase(dto.getDecision())) {
 
-            String username = generateUsername(request.getEmail());
-            String rawPassword = generateTempPassword();
+			String username = generateUsername(request.getEmail());
+			String rawPassword = generateTempPassword();
 
-            User user = User.builder()
-                    .username(username)
-                    .email(request.getEmail())
-                    .password(passwordEncoder.encode(rawPassword))
-                    .role(Role.CONSUMER)
-                    .active(true)
-                    .passwordChangeRequired(true)
-                    .build();
+			User user = User.builder().username(username).email(request.getEmail())
+					.password(passwordEncoder.encode(rawPassword)).role(Role.CONSUMER).active(true)
+					.passwordChangeRequired(true).build();
 
-            userRepository.save(user);
+			userRepository.save(user);
 
-            request.setStatus(AccountRequestStatus.APPROVED);
-            request.setReviewedAt(LocalDateTime.now());
-            request.setReviewedBy("ADMIN"); // ✅ fixed value
-            accountRequestRepository.save(request);
+			request.setStatus(AccountRequestStatus.APPROVED);
+			request.setReviewedAt(LocalDateTime.now());
+			request.setReviewedBy("ADMIN");
+			accountRequestRepository.save(request);
 
-            // 📧 account approved email
-            notificationPublisher.publishAccountApproved(
-                    AccountApprovedEvent.builder()
-                            .email(request.getEmail())
-                            .username(username)
-                            .temporaryPassword(rawPassword)
-                            .role("CONSUMER")
-                            .build()
-            );
+			notificationPublisher.publishAccountApproved(AccountApprovedEvent.builder().email(request.getEmail())
+					.username(username).temporaryPassword(rawPassword).role("CONSUMER").build());
 
-            // 🔔 consumer creation event
-            notificationPublisher.publishConsumerApproved(
-                    ConsumerApprovedEvent.builder()
-                            .id(user.getUserId())
-                            .fullName(request.getName())
-                            .email(request.getEmail())
-                            .mobileNumber(request.getPhone())
-                            .address(request.getAddress())
-                            .build()
-            );
+			notificationPublisher.publishConsumerApproved(ConsumerApprovedEvent.builder().id(user.getUserId())
+					.fullName(request.getName()).email(request.getEmail()).mobileNumber(request.getPhone())
+					.address(request.getAddress()).build());
 
-            return;
-        }
+			return;
+		}
 
-        throw new RuntimeException("Invalid decision. Use APPROVE or REJECT");
-    }
+		throw new RuntimeException("Invalid decision. Use APPROVE or REJECT");
+	}
 
-    private String generateUsername(String email) {
-        return email.split("@")[0];
-    }
+	private String generateUsername(String email) {
+		return email.split("@")[0];
+	}
 
-    private String generateTempPassword() {
-        return UUID.randomUUID()
-                .toString()
-                .substring(0, 8);
-    }
+	private String generateTempPassword() {
+		return UUID.randomUUID().toString().substring(0, 8);
+	}
 }
