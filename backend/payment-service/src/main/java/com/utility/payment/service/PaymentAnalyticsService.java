@@ -18,6 +18,7 @@ public class PaymentAnalyticsService {
 
     private final PaymentRepository paymentRepository;
 
+    /* ================= DASHBOARD ================= */
 
     public RevenueSummaryDto getMonthlyRevenue(int month, int year) {
 
@@ -41,20 +42,62 @@ public class PaymentAnalyticsService {
 
     public OutstandingSummaryDto getOutstandingSummary() {
 
-        List<Payment> successPayments =
-                paymentRepository.findByStatus(PaymentStatus.SUCCESS);
-
-        double totalPaid = successPayments.stream()
+        double totalPaid = paymentRepository
+                .findByStatus(PaymentStatus.SUCCESS)
+                .stream()
                 .mapToDouble(Payment::getAmount)
                 .sum();
 
+        // Billing service owns total billed
         return new OutstandingSummaryDto(
-                0, 
+                0,
                 totalPaid,
-                0  
+                0
         );
     }
 
+    /* ================= PAYMENTS SUMMARY ================= */
+
+    public PaymentsSummaryDto getPaymentsSummary(int month, int year) {
+
+        List<Payment> payments =
+                paymentRepository.findByBillingMonthAndBillingYear(month, year);
+
+        long success = payments.stream()
+                .filter(p -> p.getStatus() == PaymentStatus.SUCCESS)
+                .count();
+
+        long failed = payments.stream()
+                .filter(p -> p.getStatus() == PaymentStatus.FAILED)
+                .count();
+
+        return new PaymentsSummaryDto(
+                month,
+                year,
+                success,
+                failed
+        );
+    }
+
+    public FailedPaymentSummaryDto getFailedPaymentsSummary(int month, int year) {
+
+        List<Payment> failed =
+                paymentRepository.findByBillingMonthAndBillingYear(month, year)
+                        .stream()
+                        .filter(p -> p.getStatus() == PaymentStatus.FAILED)
+                        .toList();
+
+        double amount = failed.stream()
+                .mapToDouble(Payment::getAmount)
+                .sum();
+
+        return new FailedPaymentSummaryDto(
+                failed.size(),
+                amount
+        );
+    }
+
+    /* ================= REPORTS ================= */
 
     public List<PaymentModeSummaryDto> getRevenueByMode(int month, int year) {
 
@@ -91,6 +134,33 @@ public class PaymentAnalyticsService {
                                 .mapToDouble(Payment::getAmount)
                                 .sum()
                 ))
+                .toList();
+    }
+
+    public List<RevenueSummaryDto> getYearlyRevenue(int year) {
+
+        return paymentRepository.findByBillingYear(year)
+                .stream()
+                .filter(p -> p.getStatus() == PaymentStatus.SUCCESS)
+                .collect(Collectors.groupingBy(
+                        Payment::getBillingMonth,
+                        Collectors.toList()
+                ))
+                .entrySet()
+                .stream()
+                .map(e -> {
+                    double revenue = e.getValue()
+                            .stream()
+                            .mapToDouble(Payment::getAmount)
+                            .sum();
+
+                    return new RevenueSummaryDto(
+                            e.getKey(),
+                            year,
+                            revenue,
+                            e.getValue().size()
+                    );
+                })
                 .toList();
     }
 }

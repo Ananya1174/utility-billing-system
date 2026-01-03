@@ -59,18 +59,21 @@ public class SecurityConfig {
                         "/payments/invoice/**"
                 ).hasAnyRole("CONSUMER", "ACCOUNTS_OFFICER", "ADMIN")
 
-                /* ================= PAYMENT DASHBOARD (CARDS & CHARTS) ================= */
+                /* ================= PAYMENT DASHBOARD (CARDS) ================= */
                 .requestMatchers(
                         HttpMethod.GET,
                         "/dashboard/payments/revenue-summary",
-                        "/dashboard/payments/outstanding-summary"
+                        "/dashboard/payments/outstanding-summary",
+                        "/dashboard/payments/payments-summary"
                 ).hasAnyRole("ADMIN", "ACCOUNTS_OFFICER")
 
-                /* ================= PAYMENT REPORTS ================= */
+                /* ================= PAYMENT REPORTS / ANALYTICS ================= */
                 .requestMatchers(
                         HttpMethod.GET,
+                        "/dashboard/payments/failed-summary",
                         "/dashboard/payments/revenue-by-mode",
-                        "/dashboard/payments/consumer-summary"
+                        "/dashboard/payments/consumer-summary",
+                        "/dashboard/payments/revenue-yearly"
                 ).hasRole("ADMIN")
 
                 /* ================= FALLBACK ================= */

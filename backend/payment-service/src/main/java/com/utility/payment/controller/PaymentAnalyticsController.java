@@ -13,6 +13,7 @@ import java.util.List;
 public class PaymentAnalyticsController {
 
     private final PaymentAnalyticsService analyticsService;
+
     @GetMapping("/revenue-summary")
     public RevenueSummaryDto revenueSummary(
             @RequestParam int month,
@@ -26,6 +27,23 @@ public class PaymentAnalyticsController {
 
         return analyticsService.getOutstandingSummary();
     }
+
+    @GetMapping("/payments-summary")
+    public PaymentsSummaryDto paymentsSummary(
+            @RequestParam int month,
+            @RequestParam int year) {
+
+        return analyticsService.getPaymentsSummary(month, year);
+    }
+
+    @GetMapping("/failed-summary")
+    public FailedPaymentSummaryDto failedPayments(
+            @RequestParam int month,
+            @RequestParam int year) {
+
+        return analyticsService.getFailedPaymentsSummary(month, year);
+    }
+
     @GetMapping("/revenue-by-mode")
     public List<PaymentModeSummaryDto> revenueByMode(
             @RequestParam int month,
@@ -40,5 +58,12 @@ public class PaymentAnalyticsController {
             @RequestParam int year) {
 
         return analyticsService.getConsumerPaymentSummary(month, year);
+    }
+
+    @GetMapping("/revenue-yearly")
+    public List<RevenueSummaryDto> yearlyRevenue(
+            @RequestParam int year) {
+
+        return analyticsService.getYearlyRevenue(year);
     }
 }
