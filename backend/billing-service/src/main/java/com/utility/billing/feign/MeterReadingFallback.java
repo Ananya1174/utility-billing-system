@@ -10,6 +10,6 @@ public class MeterReadingFallback implements MeterReadingClient {
 
     @Override
     public MeterReadingResponse getLatest(String connectionId) {
-        return null; // 👈 IMPORTANT
+        return null; 
     }
 }

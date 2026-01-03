@@ -2,6 +2,7 @@ package com.utility.billing.controller;
 
 import com.utility.billing.dto.BillResponse;
 import com.utility.billing.dto.GenerateBillRequest;
+import com.utility.billing.model.BillStatus;
 import com.utility.billing.service.BillingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,15 @@ public class BillingController {
     @GetMapping("/{billId}")
     public BillResponse getBillById(@PathVariable String billId) {
         return service.getBillById(billId);
+    }
+    @GetMapping
+    public List<BillResponse> getAllBills(
+            @RequestParam(required = false) BillStatus status,
+            @RequestParam(required = false) Integer month,
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) String consumerId
+    ) {
+        return service.getAllBills(status, month, year, consumerId);
     }
     
 }

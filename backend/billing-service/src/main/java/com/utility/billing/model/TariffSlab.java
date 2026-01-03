@@ -17,7 +17,7 @@ public class TariffSlab {
     @Id
     private String id;
     
-    @Field(targetType = FieldType.STRING)   // ✅ ADD THIS
+    @Field(targetType = FieldType.STRING)  
     private UtilityType utilityType;
     private String planCode;        
 

@@ -195,6 +195,35 @@ public class BillingService {
 		}
 		return bills.stream().map(this::map).toList();
 	}
+	public List<BillResponse> getAllBills(
+	        BillStatus status,
+	        Integer month,
+	        Integer year,
+	        String consumerId
+	) {
+
+	    List<Bill> bills;
+
+	    if (consumerId != null && status != null) {
+	        bills = billRepository.findByConsumerIdAndStatus(consumerId, status);
+
+	    } else if (consumerId != null) {
+	        bills = billRepository.findByConsumerId(consumerId);
+
+	    } else if (status != null) {
+	        bills = billRepository.findByStatus(status);
+
+	    } else if (month != null && year != null) {
+	        bills = billRepository.findByBillingMonthAndBillingYear(month, year);
+
+	    } else {
+	        bills = billRepository.findAll();
+	    }
+
+	    return bills.stream()
+	            .map(this::map)
+	            .toList();
+	}
 
 	private BillResponse map(Bill bill) {
 

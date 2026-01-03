@@ -49,6 +49,8 @@ public class SecurityConfig {
                 /* ================= BILL VIEW ================= */
                 .requestMatchers(HttpMethod.GET, "/bills/**")
                     .hasAnyRole("CONSUMER", "ACCOUNTS_OFFICER", "BILLING_OFFICER","ADMIN")
+                    .requestMatchers(HttpMethod.GET, "/bills")
+                    .hasAnyRole("ADMIN", "BILLING_OFFICER")
 
                 .anyRequest().authenticated()
             )
