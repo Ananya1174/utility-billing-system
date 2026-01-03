@@ -20,50 +20,29 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TariffQueryService {
 
-    private final TariffPlanRepository planRepo;
-    private final TariffSlabRepository slabRepo;
+	private final TariffPlanRepository planRepo;
+	private final TariffSlabRepository slabRepo;
 
-    public TariffResponseDto getTariffsByUtility(UtilityType utilityType) {
+	public TariffResponseDto getTariffsByUtility(UtilityType utilityType) {
 
-        // 1️⃣ Fetch active plans
-        List<TariffPlan> plans =
-                planRepo.findByUtilityTypeAndActiveTrue(utilityType);
+		List<TariffPlan> plans = planRepo.findByUtilityTypeAndActiveTrue(utilityType);
 
-        if (plans.isEmpty()) {
-            return new TariffResponseDto(
-                    utilityType.name(),
-                    List.of()
-            );
-        }
+		if (plans.isEmpty()) {
+			return new TariffResponseDto(utilityType.name(), List.of());
+		}
 
-        // 2️⃣ Build response
-        List<TariffPlanDto> planDtos = plans.stream()
-                .map(plan -> {
+		List<TariffPlanDto> planDtos = plans.stream().map(plan -> {
 
-                    List<TariffSlab> slabs =
-                            slabRepo.findByUtilityTypeAndPlanCodeOrderByMinUnitsAsc(
-                                    utilityType,
-                                    plan.getPlanCode()
-                            );
+			List<TariffSlab> slabs = slabRepo.findByUtilityTypeAndPlanCodeOrderByMinUnitsAsc(utilityType,
+					plan.getPlanCode());
 
-                    List<TariffSlabDto> slabDtos = slabs.stream()
-                            .map(slab -> new TariffSlabDto(
-                                    slab.getMinUnits(),
-                                    slab.getMaxUnits(),
-                                    slab.getRate()
-                            ))
-                            .collect(Collectors.toList());
+			List<TariffSlabDto> slabDtos = slabs.stream()
+					.map(slab -> new TariffSlabDto(slab.getMinUnits(), slab.getMaxUnits(), slab.getRate()))
+					.collect(Collectors.toList());
 
-                    return new TariffPlanDto(
-                            plan.getPlanCode(),
-                            slabDtos
-                    );
-                })
-                .collect(Collectors.toList());
+			return new TariffPlanDto(plan.getPlanCode(), slabDtos);
+		}).collect(Collectors.toList());
 
-        return new TariffResponseDto(
-                utilityType.name(),
-                planDtos
-        );
-    }
+		return new TariffResponseDto(utilityType.name(), planDtos);
+	}
 }
