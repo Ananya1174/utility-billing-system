@@ -1,6 +1,5 @@
 <div class="page-container">
 
-  <!-- HEADER -->
   <div class="page-header">
     <h2>My Utilities</h2>
 
@@ -12,17 +11,16 @@
     </button>
   </div>
 
-  <!-- EMPTY STATE -->
-  <div class="empty-state" *ngIf="!hasUtilities">
-    <p>You don’t have any utilities yet.</p>
+  <div *ngIf="loading">Loading...</div>
+
+  <div class="empty-state" *ngIf="!loading && !hasUtilities">
+    <p>No utilities found.</p>
     <button class="primary-btn" (click)="openRequestDialog()">
       Request Utility
     </button>
   </div>
 
-  <!-- UTILITIES LIST -->
-  <div class="utilities-grid" *ngIf="hasUtilities">
-
+  <div class="utilities-grid" *ngIf="!loading && hasUtilities">
     <div class="utility-card" *ngFor="let u of utilities">
 
       <h3>{{ u.utilityType }}</h3>
@@ -33,23 +31,16 @@
         <strong>Meter No:</strong> {{ u.meterNumber }}
       </p>
 
-      <span
-        class="status"
-        [ngClass]="u.status.toLowerCase()">
+      <span class="status" [ngClass]="u.status.toLowerCase()">
         {{ u.status }}
       </span>
-
       <p class="hint" *ngIf="u.status === 'PENDING'">
         Waiting for admin approval
       </p>
 
-      <button
-        class="secondary-btn"
-        *ngIf="u.status === 'APPROVED'">
-        View Bills
-      </button>
-
+      
     </div>
   </div>
+
 
 </div>

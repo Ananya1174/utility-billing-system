@@ -1,23 +1,34 @@
-<h2>User Management</h2>
-<p>Manage all system users</p>
 
-<!-- TABS -->
-<div class="tabs">
-  <button (click)="setTab('ALL')" [class.active]="activeTab === 'ALL'">
-    All Users
-  </button>
-  <button (click)="setTab('CONSUMER')" [class.active]="activeTab === 'CONSUMER'">
-    Consumers
-  </button>
-  <button (click)="setTab('BILLING_OFFICER')" [class.active]="activeTab === 'BILLING_OFFICER'">
-    Billing Officers
-  </button>
-  <button (click)="setTab('ACCOUNTS_OFFICER')" [class.active]="activeTab === 'ACCOUNTS_OFFICER'">
-    Accounts Officers
-  </button>
+
+<h2>User Management</h2>
+<p class="subtitle">Manage all system users</p>
+
+<div class="top-bar">
+  <div class="tabs">
+    <button (click)="setTab('ALL')" [class.active]="activeTab === 'ALL'">
+      All Users
+    </button>
+    <button (click)="setTab('CONSUMER')" [class.active]="activeTab === 'CONSUMER'">
+      Consumers
+    </button>
+    <button (click)="setTab('BILLING_OFFICER')" [class.active]="activeTab === 'BILLING_OFFICER'">
+      Billing Officers
+    </button>
+    <button (click)="setTab('ACCOUNTS_OFFICER')" [class.active]="activeTab === 'ACCOUNTS_OFFICER'">
+      Accounts Officers
+    </button>
+  </div>
+
+  <div class="page-size">
+    <label>Rows:</label>
+    <select [(ngModel)]="itemsPerPage" (change)="onPageSizeChange()">
+      <option [value]="10">10</option>
+      <option [value]="25">25</option>
+      <option [value]="50">50</option>
+    </select>
+  </div>
 </div>
 
-<!-- USERS TABLE -->
 <table class="users-table">
   <thead>
     <tr>
@@ -31,7 +42,7 @@
   </thead>
 
   <tbody>
-    <tr *ngFor="let user of filteredUsers">
+    <tr *ngFor="let user of paginatedUsers">
       <td class="mono">{{ user.userId }}</td>
       <td>{{ user.username }}</td>
       <td>{{ user.email }}</td>
@@ -44,20 +55,34 @@
         </span>
       </td>
       <td>
-  <!-- Show delete ONLY if user is ACTIVE -->
-  <button
-    *ngIf="user.status === 'ACTIVE'"
-    class="delete-btn"
-    (click)="deleteUser(user.userId)">
-    Delete
-  </button>
-
-
-</td>
+        <button
+          *ngIf="user.status === 'ACTIVE'"
+          class="delete-btn"
+          (click)="deleteUser(user.userId)">
+          Delete
+        </button>
+      </td>
     </tr>
 
     <tr *ngIf="filteredUsers.length === 0">
-      <td colspan="6">No users found</td>
+      <td colspan="6" class="empty">No users found</td>
     </tr>
   </tbody>
 </table>
+
+<div class="pagination" *ngIf="totalPages > 1">
+  <button (click)="prevPage()" [disabled]="currentPage === 1">
+    Prev
+  </button>
+
+  <button
+    *ngFor="let page of pages"
+    (click)="goToPage(page)"
+    [class.active]="currentPage === page">
+    {{ page }}
+  </button>
+
+  <button (click)="nextPage()" [disabled]="currentPage === totalPages">
+    Next
+  </button>
+</div>
