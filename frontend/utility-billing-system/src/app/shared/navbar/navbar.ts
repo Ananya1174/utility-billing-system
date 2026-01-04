@@ -46,13 +46,12 @@ export class Navbar {
   }
 
   logout() {
-    this.logoutDialog = false;
+  this.logoutDialog = false;
 
-    // Clear auth
-    localStorage.clear();
-    sessionStorage.clear();
+  localStorage.clear();
+  sessionStorage.clear();
 
-    // Redirect to login
-    this.router.navigateByUrl('/login');
-  }
+  // Redirect to landing
+  this.router.navigate(['/']);
+}
 }

@@ -1,32 +1,56 @@
-<div class="login-container">
-  <div class="login-card">
-    <h2>Welcome Back</h2>
-    <p class="subtitle">Login to manage your utility services</p>
 
-    <form [formGroup]="loginForm" (ngSubmit)="login()">
+<div class="login-wrapper">
 
-      <label>Username</label>
-      <input
-        type="text"
-        placeholder="Enter username"
-        formControlName="username"
-      />
-
-      <label>Password</label>
-      <input
-        type="password"
-        placeholder="Enter password"
-        formControlName="password"
-      />
-
-      <button type="submit" [disabled]="loginForm.invalid">
-        Login
-      </button>
-
-      <p class="error" *ngIf="errorMessage">
-        {{ errorMessage }}
-      </p>
-
-    </form>
+  <!-- LEFT SIDE -->
+  <div class="login-left">
+    <img
+      src="assets/undraw_enter-password_1kl4.svg"
+      alt="Login illustration"
+    />
   </div>
+
+  <!-- RIGHT SIDE -->
+  <div class="login-right">
+    <div class="login-card">
+
+      <h2>Hello!</h2>
+      <p class="subtitle">Sign in to get started</p>
+
+      <form [formGroup]="loginForm" (ngSubmit)="login()">
+
+        <div class="input-group">
+          <input
+            type="text"
+            placeholder="Username"
+            formControlName="username"
+            autocomplete="username"
+          />
+        </div>
+
+        <div class="input-group">
+          <input
+            type="password"
+            placeholder="Password"
+            formControlName="password"
+            autocomplete="current-password"
+          />
+        </div>
+
+        <button type="submit" [disabled]="loginForm.invalid">
+          Login
+        </button>
+
+        <a class="forgot-password" (click)="goToForgotPassword()">
+          Forgot Password
+        </a>
+
+        <p class="error" *ngIf="errorMessage">
+          {{ errorMessage }}
+        </p>
+
+      </form>
+
+    </div>
+  </div>
+
 </div>

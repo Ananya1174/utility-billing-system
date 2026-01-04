@@ -45,22 +45,24 @@ export class LoginComponent {
 
         // FORCE PASSWORD CHANGE (CONSUMER ONLY)
         if (res.role === 'CONSUMER' && res.passwordChangeRequired) {
-          this.router.navigate(['/change-password'], {
-            queryParams: { firstLogin: true }
-          });
-          return;
-        }
+  this.router.navigate(['/change-password'], {
+    queryParams: { firstLogin: true }
+  });
+  return;
+}
 
-        // ROLE BASED REDIRECT
-        if (res.role === 'ADMIN') {
-          this.router.navigate(['/admin/dashboard']);
-        } else {
-          this.router.navigate(['/home']);
-        }
+if (res.role === 'ADMIN') {
+  this.router.navigate(['/admin/dashboard']);
+} else {
+  this.router.navigate(['/home']);
+}
       },
       error: () => {
         this.errorMessage = 'Invalid username or password';
       }
     });
+}
+goToForgotPassword() {
+  this.router.navigate(['/forgot-password']);
 }
 }

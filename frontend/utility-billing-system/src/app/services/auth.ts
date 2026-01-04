@@ -20,4 +20,17 @@ export class AuthService {
     }
   );
 }
+forgotPassword(payload: { email: string }) {
+  return this.http.post(
+    'http://localhost:8031/auth/forgot-password',
+    payload
+  );
+}
+
+resetPassword(payload: { resetToken: string; newPassword: string }) {
+  return this.http.post(
+    'http://localhost:8031/auth/reset-password',
+    payload
+  );
+}
 }
