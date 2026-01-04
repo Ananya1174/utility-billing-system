@@ -1,0 +1,30 @@
+<h3>Request Utility</h3>
+
+<form>
+
+  <label>Utility Type</label>
+  <select [(ngModel)]="utilityType" name="utility" (change)="onUtilityChange()">
+    <option value="">Select utility</option>
+    <option *ngFor="let u of availableUtilities" [value]="u">
+      {{ u }}
+    </option>
+  </select>
+
+  <label>Tariff Plan</label>
+  <select [(ngModel)]="tariffPlan" name="tariff">
+    <option value="">Select plan</option>
+    <option *ngFor="let t of tariffPlans" [value]="t">
+      {{ t }}
+    </option>
+  </select>
+
+  <div class="actions">
+    <button type="button" class="primary-btn" (click)="submit()">
+      Submit
+    </button>
+    <button type="button" class="secondary-btn" (click)="cancel()">
+      Cancel
+    </button>
+  </div>
+
+</form>

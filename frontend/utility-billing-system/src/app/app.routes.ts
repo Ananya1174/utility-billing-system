@@ -16,6 +16,10 @@ import { ForcePasswordChangeGuard } from './core/guards/force-password-change-gu
 import { AuthLayoutComponent } from './shared/auth-layout';
 import { ForgotPasswordComponent } from './core/auth/forgot-password/forgot-password';
 import { ResetPasswordComponent } from './core/auth/reset-password/reset-password';
+import { ConsumerDashboard } from './features/consumer/consumer-dashboard/consumer-dashboard';
+import { MyUtilitiesComponent } from './features/consumer/my-utilities/my-utilities';
+
+
 export const routes: Routes = [
 
   // ---------- PUBLIC ----------
@@ -24,7 +28,7 @@ export const routes: Routes = [
   { path: 'create-account', component: CreateAccountComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'reset-password', component: ResetPasswordComponent },
-
+  { path: 'profile', component: ProfileComponent },
 
   // ---------- AUTHENTICATED (NAVBAR INCLUDED) ----------
   {
@@ -33,10 +37,18 @@ export const routes: Routes = [
   canActivateChild: [ForcePasswordChangeGuard],
   children: [
 
+    // TEMP (will remove later)
     { path: 'home', component: Home },
+
     { path: 'change-password', component: ChangePasswordComponent },
 
-    // ADMIN
+    // ---------- CONSUMER ----------
+    { path: 'consumer/dashboard', component: ConsumerDashboard },
+    { path: 'consumer/utilities', component: MyUtilitiesComponent },
+    //{ path: 'consumer/bills', component: BillsComponent },
+    //{ path: 'consumer/payments', component: PaymentsComponent },
+
+    // ---------- ADMIN ----------
     { path: 'admin/dashboard', component: AdminDashboardComponent },
     { path: 'admin/reports', component: AdminReportsComponent },
     { path: 'admin/users', component: UserManagementComponent },

@@ -6,12 +6,12 @@
   <ul class="navbar-links">
 
     <!-- CONSUMER -->
-    <ng-container *ngIf="isConsumer()">
-       <li><a routerLink="/consumer/dashboard">Dashboard</a></li>
+   <ng-container *ngIf="isConsumer()">
+  <li><a routerLink="/consumer/dashboard">Dashboard</a></li>
   <li><a routerLink="/consumer/utilities">My Utilities</a></li>
   <li><a routerLink="/consumer/bills">Bills</a></li>
   <li><a routerLink="/consumer/payments">Payments</a></li>
-    </ng-container>
+</ng-container>
 
     <!-- ADMIN -->
     <ng-container *ngIf="isAdmin()">
