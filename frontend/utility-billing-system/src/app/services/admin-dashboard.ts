@@ -10,7 +10,13 @@ export class AdminDashboardService {
 
   getBillsSummary(month: number, year: number) {
     return this.http.get<any>(
-      `${this.baseUrl}/dashboard/bills-summary?month=${month}&year=${year}`
+      `${this.baseUrl}/dashboard/billing/bills-summary?month=${month}&year=${year}`
+    );
+  }
+
+  getConsumptionSummary(month: number, year: number) {
+    return this.http.get<any[]>(
+      `${this.baseUrl}/dashboard/billing/consumption-summary?month=${month}&year=${year}`
     );
   }
 
@@ -26,21 +32,15 @@ export class AdminDashboardService {
     );
   }
 
-  getPendingUtilityRequests() {
-    return this.http.get<any[]>(
-      `${this.baseUrl}/connections/requests/pending`
-    );
-  }
-
-  getConsumptionSummary(month: number, year: number) {
-    return this.http.get<any[]>(
-      `${this.baseUrl}/dashboard/consumption-summary?month=${month}&year=${year}`
-    );
-  }
-
   getRevenueByMode(month: number, year: number) {
     return this.http.get<any[]>(
       `${this.baseUrl}/dashboard/payments/revenue-by-mode?month=${month}&year=${year}`
+    );
+  }
+
+  getPendingUtilityRequests() {
+    return this.http.get<any[]>(
+      `${this.baseUrl}/connections/requests/pending`
     );
   }
 }

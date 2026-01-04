@@ -13,7 +13,7 @@ import { HttpClient } from '@angular/common/http';
 export class BillingPaymentsComponent {
 
   consumerId = '';
-  activeTab = 'BILLS';
+  activeTab: 'BILLS' | 'PAYMENTS' | 'OUTSTANDING' | 'INVOICE' = 'BILLS';
 
   bills: any[] = [];
   payments: any[] = [];
@@ -21,11 +21,12 @@ export class BillingPaymentsComponent {
   selectedBill: any = null;
   outstanding: any = null;
 
-  selectedPayment: any = null;
-  invoice: any = null;
+  selectedInvoice: any = null;
 
   private baseUrl = 'http://localhost:8031';
-  private invoiceBaseUrl = 'http://localhost:8035';
+
+  loading = false;
+  error = '';
 
   constructor(
     private http: HttpClient,
@@ -35,10 +36,20 @@ export class BillingPaymentsComponent {
   loadData() {
     if (!this.consumerId) return;
 
+    this.loading = true;
+    this.error = '';
+
     this.http.get<any[]>(`${this.baseUrl}/bills/consumer/${this.consumerId}`)
-      .subscribe(res => {
-        this.bills = res;
-        this.cdr.detectChanges();
+      .subscribe({
+        next: res => {
+          this.bills = res;
+          this.loading = false;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.error = 'No bills found for this consumer';
+          this.loading = false;
+        }
       });
 
     this.http.get<any[]>(`${this.baseUrl}/payments/consumer/${this.consumerId}`)
@@ -48,56 +59,48 @@ export class BillingPaymentsComponent {
       });
   }
 
-  viewBill(billId: string) {
-    this.http.get<any>(`${this.baseUrl}/bills/${billId}`)
-      .subscribe(res => {
-        this.selectedBill = res;
-        this.activeTab = 'OUTSTANDING';
-        this.loadOutstanding(billId);
-      });
-  }
+  viewBill(bill: any) {
+    this.selectedBill = bill;
+    this.activeTab = 'OUTSTANDING';
 
-  loadOutstanding(billId: string) {
-    this.http.get<any>(`${this.baseUrl}/payments/outstanding/${billId}`)
+    this.http.get<any>(`${this.baseUrl}/payments/outstanding/${bill.id}`)
       .subscribe(res => {
         this.outstanding = res;
         this.cdr.detectChanges();
       });
   }
 
-  viewInvoice(paymentId: string) {
-    this.http.get<any>(`${this.baseUrl}/payments/invoice/${paymentId}`)
-      .subscribe(res => {
-        this.invoice = res;
+  viewInvoice(payment: any) {
+  this.loading = true;
+  this.error = '';
+
+  this.http
+    .get<any>(`${this.baseUrl}/payments/invoice/${payment.paymentId}`)
+    .subscribe({
+      next: (invoice) => {
+        this.selectedInvoice = invoice;   // ✅ real invoice
         this.activeTab = 'INVOICE';
+        this.loading = false;
         this.cdr.detectChanges();
-      });
-  }
+      },
+      error: () => {
+        this.loading = false;
+        this.error = 'Invoice not found for this payment';
+      }
+    });
+}
 
   downloadInvoice(paymentId: string) {
-
-  this.http.get(
-    `${this.baseUrl}/payments/invoice/${paymentId}/download`,
-    {
-      responseType: 'blob',  
-      observe: 'response'
-    }
-  ).subscribe({
-    next: (res) => {
-      const blob = res.body!;
+    this.http.get(
+      `${this.baseUrl}/payments/invoice/${paymentId}/download`,
+      { responseType: 'blob' }
+    ).subscribe(blob => {
       const url = window.URL.createObjectURL(blob);
-
       const a = document.createElement('a');
       a.href = url;
       a.download = `invoice-${paymentId}.pdf`;
       a.click();
-
       window.URL.revokeObjectURL(url);
-    },
-    error: err => {
-      console.error('Download failed', err);
-      alert('Invoice download failed (Unauthorized or Forbidden)');
-    }
-  });
-}
+    });
+  }
 }

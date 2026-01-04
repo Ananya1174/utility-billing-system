@@ -1,57 +1,78 @@
 <app-navbar></app-navbar>
 
 <div class="dashboard-container">
-  <h2>Admin Dashboard</h2>
-  ...
-</div>
-<div class="dashboard-container">
 
   <h2>Admin Dashboard</h2>
+
+  <!-- FILTER BAR -->
+  <div class="filters">
+    <select [(ngModel)]="month" (change)="onFilterChange()">
+      <option *ngFor="let m of months" [value]="m.value">
+        {{ m.name }}
+      </option>
+    </select>
+
+    <select [(ngModel)]="year" (change)="onFilterChange()">
+      <option *ngFor="let y of years" [value]="y">
+        {{ y }}
+      </option>
+    </select>
+  </div>
 
   <!-- SUMMARY CARDS -->
   <div class="cards">
     <div class="card">
       <h4>Monthly Revenue</h4>
-      <p>₹ {{ revenueSummary?.totalRevenue }}</p>
+      <p>₹ {{ revenueSummary?.totalRevenue || 0 }}</p>
     </div>
 
     <div class="card">
-      <h4>Outstanding Amount</h4>
-      <p>₹ {{ outstandingSummary?.outstandingAmount }}</p>
+      <h4>Outstanding</h4>
+      <p>₹ {{ outstandingSummary?.outstandingAmount || 0 }}</p>
     </div>
 
     <div class="card">
       <h4>Total Bills</h4>
-      <p>{{ billsSummary?.totalBills }}</p>
+      <p>{{ billsSummary?.totalBills || 0 }}</p>
     </div>
 
     <div class="card">
-      <h4>Pending Utility Requests</h4>
+      <h4>Pending Requests</h4>
       <p>{{ pendingRequestsCount }}</p>
     </div>
   </div>
 
-  <!-- CHARTS -->
+  <!-- DATA SECTIONS -->
   <div class="charts">
 
-    <div class="chart">
-      <h4>Consumption by Utility</h4>
-      <ul>
-        <li *ngFor="let c of consumptionData">
-          {{ c.utilityType }} : {{ c.totalUnits }} units
-        </li>
-      </ul>
-    </div>
+    <!-- CONSUMPTION -->
+<div class="chart">
+  <h4>Consumption by Utility</h4>
 
-    <div class="chart">
-      <h4>Revenue by Payment Mode</h4>
-      <ul>
-        <li *ngFor="let r of revenueByMode">
-          {{ r.mode }} : ₹ {{ r.amount }}
-        </li>
-      </ul>
-    </div>
+  <canvas
+    *ngIf="consumptionChartData"
+    baseChart
+    [data]="consumptionChartData"
+    [type]="'pie'">
+  </canvas>
 
-  </div>
+  <p *ngIf="!consumptionData.length" class="empty">
+    No consumption data
+  </p>
+</div>
 
+<!-- REVENUE BY MODE -->
+<div class="chart">
+  <h4>Revenue by Payment Mode</h4>
+
+  <canvas
+    *ngIf="revenueChartData"
+    baseChart
+    [data]="revenueChartData"
+    [type]="'bar'">
+  </canvas>
+
+  <p *ngIf="!revenueByMode.length" class="empty">
+    No revenue data
+  </p>
 </div>
