@@ -79,15 +79,17 @@ export class ResetPasswordComponent {
     };
 
     this.authService.resetPassword(payload).subscribe({
-      next: () => {
-        this.loading = false;
-        this.snackBar.open(
-          'Password reset successful',
-          'OK',
-          { duration: 3000 }
-        );
-        this.router.navigate(['/login']);
-      },
+      next: (res: string) => {
+  this.loading = false;
+
+  this.snackBar.open(
+    res || 'Password reset successful',
+    'OK',
+    { duration: 3000 }
+  );
+
+  this.router.navigate(['/login']);
+},
       error: (err) => {
         this.loading = false;
         this.snackBar.open(

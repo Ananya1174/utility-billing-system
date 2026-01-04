@@ -42,15 +42,15 @@ export class ForgotPasswordComponent {
     this.loading = true;
 
     this.authService.forgotPassword({ email }).subscribe({
-      next: (res: any) => {
-        this.loading = false;
-        this.snackBar.open(
-          res?.message || 'Password reset link sent to email',
-          'OK',
-          { duration: 3000 }
-        );
-        this.form.reset();
-      },
+      next: (res: string) => {
+  this.loading = false;
+  this.snackBar.open(
+    res || 'Password reset link sent to email',
+    'OK',
+    { duration: 3000 }
+  );
+  this.form.reset();
+},
       error: (err) => {
         this.loading = false;
         this.snackBar.open(
