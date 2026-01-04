@@ -1,56 +1,65 @@
 
-<div class="login-wrapper">
 
-  <!-- LEFT SIDE -->
-  <div class="login-left">
-    <img
-      src="assets/undraw_enter-password_1kl4.svg"
-      alt="Login illustration"
-    />
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-container">
+    <button class="logo" (click)="goHome()">⚡ UtilityBilling</button>
+
+    <div class="nav-actions">
+      <button class="btn ghost" (click)="goToLogin()">Login</button>
+      <button class="btn primary" (click)="goToCreateAccount()">Create Account</button>
+    </div>
   </div>
+</nav>
 
-  <!-- RIGHT SIDE -->
-  <div class="login-right">
-    <div class="login-card">
+<!-- PAGE -->
+<div class="login-page">
 
-      <h2>Hello!</h2>
-      <p class="subtitle">Sign in to get started</p>
+  <div class="login-card">
+
+    <!-- LEFT : FORM -->
+    <div class="login-form">
+      <h2>Welcome Back</h2>
+      <p class="subtitle">
+        Login to manage your utility services.
+      </p>
 
       <form [formGroup]="loginForm" (ngSubmit)="login()">
 
-        <div class="input-group">
-          <input
-            type="text"
-            placeholder="Username"
-            formControlName="username"
-            autocomplete="username"
-          />
-        </div>
+        <input
+          type="text"
+          placeholder="Username"
+          formControlName="username"
+          autocomplete="username"
+        />
 
-        <div class="input-group">
-          <input
-            type="password"
-            placeholder="Password"
-            formControlName="password"
-            autocomplete="current-password"
-          />
-        </div>
+        <input
+          type="password"
+          placeholder="Password"
+          formControlName="password"
+          autocomplete="current-password"
+        />
 
         <button type="submit" [disabled]="loginForm.invalid">
           Login
         </button>
 
-        <a class="forgot-password" (click)="goToForgotPassword()">
-          Forgot Password
-        </a>
+        <a class="forgot-password">Forgot Password?</a>
 
         <p class="error" *ngIf="errorMessage">
           {{ errorMessage }}
         </p>
 
       </form>
-
     </div>
-  </div>
 
+    <!-- RIGHT : IMAGE -->
+    <div class="login-image">
+      <img
+        src="/assets/login.svg"
+        alt="Login illustration"
+      />
+    </div>
+
+  </div>
 </div>

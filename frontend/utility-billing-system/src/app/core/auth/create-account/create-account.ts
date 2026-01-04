@@ -1,14 +1,17 @@
+
+
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-create-account',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './create-account.html',
-  styleUrl: './create-account.css'
+  styleUrls: ['./create-account.css']
 })
 export class CreateAccountComponent {
 
@@ -22,7 +25,8 @@ export class CreateAccountComponent {
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router
   ) {
     this.accountForm = this.fb.group({
       name: ['', Validators.required],
@@ -34,6 +38,7 @@ export class CreateAccountComponent {
       address: ['', Validators.required]
     });
   }
+
   get f() {
     return this.accountForm.controls;
   }
@@ -51,14 +56,25 @@ export class CreateAccountComponent {
           this.cdr.detectChanges();
         },
         error: (err) => {
-          console.log('ERROR OBJECT 👉', err);
-
           this.errorMessage =
             err?.error?.message || 'Something went wrong. Please try again.';
           this.successMessage = '';
-
           this.cdr.detectChanges();
         }
       });
+  }
+
+  /* ================= NAVBAR METHODS ================= */
+
+  goHome(): void {
+    this.router.navigate(['/']);
+  }
+
+  goToLogin(): void {
+    this.router.navigate(['/login']);
+  }
+
+  goToCreateAccount(): void {
+    this.router.navigate(['/create-account']);
   }
 }
