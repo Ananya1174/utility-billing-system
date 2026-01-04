@@ -1,10 +1,12 @@
+
+
 <h2>Billing & Payments</h2>
 <p class="subtitle">
   View consumer bills, payments, outstanding balance and invoices
 </p>
 
 <!-- SEARCH -->
-<div class="search-box">
+<div class="filters">
   <input
     type="text"
     placeholder="Enter Consumer ID"
@@ -13,151 +15,129 @@
   <button (click)="loadData()">Load</button>
 </div>
 
-<p *ngIf="error" class="error">{{ error }}</p>
+<p *ngIf="error" class="danger">{{ error }}</p>
 <p *ngIf="loading" class="loading">Loading data...</p>
 
 <!-- TABS -->
 <div class="tabs">
-  <button [class.active]="activeTab==='BILLS'" (click)="activeTab='BILLS'">Bills</button>
-  <button [class.active]="activeTab==='PAYMENTS'" (click)="activeTab='PAYMENTS'">Payments</button>
-  <button [disabled]="!selectedBill" [class.active]="activeTab==='OUTSTANDING'" (click)="activeTab='OUTSTANDING'">
-    Outstanding
-  </button>
-  <button [disabled]="!selectedInvoice" [class.active]="activeTab==='INVOICE'" (click)="activeTab='INVOICE'">
-    Invoice
-  </button>
+  <button [class.active]="activeTab==='BILLS'" (click)="switchTab('BILLS')">Bills</button>
+  <button [class.active]="activeTab==='PAYMENTS'" (click)="switchTab('PAYMENTS')">Payments</button>
+  <button [disabled]="!selectedBill" [class.active]="activeTab==='OUTSTANDING'"
+          (click)="activeTab='OUTSTANDING'">Outstanding</button>
+  <button [disabled]="!selectedInvoice" [class.active]="activeTab==='INVOICE'"
+          (click)="activeTab='INVOICE'">Invoice</button>
 </div>
 
 <!-- ================= BILLS ================= -->
 <div *ngIf="activeTab==='BILLS'" class="card">
   <table>
-    <tr>
-      <th>Bill ID</th>
-      <th>Utility</th>
-      <th>Period</th>
-      <th>Amount</th>
-      <th>Status</th>
-      <th></th>
-    </tr>
+    <thead>
+      <tr>
+        <th class="sortable" (click)="sort('bills','id')">
+          Bill ID <span class="sort-icon">{{ sortIcon('bills','id') }}</span>
+        </th>
+        <th class="sortable" (click)="sort('bills','utilityType')">
+          Utility <span class="sort-icon">{{ sortIcon('bills','utilityType') }}</span>
+        </th>
+        <th>Period</th>
+        <th class="sortable" (click)="sort('bills','payableAmount')">
+          Amount <span class="sort-icon">{{ sortIcon('bills','payableAmount') }}</span>
+        </th>
+        <th>Status</th>
+        <th></th>
+      </tr>
+    </thead>
 
-    <tr *ngFor="let b of bills">
-      <td class="mono">{{ b.id }}</td>
-      <td>{{ b.utilityType }}</td>
-      <td>{{ b.billingMonth }}/{{ b.billingYear }}</td>
-      <td>₹ {{ b.payableAmount }}</td>
-      <td>
-        <span class="status" [ngClass]="b.status.toLowerCase()">
-          {{ b.status }}
-        </span>
-      </td>
-      <td>
-        <button class="link" (click)="viewBill(b)">View</button>
-      </td>
-    </tr>
+    <tbody>
+      <tr *ngFor="let b of pagedBills">
+        <td class="mono">{{ b.id }}</td>
+        <td>{{ b.utilityType }}</td>
+        <td>{{ b.billingMonth }}/{{ b.billingYear }}</td>
+        <td>₹ {{ b.payableAmount }}</td>
+        <td>{{ b.status }}</td>
+        <td>
+          <button class="link" (click)="viewBill(b)">View</button>
+        </td>
+      </tr>
+    </tbody>
   </table>
 
-  <p *ngIf="!bills.length" class="empty">No bills available</p>
+  <p *ngIf="!pagedBills.length" class="empty">No bills available</p>
+
+  <!-- PAGINATION -->
+  <div class="pagination">
+  <select [(ngModel)]="pageSize" (change)="updatePaging()">
+    <option [value]="10">10</option>
+    <option [value]="25">25</option>
+    <option [value]="50">50</option>
+  </select>
+
+  <div class="pager">
+    <button class="prev" (click)="prevPage()" [disabled]="pageIndex === 0">
+      Prev
+    </button>
+
+    <button class="next"
+            (click)="nextPage()"
+            [disabled]="pageIndex >= totalPages - 1">
+      Next
+    </button>
+  </div>
+</div>
 </div>
 
 <!-- ================= PAYMENTS ================= -->
 <div *ngIf="activeTab==='PAYMENTS'" class="card">
   <table>
-    <tr>
-      <th>Payment ID</th>
-      <th>Bill ID</th>
-      <th>Amount</th>
-      <th>Mode</th>
-      <th>Status</th>
-      <th>Invoice</th>
-    </tr>
+    <thead>
+      <tr>
+        <th class="sortable" (click)="sort('payments','paymentId')">
+          Payment ID <span class="sort-icon">{{ sortIcon('payments','paymentId') }}</span>
+        </th>
+        <th>Bill ID</th>
+        <th class="sortable" (click)="sort('payments','amount')">
+          Amount <span class="sort-icon">{{ sortIcon('payments','amount') }}</span>
+        </th>
+        <th>Mode</th>
+        <th>Status</th>
+        <th>Invoice</th>
+      </tr>
+    </thead>
 
-    <tr *ngFor="let p of payments">
-      <td class="mono">{{ p.paymentId }}</td>
-      <td class="mono">{{ p.billId }}</td>
-      <td>₹ {{ p.amount }}</td>
-      <td>{{ p.mode }}</td>
-      <td>{{ p.status }}</td>
-      <td>
-       <button
-  *ngIf="p.invoiceId"
-  (click)="viewInvoice(p)">
-  View 
-</button>
-        <button
-  *ngIf="p.status === 'SUCCESS' && p.invoiceId"
-  (click)="downloadInvoice(p.paymentId)">
-  Download
-</button>
-      </td>
-    </tr>
+    <tbody>
+      <tr *ngFor="let p of pagedPayments">
+        <td class="mono">{{ p.paymentId }}</td>
+        <td class="mono">{{ p.billId }}</td>
+        <td>₹ {{ p.amount }}</td>
+        <td>{{ p.mode }}</td>
+        <td>{{ p.status }}</td>
+        <td>
+          <button *ngIf="p.invoiceId" (click)="viewInvoice(p)">View</button>
+          <button *ngIf="p.invoiceId && p.status==='SUCCESS'"
+                  (click)="downloadInvoice(p.paymentId)">Download</button>
+        </td>
+      </tr>
+    </tbody>
   </table>
 
-  <p *ngIf="!payments.length" class="empty">No payments available</p>
-</div>
+  <p *ngIf="!pagedPayments.length" class="empty">No payments available</p>
 
-<!-- ================= OUTSTANDING ================= -->
-<div *ngIf="activeTab==='OUTSTANDING' && outstanding" class="summary-card">
-  <h3>Outstanding Summary</h3>
-
-  <div class="row">
-    <span>Total Amount</span>
-    <span>₹ {{ outstanding.totalAmount }}</span>
-  </div>
-
-  <div class="row">
-    <span>Paid</span>
-    <span>₹ {{ outstanding.totalPaid }}</span>
-  </div>
-
-  <div class="row highlight">
-    <span>Outstanding</span>
-    <span>₹ {{ outstanding.outstandingAmount }}</span>
-  </div>
-</div>
-
-<!-- INVOICE -->
-<div *ngIf="activeTab === 'INVOICE' && selectedInvoice" class="invoice">
-
-  <h3>🧾 Invoice Details</h3>
-
-  <div class="invoice-grid">
-    <div><b>Invoice Number:</b> {{ selectedInvoice.invoiceNumber }}</div>
-    <div><b>Invoice Date:</b> {{ selectedInvoice.invoiceDate | date }}</div>
-
-    <div><b>Billing Period:</b>
-      {{ selectedInvoice.billingMonth }}/{{ selectedInvoice.billingYear }}
+  <!-- PAGINATION -->
+  <div class="pagination-bar">
+    <div class="page-size">
+      Show
+      <select [(ngModel)]="pageSize" (change)="changePageSize()">
+        <option [value]="10">10</option>
+        <option [value]="25">25</option>
+        <option [value]="50">50</option>
+      </select>
+      entries
     </div>
 
-    <div><b>Consumer ID:</b> {{ selectedInvoice.consumerId }}</div>
-    <div><b>Bill ID:</b> {{ selectedInvoice.billId }}</div>
-    <div><b>Payment ID:</b> {{ selectedInvoice.paymentId }}</div>
+    <div class="pager">
+      <button (click)="prevPage()" [disabled]="pageIndex===0">Prev</button>
+      <span>Page {{ pageIndex + 1 }} of {{ totalPages }}</span>
+      <button (click)="nextPage()" [disabled]="pageIndex>=totalPages-1">Next</button>
+    </div>
   </div>
-
-  <hr />
-
-  <h4>💰 Charges</h4>
-
-  <table class="invoice-table">
-    <tr>
-      <td>Energy Charge</td>
-      <td>₹ {{ selectedInvoice.energyCharge }}</td>
-    </tr>
-    <tr>
-      <td>Tax</td>
-      <td>₹ {{ selectedInvoice.tax }}</td>
-    </tr>
-    <tr>
-      <td>Penalty</td>
-      <td>₹ {{ selectedInvoice.penalty }}</td>
-    </tr>
-    <tr class="total">
-      <td>Total Amount</td>
-      <td>₹ {{ selectedInvoice.totalAmount }}</td>
-    </tr>
-    <tr>
-      <td>Amount Paid</td>
-      <td>₹ {{ selectedInvoice.amountPaid }}</td>
-    </tr>
-  </table>
-
 </div>

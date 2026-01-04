@@ -16,9 +16,12 @@ import { ForcePasswordChangeGuard } from './core/guards/force-password-change-gu
 import { AuthLayoutComponent } from './shared/auth-layout';
 import { ForgotPasswordComponent } from './core/auth/forgot-password/forgot-password';
 import { ResetPasswordComponent } from './core/auth/reset-password/reset-password';
+
+// CONSUMER
 import { ConsumerDashboard } from './features/consumer/consumer-dashboard/consumer-dashboard';
 import { MyUtilitiesComponent } from './features/consumer/my-utilities/my-utilities';
-
+import { BillsComponent } from './features/consumer/bills/bills';
+// import { PaymentsComponent } from './features/consumer/payments/payments.component';
 
 export const routes: Routes = [
 
@@ -32,32 +35,32 @@ export const routes: Routes = [
 
   // ---------- AUTHENTICATED (NAVBAR INCLUDED) ----------
   {
-  path: '',
-  component: AuthLayoutComponent,
-  canActivateChild: [ForcePasswordChangeGuard],
-  children: [
+    path: '',
+    component: AuthLayoutComponent,
+    canActivateChild: [ForcePasswordChangeGuard],
+    children: [
 
-    // TEMP (will remove later)
-    { path: 'home', component: Home },
+      // TEMP (remove later)
+      { path: 'home', component: Home },
 
-    { path: 'change-password', component: ChangePasswordComponent },
+      { path: 'change-password', component: ChangePasswordComponent },
 
-    // ---------- CONSUMER ----------
-    { path: 'consumer/dashboard', component: ConsumerDashboard },
-    { path: 'consumer/utilities', component: MyUtilitiesComponent },
-    //{ path: 'consumer/bills', component: BillsComponent },
-    //{ path: 'consumer/payments', component: PaymentsComponent },
+      // ---------- CONSUMER ----------
+      { path: 'consumer/dashboard', component: ConsumerDashboard },
+      { path: 'consumer/utilities', component: MyUtilitiesComponent },
+      { path: 'consumer/bills', component: BillsComponent },
+      // { path: 'consumer/payments', component: PaymentsComponent },
 
-    // ---------- ADMIN ----------
-    { path: 'admin/dashboard', component: AdminDashboardComponent },
-    { path: 'admin/reports', component: AdminReportsComponent },
-    { path: 'admin/users', component: UserManagementComponent },
-    { path: 'admin/account-requests', component: AccountRequestsComponent },
-    { path: 'admin/utility-requests', component: UtilityRequestsComponent },
-    { path: 'admin/tariffs', component: TariffManagementComponent },
-    { path: 'admin/billing', component: BillingPaymentsComponent },
-  ]
-},
+      // ---------- ADMIN ----------
+      { path: 'admin/dashboard', component: AdminDashboardComponent },
+      { path: 'admin/reports', component: AdminReportsComponent },
+      { path: 'admin/users', component: UserManagementComponent },
+      { path: 'admin/account-requests', component: AccountRequestsComponent },
+      { path: 'admin/utility-requests', component: UtilityRequestsComponent },
+      { path: 'admin/tariffs', component: TariffManagementComponent },
+      { path: 'admin/billing', component: BillingPaymentsComponent },
+    ]
+  },
 
   // ---------- FALLBACK ----------
   { path: '**', redirectTo: '' }

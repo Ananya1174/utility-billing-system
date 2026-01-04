@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -28,6 +28,7 @@ export class RequestUtilityDialogComponent {
     private utilityService: UtilityService,
     private authService: AuthService,
     private dialogRef: MatDialogRef<RequestUtilityDialogComponent>,
+    private cdr: ChangeDetectorRef,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     const blocked = data.existingUtilities || [];
@@ -43,27 +44,27 @@ export class RequestUtilityDialogComponent {
     this.utilityService.getTariffs(this.utilityType).subscribe({
       next: (res) => {
         this.tariffPlans = res.plans.map((p: any) => p.planCode);
+        this.cdr.detectChanges(); // ✅ update dropdown
       }
     });
   }
 
   submit(): void {
     if (!this.utilityType || !this.tariffPlan) {
-      console.log('Form invalid');
       return;
     }
 
     const consumerId = this.authService.getUserId();
 
-    console.log('consumerId from JWT:', consumerId);
-
     if (!consumerId) {
       this.errorMsg = 'Session expired. Please login again.';
+      this.cdr.detectChanges();
       return;
     }
 
     this.submitting = true;
     this.errorMsg = '';
+    this.cdr.detectChanges();
 
     this.utilityService.requestConnection(
       {
@@ -78,6 +79,7 @@ export class RequestUtilityDialogComponent {
       error: (err) => {
         this.errorMsg = err.error?.message || 'Request failed';
         this.submitting = false;
+        this.cdr.detectChanges();
       }
     });
   }

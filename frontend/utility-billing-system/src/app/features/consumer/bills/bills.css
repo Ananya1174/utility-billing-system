@@ -1,0 +1,34 @@
+.bill-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.bill-card {
+  border: 1px solid #ddd;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.status.paid {
+  color: green;
+}
+.status.due {
+  color: orange;
+}
+.status.overdue {
+  color: red;
+}
+
+.actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+.pay-btn {
+  background: #1976d2;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+}

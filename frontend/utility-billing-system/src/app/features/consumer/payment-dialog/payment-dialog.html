@@ -1,0 +1,22 @@
+<h3>Pay Bill</h3>
+
+<div *ngIf="step === 'INIT'">
+  <p><strong>Amount:</strong> ₹{{ bill.payableAmount }}</p>
+
+  <button class="primary-btn" (click)="initiatePayment()" [disabled]="loading">
+    Send OTP
+  </button>
+</div>
+
+<div *ngIf="step === 'OTP'">
+  <label>Enter OTP</label>
+  <input type="text" [(ngModel)]="otp" maxlength="6" />
+
+  <button class="primary-btn" (click)="confirmOtp()" [disabled]="loading">
+    Confirm Payment
+  </button>
+</div>
+
+<p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>
+
+<button class="secondary-btn" (click)="cancel()">Cancel</button>

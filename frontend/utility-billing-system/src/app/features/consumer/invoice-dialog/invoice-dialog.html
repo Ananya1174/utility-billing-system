@@ -1,0 +1,36 @@
+<h2>Invoice</h2>
+
+<div *ngIf="loading">Loading invoice...</div>
+
+<div *ngIf="!loading && invoice">
+
+  <p><strong>Invoice Number:</strong> {{ invoice.invoiceNumber }}</p>
+  <p><strong>Invoice ID:</strong> {{ invoice.id }}</p>
+
+  <hr />
+
+  <p><strong>Bill ID:</strong> {{ invoice.billId }}</p>
+  <p><strong>Payment ID:</strong> {{ invoice.paymentId }}</p>
+
+  <hr />
+
+  <p>
+    <strong>Billing Period:</strong>
+    {{ invoice.billingMonth }}/{{ invoice.billingYear }}
+  </p>
+
+  <p><strong>Invoice Date:</strong>
+    {{ invoice.invoiceDate | date:'medium' }}
+  </p>
+
+  <hr />
+
+  <p><strong>Energy Charge:</strong> ₹{{ invoice.energyCharge }}</p>
+  <p><strong>Tax:</strong> ₹{{ invoice.tax }}</p>
+  <p><strong>Penalty:</strong> ₹{{ invoice.penalty }}</p>
+
+  <hr />
+
+  <h3>Total Amount Paid: ₹{{ invoice.amountPaid }}</h3>
+
+</div>

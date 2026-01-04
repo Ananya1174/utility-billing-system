@@ -1,0 +1,14 @@
+<h3>Bill Details</h3>
+
+<div *ngIf="bill; else loading">
+  <p><strong>Utility:</strong> {{ bill.utilityType }}</p>
+  <p><strong>Tariff:</strong> {{ bill.tariffPlan }}</p>
+  <p><strong>Period:</strong> {{ bill.billingMonth }}/{{ bill.billingYear }}</p>
+  <p><strong>Units:</strong> {{ bill.consumptionUnits }}</p>
+  <p><strong>Total:</strong> ₹{{ bill.totalAmount }}</p>
+  <p><strong>Status:</strong> {{ bill.status }}</p>
+</div>
+
+<ng-template #loading>
+  <p>Loading bill details...</p>
+</ng-template>

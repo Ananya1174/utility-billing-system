@@ -1,40 +1,80 @@
-.subtitle {
-  color: #666;
-  margin-bottom: 16px;
+
+
+/* ================= GLOBAL ================= */
+* {
+  box-sizing: border-box;
 }
 
+:host {
+  display: block;
+  background: #f9fafb;
+  padding: 24px 32px;
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+}
+
+/* ================= TITLE ================= */
+h2 {
+  margin-bottom: 6px;
+  font-size: 1.8rem;
+  color: #1e3a8a;
+}
+
+.subtitle {
+  margin-bottom: 22px;
+  font-size: 0.95rem;
+  color: #475569;
+}
+
+/* ================= SEARCH ================= */
 .search-box {
   display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: 12px;
+  margin-bottom: 22px;
 }
 
 .search-box input {
-  flex: 1;
-  padding: 8px;
+  padding: 8px 12px;
+  width: 260px;
+  border-radius: 6px;
+  border: 1px solid #cbd5f5;
+  font-size: 14px;
 }
 
 .search-box button {
-  padding: 8px 16px;
+  padding: 8px 18px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
+.search-box button:hover {
+  background: #1d4ed8;
+}
+
+/* ================= TABS ================= */
 .tabs {
   display: flex;
   gap: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .tabs button {
-  padding: 8px 14px;
-  border: none;
-  background: #eee;
-  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #cbd5f5;
+  background: #ffffff;
+  color: #334155;
   cursor: pointer;
 }
 
 .tabs button.active {
-  background: #1976d2;
-  color: #fff;
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
 }
 
 .tabs button:disabled {
@@ -42,119 +82,187 @@
   cursor: not-allowed;
 }
 
+/* ================= CARD ================= */
 .card {
-  background: #fff;
-  padding: 16px;
-  border-radius: 8px;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
 }
 
+/* ================= TABLE ================= */
 table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed; /* 🔑 prevents jumping */
+  font-size: 0.9rem;
 }
 
-th, td {
-  padding: 10px;
-  border-bottom: 1px solid #eee;
+th {
+  background: #f1f5f9;
+  color: #475569;
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid #e5e7eb;
+  user-select: none;
 }
 
-.mono {
-  font-family: monospace;
-  font-size: 13px;
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.status {
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-}
-
-.status.paid {
-  background: #d4edda;
-  color: #155724;
-}
-
-.status.due {
-  background: #fff3cd;
-  color: #856404;
-}
-
-.status.overdue {
-  background: #f8d7da;
-  color: #721c24;
-}
-
-.link {
-  background: none;
-  border: none;
-  color: #1976d2;
+th.sortable {
   cursor: pointer;
 }
 
-.summary-card {
-  background: #fff;
-  padding: 20px;
-  max-width: 400px;
-  border-radius: 8px;
+th .sort-icon {
+  display: inline-block;
+  width: 14px;
+  margin-left: 6px;
+  text-align: center;
+  color: #2563eb;
 }
 
-.row {
+/* ================= TEXT ================= */
+.mono {
+  font-family: monospace;
+  font-size: 0.85rem;
+}
+
+/* ================= STATUS ================= */
+.status {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status.paid {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status.unpaid {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* ================= BUTTONS ================= */
+.link {
+  background: none;
+  border: none;
+  color: #2563eb;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+/* ================= PAGINATION ================= */
+.pagination {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
+  align-items: center;
+  margin-top: 16px;
 }
 
-.row.highlight {
-  font-weight: bold;
+.pagination select {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #cbd5f5;
 }
 
+/* ================= PAGINATION (UPGRADED) ================= */
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 18px;
+}
+
+/* PAGE SIZE SELECT */
+.pagination select {
+  padding: 7px 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5f5;
+  font-size: 13px;
+  background: #ffffff;
+}
+
+/* BUTTON GROUP */
+.pagination .pager {
+  display: flex;
+  gap: 10px;
+}
+
+/* PREV / NEXT BUTTON */
+.pagination button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  background: #ffffff;
+  color: #2563eb;
+  border: 1px solid #cbd5f5;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+.pagination button:disabled {
+  background: #f1f5f9;
+  color: #94a3b8;
+  border-color: #e5e7eb;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* ARROW ICONS */
+.pagination button::before {
+  font-size: 14px;
+}
+
+.pagination button.prev::before {
+  content: "←";
+}
+
+.pagination button.next::after {
+  content: "→";
+}
+
+/* ================= EMPTY ================= */
 .empty {
-  text-align: center;
-  color: #777;
-  margin-top: 20px;
+  margin-top: 16px;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+/* ================= LOADING / ERROR ================= */
+.loading {
+  color: #2563eb;
+  font-weight: 500;
+  margin: 14px 0;
 }
 
 .error {
-  color: #d32f2f;
-}
-
-.loading {
-  color: #1976d2;
-}
-.invoice-card {
-  background: #ffffff;
-  padding: 20px;
-  border-radius: 8px;
-  max-width: 600px;
-  margin-top: 20px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-}
-
-.invoice-card h3 {
-  margin-bottom: 16px;
-}
-
-.invoice-card .row {
-  display: flex;
-  justify-content: space-between;
-  margin: 6px 0;
-}
-
-.invoice-card .mono {
-  font-family: monospace;
-  font-size: 12px;
-}
-
-.invoice-card .total {
-  font-size: 16px;
-  margin-top: 10px;
-}
-
-.invoice-card .paid {
-  color: green;
-  font-weight: bold;
-}
-
-.invoice-card hr {
-  margin: 12px 0;
+  color: #dc2626;
+  margin: 14px 0;
 }
