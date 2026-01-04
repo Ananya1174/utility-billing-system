@@ -2,7 +2,6 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BaseChartDirective } from 'ng2-charts';
-import { ChartData, ChartOptions } from 'chart.js';
 
 import { AdminDashboardService } from '../../../services/admin-dashboard';
 import { Navbar } from "../../../shared/navbar/navbar";
@@ -10,12 +9,7 @@ import { Navbar } from "../../../shared/navbar/navbar";
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [
-  CommonModule,
-  FormsModule,
-  BaseChartDirective,
-  Navbar
-],
+  imports: [CommonModule, FormsModule, BaseChartDirective, Navbar],
   templateUrl: './admin-dashboard.html',
   styleUrl: './admin-dashboard.css'
 })
@@ -23,6 +17,7 @@ export class AdminDashboardComponent implements OnInit {
 
   month = new Date().getMonth() + 1;
   year = new Date().getFullYear();
+  selectedMonthName = '';
 
   months = [
     { value: 1, name: 'Jan' }, { value: 2, name: 'Feb' },
@@ -37,15 +32,17 @@ export class AdminDashboardComponent implements OnInit {
 
   billsSummary: any;
   revenueSummary: any;
-  outstandingSummary: any;
-  pendingRequestsCount = 0;
+
+  /** ✅ MONTHLY outstanding only */
+  monthlyOutstandingAmount = 0;
 
   consumptionData: any[] = [];
   revenueByMode: any[] = [];
+  monthlyOutstanding: any[] = [];
 
-  // CHART DATA
   consumptionChartData: any;
   revenueChartData: any;
+  outstandingChartData: any;
 
   constructor(
     private dashboardService: AdminDashboardService,
@@ -54,64 +51,85 @@ export class AdminDashboardComponent implements OnInit {
 
   ngOnInit() {
     this.loadDashboard();
+     this.updateSelectedMonthName();
   }
 
   onFilterChange() {
     this.loadDashboard();
+     this.updateSelectedMonthName();
   }
 
   loadDashboard() {
 
+    // Bills summary (paid / unpaid)
     this.dashboardService.getBillsSummary(this.month, this.year)
       .subscribe(res => {
         this.billsSummary = res;
         this.cdr.detectChanges();
       });
 
+    // Monthly revenue
     this.dashboardService.getRevenueSummary(this.month, this.year)
       .subscribe(res => {
         this.revenueSummary = res;
         this.cdr.detectChanges();
       });
 
-    this.dashboardService.getOutstandingSummary()
-      .subscribe(res => {
-        this.outstandingSummary = res;
-        this.cdr.detectChanges();
-      });
-
-    this.dashboardService.getPendingUtilityRequests()
-      .subscribe(res => this.pendingRequestsCount = res.length);
-
+    // Consumption
     this.dashboardService.getConsumptionSummary(this.month, this.year)
       .subscribe(res => {
         this.consumptionData = res || [];
         this.buildConsumptionChart();
       });
 
+    // Revenue by mode
     this.dashboardService.getRevenueByMode(this.month, this.year)
       .subscribe(res => {
         this.revenueByMode = res || [];
         this.buildRevenueChart();
+      });
+
+    // ✅ Monthly Outstanding (YEARLY API → pick selected month)
+    this.dashboardService.getMonthlyOutstanding(this.year)
+      .subscribe(res => {
+        this.monthlyOutstanding = res || [];
+
+        const currentMonth = this.monthlyOutstanding.find(
+          m => m.month === this.month
+        );
+
+        this.monthlyOutstandingAmount =
+          currentMonth?.outstandingAmount ?? 0;
+
+        this.buildOutstandingChart();
+        this.cdr.detectChanges();
       });
   }
 
   buildConsumptionChart() {
     this.consumptionChartData = {
       labels: this.consumptionData.map(c => c.utilityType),
-      datasets: [{
-        data: this.consumptionData.map(c => c.totalUnits),
-        label: 'Units Consumed'
-      }]
+      datasets: [{ data: this.consumptionData.map(c => c.totalUnits) }]
     };
   }
+  updateSelectedMonthName() {
+  const found = this.months.find(m => m.value === this.month);
+  this.selectedMonthName = found ? found.name : '';
+}
 
   buildRevenueChart() {
     this.revenueChartData = {
       labels: this.revenueByMode.map(r => r.mode),
+      datasets: [{ data: this.revenueByMode.map(r => r.amount) }]
+    };
+  }
+
+  buildOutstandingChart() {
+    this.outstandingChartData = {
+      labels: this.monthlyOutstanding.map(m => m.monthName),
       datasets: [{
-        data: this.revenueByMode.map(r => r.amount),
-        label: 'Revenue'
+        data: this.monthlyOutstanding.map(m => m.outstandingAmount),
+        label: 'Outstanding Amount'
       }]
     };
   }

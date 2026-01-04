@@ -13,6 +13,7 @@ import { TariffManagementComponent } from './features/admin/tariff-management/ta
 import { UtilityRequestsComponent } from './features/admin/utility-requests/utility-requests';
 import { BillingPaymentsComponent } from './features/admin/billing-payments/billing-payments';
 import { AdminDashboardComponent } from './features/admin/admin-dashboard/admin-dashboard';
+import { AdminReportsComponent } from './features/admin/admin-reports/admin-reports';
 export const routes: Routes = [
 
   // ---------------- Landing ----------------
@@ -55,6 +56,10 @@ export const routes: Routes = [
     }
   ]
 },
+{
+    path: 'admin/reports',
+    component: AdminReportsComponent
+  },
 
   // ---------------- Forced Password Change ----------------
   {

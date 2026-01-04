@@ -1,4 +1,4 @@
-<app-navbar></app-navbar>
+
 
 <div class="dashboard-container">
 
@@ -27,52 +27,56 @@
     </div>
 
     <div class="card">
-      <h4>Outstanding</h4>
-      <p>₹ {{ outstandingSummary?.outstandingAmount || 0 }}</p>
+  <h4>Outstanding ({{ selectedMonthName }} {{ year }})</h4>
+  <p>₹ {{ monthlyOutstandingAmount }}</p>
+</div>
+
+    <div class="card">
+      <h4>Paid Bills</h4>
+      <p class="success">{{ billsSummary?.paidBills || 0 }}</p>
     </div>
 
     <div class="card">
-      <h4>Total Bills</h4>
-      <p>{{ billsSummary?.totalBills || 0 }}</p>
-    </div>
-
-    <div class="card">
-      <h4>Pending Requests</h4>
-      <p>{{ pendingRequestsCount }}</p>
+      <h4>Unpaid Bills</h4>
+      <p class="warning">{{ billsSummary?.unpaidBills || 0 }}</p>
     </div>
   </div>
 
-  <!-- DATA SECTIONS -->
+  <!-- CHARTS -->
   <div class="charts">
 
     <!-- CONSUMPTION -->
-<div class="chart">
-  <h4>Consumption by Utility</h4>
+    <div class="chart">
+      <h4>Consumption by Utility</h4>
+      <canvas
+        *ngIf="consumptionChartData"
+        baseChart
+        [data]="consumptionChartData"
+        [type]="'pie'">
+      </canvas>
+    </div>
 
-  <canvas
-    *ngIf="consumptionChartData"
-    baseChart
-    [data]="consumptionChartData"
-    [type]="'pie'">
-  </canvas>
+    <!-- REVENUE BY MODE -->
+    <div class="chart">
+      <h4>Revenue by Payment Mode</h4>
+      <canvas
+        *ngIf="revenueChartData"
+        baseChart
+        [data]="revenueChartData"
+        [type]="'bar'">
+      </canvas>
+    </div>
 
-  <p *ngIf="!consumptionData.length" class="empty">
-    No consumption data
-  </p>
-</div>
+    <!-- MONTHLY OUTSTANDING -->
+    <div class="chart wide">
+      <h4>Monthly Outstanding Trend</h4>
+      <canvas
+        *ngIf="outstandingChartData"
+        baseChart
+        [data]="outstandingChartData"
+        [type]="'line'">
+      </canvas>
+    </div>
 
-<!-- REVENUE BY MODE -->
-<div class="chart">
-  <h4>Revenue by Payment Mode</h4>
-
-  <canvas
-    *ngIf="revenueChartData"
-    baseChart
-    [data]="revenueChartData"
-    [type]="'bar'">
-  </canvas>
-
-  <p *ngIf="!revenueByMode.length" class="empty">
-    No revenue data
-  </p>
+  </div>
 </div>

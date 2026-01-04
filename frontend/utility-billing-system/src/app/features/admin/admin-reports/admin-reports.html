@@ -1,0 +1,114 @@
+<h2>Admin Reports</h2>
+<p class="subtitle">
+  Financial & consumption reports for administrative analysis
+</p>
+
+<!-- FILTERS -->
+<div class="filters">
+  <select [(ngModel)]="month" (change)="loadReports()">
+    <option *ngFor="let m of months" [value]="m.value">
+      {{ m.name }}
+    </option>
+  </select>
+
+  <select [(ngModel)]="year" (change)="loadReports()">
+    <option *ngFor="let y of years" [value]="y">
+      {{ y }}
+    </option>
+  </select>
+</div>
+
+<p *ngIf="loading" class="loading">Loading reports...</p>
+
+<!-- 1️⃣ CONSUMER BILLING SUMMARY -->
+<div class="card">
+  <h3>Consumer-wise Billing Summary</h3>
+  <table>
+    <tr>
+      <th>Consumer ID</th>
+      <th>Total Bills</th>
+      <th>Total Amount</th>
+    </tr>
+    <tr *ngFor="let c of consumerBilling">
+      <td class="mono">{{ c.consumerId }}</td>
+      <td>{{ c.totalBills }}</td>
+      <td>₹ {{ c.totalAmount }}</td>
+    </tr>
+  </table>
+</div>
+
+<!-- 2️⃣ AVERAGE CONSUMPTION -->
+<div class="card">
+  <h3>Average Consumption (Units)</h3>
+  <table>
+    <tr>
+      <th>Utility</th>
+      <th>Average Units</th>
+    </tr>
+    <tr *ngFor="let a of avgConsumption">
+      <td>{{ a.utilityType }}</td>
+      <td>{{ a.averageUnits }}</td>
+    </tr>
+  </table>
+</div>
+
+<!-- 3️⃣ TOP PAYING CONSUMERS -->
+<div class="card">
+  <h3>Top Paying Consumers</h3>
+  <table>
+    <tr>
+      <th>Consumer ID</th>
+      <th>Payments</th>
+      <th>Total Paid</th>
+    </tr>
+    <tr *ngFor="let c of topConsumers">
+      <td class="mono">{{ c.consumerId }}</td>
+      <td>{{ c.paymentCount }}</td>
+      <td>₹ {{ c.totalPaid }}</td>
+    </tr>
+  </table>
+</div>
+
+<!-- 4️⃣ BILLING vs COLLECTION -->
+<div class="card">
+  <h3>Billing vs Collection Gap</h3>
+  <div class="grid">
+    <div>
+      <label>Total Billed</label>
+      <p>₹ {{ collectionGap?.totalBilled }}</p>
+    </div>
+    <div>
+      <label>Total Paid</label>
+      <p>₹ {{ collectionGap?.totalPaid }}</p>
+    </div>
+    <div class="highlight">
+      <label>Outstanding</label>
+      <p>₹ {{ collectionGap?.outstandingAmount }}</p>
+    </div>
+  </div>
+</div>
+
+<!-- 5️⃣ MONTHLY OUTSTANDING -->
+<div class="card">
+  <h3>Monthly Outstanding Trend</h3>
+
+  <table *ngIf="monthlyOutstanding.length">
+    <tr>
+      <th>Month</th>
+      <th>Total Billed</th>
+      <th>Total Paid</th>
+      <th>Outstanding</th>
+    </tr>
+
+    <tr *ngFor="let m of monthlyOutstanding">
+      <td>{{ m.monthName }}</td>
+      <td>₹ {{ m.totalBilled }}</td>
+      <td>₹ {{ m.totalPaid }}</td>
+      <td class="danger">₹ {{ m.outstandingAmount }}</td>
+    </tr>
+  </table>
+
+  <p *ngIf="!monthlyOutstanding.length">
+    No outstanding data available
+  </p>
+</div>

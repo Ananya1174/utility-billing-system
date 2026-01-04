@@ -13,12 +13,13 @@ import { ConfirmDialogComponent } from "../confirm-dialog/confirm-dialog";
 export class Navbar {
 
   role: string | null = null;
+  logoutDialog = false;
 
   constructor(private router: Router) {
     this.role = localStorage.getItem('role');
   }
 
-  // Role helpers (clean & readable)
+  /* ===== ROLE HELPERS ===== */
   isAdmin() {
     return this.role === 'ADMIN';
   }
@@ -34,21 +35,24 @@ export class Navbar {
   isAccountsOfficer() {
     return this.role === 'ACCOUNTS_OFFICER';
   }
-  logoutDialog = false;
+
+  /* ===== LOGOUT FLOW ===== */
   confirmLogout() {
-  this.logoutDialog = true;
-}
-logout() {
-  this.logoutDialog = false;
+    this.logoutDialog = true;
+  }
 
-  // Clear auth
-  localStorage.clear();
-  sessionStorage.clear();
+  cancelLogout() {
+    this.logoutDialog = false;
+  }
 
-  // Navigate to login
-  window.location.href = '/login';
-}
-cancelLogout() {
-  this.logoutDialog = false;
-}
+  logout() {
+    this.logoutDialog = false;
+
+    // Clear auth
+    localStorage.clear();
+    sessionStorage.clear();
+
+    // Redirect to login
+    this.router.navigateByUrl('/login');
+  }
 }

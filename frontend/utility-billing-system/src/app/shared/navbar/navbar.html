@@ -16,7 +16,7 @@
 
     <!-- ADMIN -->
     <ng-container *ngIf="isAdmin()">
-       <li><a routerLink="/admin/dashboard">Dashboard</a></li>
+      <li><a routerLink="/admin/dashboard">Dashboard</a></li>
       <li><a routerLink="/admin/account-requests">Account Requests</a></li>
       <li><a routerLink="/admin/users">Users</a></li>
       <li><a routerLink="/admin/utility-requests">Utility Requests</a></li>
@@ -26,15 +26,15 @@
     </ng-container>
 
     <!-- BILLING OFFICER -->
-     <li><a routerLink="/home">Home</a></li>
     <ng-container *ngIf="isBillingOfficer()">
+      <li><a routerLink="/home">Home</a></li>
       <li><a routerLink="/billing/generate">Generate Bills</a></li>
       <li><a routerLink="/billing/reports">Reports</a></li>
     </ng-container>
 
     <!-- ACCOUNTS OFFICER -->
-     <li><a routerLink="/home">Home</a></li>
     <ng-container *ngIf="isAccountsOfficer()">
+      <li><a routerLink="/home">Home</a></li>
       <li><a routerLink="/accounts/payments">Payments</a></li>
       <li><a routerLink="/accounts/reports">Reports</a></li>
     </ng-container>
@@ -44,12 +44,12 @@
   </ul>
 
   <div class="navbar-right">
-    <button class="logout-btn" (click)="logout()">Logout</button>
+    <!-- ✅ ONLY logout trigger -->
+    <button class="logout-btn" (click)="confirmLogout()">Logout</button>
   </div>
 </nav>
 
-<button (click)="confirmLogout()">Logout</button>
-
+<!-- ✅ Reusable confirmation dialog -->
 <app-confirm-dialog
   [visible]="logoutDialog"
   title="Logout"
