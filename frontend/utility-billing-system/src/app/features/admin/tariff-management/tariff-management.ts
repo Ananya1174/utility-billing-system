@@ -2,20 +2,22 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { ConfirmDialogComponent } from '../../../shared/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'app-tariff-management',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule,ConfirmDialogComponent],
   templateUrl: './tariff-management.html',
   styleUrl: './tariff-management.css'
 })
 export class TariffManagementComponent implements OnInit {
 
   plans: any[] = [];
-  filteredPlans: any[] = [];
+  confirmVisible = false;
+confirmPlanId: string | null = null;
 
-  utilityFilter = 'ALL';
+  utilityFilter: 'ALL' | 'ELECTRICITY' | 'WATER' | 'GAS' | 'INTERNET' = 'ALL';
   activeOnly = true;
 
   showAddPlan = false;
@@ -34,6 +36,9 @@ export class TariffManagementComponent implements OnInit {
     rate: null as number | null
   };
 
+  loading = false;
+  error = '';
+
   private baseUrl = 'http://localhost:8031/tariffs';
 
   constructor(
@@ -42,69 +47,106 @@ export class TariffManagementComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.loadActivePlans();
+    this.loadPlans();
   }
 
-  loadActivePlans() {
-    this.http.get<any[]>(`${this.baseUrl}/plans/active`)
-      .subscribe(res => {
-        this.plans = res;
-        this.applyFilter();
+  /* ================= LOAD PLANS ================= */
+
+  loadPlans() {
+    this.loading = true;
+    this.error = '';
+
+    let url = `${this.baseUrl}/plans`;
+
+    if (this.activeOnly) {
+      url += '?active=true';
+    }
+
+    this.http.get<any[]>(url).subscribe({
+      next: res => {
+        this.plans =
+          this.utilityFilter === 'ALL'
+            ? res
+            : res.filter(p => p.utilityType === this.utilityFilter);
+
+        this.loading = false;
         this.cdr.detectChanges();
+      },
+      error: () => {
+        this.error = 'Failed to load tariff plans';
+        this.loading = false;
+      }
+    });
+  }
+
+  onFilterChange() {
+    this.loadPlans();
+  }
+
+  /* ================= ADD PLAN ================= */
+
+  addPlan() {
+    if (!this.newPlan.utilityType || !this.newPlan.planCode) {
+      alert('All fields are required');
+      return;
+    }
+
+    this.http.post(`${this.baseUrl}/plans`, this.newPlan)
+      .subscribe(() => {
+        this.showAddPlan = false;
+        this.newPlan = { utilityType: '', planCode: '' };
+        this.loadPlans();
       });
   }
 
-  applyFilter() {
-    this.filteredPlans = this.plans.filter(p => {
-      const utilityMatch =
-        this.utilityFilter === 'ALL' || p.utilityType === this.utilityFilter;
-      const activeMatch =
-        !this.activeOnly || p.active === true;
-
-      return utilityMatch && activeMatch;
-    });
-  }
+  /* ================= DEACTIVATE ================= */
 
   deactivatePlan(planId: string) {
     if (!confirm('Deactivate this tariff plan?')) return;
 
     this.http.put(`${this.baseUrl}/plans/${planId}/deactivate`, {})
       .subscribe(() => {
-        this.loadActivePlans();
         this.closeSlabs();
+        this.loadPlans();
       });
   }
+  openDeactivateDialog(planId: string) {
+  this.confirmPlanId = planId;
+  this.confirmVisible = true;
+}
 
-  addPlan() {
-    if (!this.newPlan.utilityType || !this.newPlan.planCode) {
-      alert('All fields required');
-      return;
-    }
+confirmDeactivate() {
+  if (!this.confirmPlanId) return;
 
-    this.http.post(`${this.baseUrl}/plans`, {
-      utilityType: this.newPlan.utilityType,
-      planCode: this.newPlan.planCode,
-      active: true
-    }).subscribe(() => {
-      this.showAddPlan = false;
-      this.newPlan = { utilityType: '', planCode: '' };
-      this.loadActivePlans();
+  this.http
+    .put(`${this.baseUrl}/plans/${this.confirmPlanId}/deactivate`, {})
+    .subscribe(() => {
+      this.confirmVisible = false;
+      this.confirmPlanId = null;
+      this.loadPlans();
+      this.closeSlabs();
     });
-  }
+}
+
+cancelDeactivate() {
+  this.confirmVisible = false;
+  this.confirmPlanId = null;
+}
+
+  /* ================= SLABS ================= */
 
   openSlabs(plan: any) {
     this.selectedPlan = plan;
     this.newSlab = { minUnits: null, maxUnits: null, rate: null };
 
-    this.http.get<any>(
-      `${this.baseUrl}?utilityType=${plan.utilityType}`
-    ).subscribe(res => {
-      const planData = res.plans.find(
-        (p: any) => p.planCode === plan.planCode
-      );
-      this.slabs = planData?.slabs || [];
-      this.cdr.detectChanges();
-    });
+    this.http.get<any>(`${this.baseUrl}?utilityType=${plan.utilityType}`)
+      .subscribe(res => {
+        const planData = res.plans.find(
+          (p: any) => p.planCode === plan.planCode
+        );
+        this.slabs = planData?.slabs || [];
+        this.cdr.detectChanges();
+      });
   }
 
   addSlab() {
@@ -123,15 +165,11 @@ export class TariffManagementComponent implements OnInit {
     const payload = {
       utilityType: this.selectedPlan.utilityType,
       planCode: this.selectedPlan.planCode,
-      minUnits: this.newSlab.minUnits,
-      maxUnits: this.newSlab.maxUnits,
-      rate: this.newSlab.rate
+      ...this.newSlab
     };
 
     this.http.post(`${this.baseUrl}/slabs`, payload)
-      .subscribe(() => {
-        this.openSlabs(this.selectedPlan);
-      });
+      .subscribe(() => this.openSlabs(this.selectedPlan));
   }
 
   closeSlabs() {

@@ -1,9 +1,9 @@
 <h2>Tariff Management</h2>
-<p>Configure tariff plans and slabs for utilities</p>
+<p class="subtitle">Configure tariff plans and slabs for utilities</p>
 
 <!-- FILTERS -->
 <div class="filters">
-  <select [(ngModel)]="utilityFilter" (change)="applyFilter()">
+  <select [(ngModel)]="utilityFilter" (change)="onFilterChange()">
     <option value="ALL">All Utilities</option>
     <option value="ELECTRICITY">Electricity</option>
     <option value="WATER">Water</option>
@@ -11,10 +11,10 @@
     <option value="INTERNET">Internet</option>
   </select>
 
-  <label>
+  <label class="checkbox">
     <input type="checkbox"
            [(ngModel)]="activeOnly"
-           (change)="applyFilter()" />
+           (change)="onFilterChange()" />
     Show Active Only
   </label>
 
@@ -23,7 +23,10 @@
   </button>
 </div>
 
-<!-- ADD PLAN FORM -->
+<p *ngIf="loading" class="loading">Loading tariff plans…</p>
+<p *ngIf="error" class="error">{{ error }}</p>
+
+<!-- ADD PLAN -->
 <div *ngIf="showAddPlan" class="add-plan">
   <h4>Add Tariff Plan</h4>
 
@@ -35,13 +38,14 @@
     <option value="INTERNET">Internet</option>
   </select>
 
-  <input
-    type="text"
-    placeholder="Plan Code"
-    [(ngModel)]="newPlan.planCode" />
+  <input type="text"
+         placeholder="Plan Code"
+         [(ngModel)]="newPlan.planCode" />
 
-  <button (click)="addPlan()">Save</button>
-  <button class="cancel" (click)="showAddPlan = false">Cancel</button>
+  <div class="actions">
+    <button (click)="addPlan()">Save</button>
+    <button class="cancel" (click)="showAddPlan = false">Cancel</button>
+  </div>
 </div>
 
 <!-- PLANS TABLE -->
@@ -57,41 +61,43 @@
   </thead>
 
   <tbody>
-    <tr *ngFor="let p of filteredPlans">
+    <tr *ngFor="let p of plans">
       <td class="mono">{{ p.id }}</td>
       <td>{{ p.utilityType }}</td>
       <td>{{ p.planCode }}</td>
       <td>
-        <span [class.active]="p.active"
+        <span class="status"
+              [class.active]="p.active"
               [class.inactive]="!p.active">
           {{ p.active ? 'ACTIVE' : 'INACTIVE' }}
         </span>
       </td>
       <td>
-        <button (click)="openSlabs(p)">
-          Manage Slabs
-        </button>
+        <button
+  *ngIf="p.active"
+  (click)="openSlabs(p)">
+  Manage Slabs
+</button>
+
 
         <button
-          *ngIf="p.active"
-          class="deactivate"
-          (click)="deactivatePlan(p.id)">
-          Deactivate
-        </button>
+  *ngIf="p.active"
+  class="deactivate"
+  (click)="openDeactivateDialog(p.id)">
+  Deactivate
+</button>
 
-        <span *ngIf="!p.active" class="inactive-note">
-          Read-only
-        </span>
+    
       </td>
     </tr>
 
-    <tr *ngIf="filteredPlans.length === 0">
+    <tr *ngIf="!plans.length">
       <td colspan="5">No tariff plans found</td>
     </tr>
   </tbody>
 </table>
 
-<!-- SLAB MANAGEMENT PANEL -->
+<!-- SLABS PANEL -->
 <div *ngIf="selectedPlan" class="slab-panel">
 
   <h3>
@@ -100,10 +106,9 @@
   </h3>
 
   <p *ngIf="!selectedPlan.active" class="warning">
-    ⚠ This tariff plan is inactive. Slabs cannot be modified.
+    ⚠ This plan is inactive. Slabs cannot be modified.
   </p>
 
-  <!-- SLABS TABLE -->
   <table>
     <thead>
       <tr>
@@ -118,30 +123,30 @@
         <td>{{ s.maxUnits }}</td>
         <td>{{ s.rate }}</td>
       </tr>
-      <tr *ngIf="slabs.length === 0">
+      <tr *ngIf="!slabs.length">
         <td colspan="3">No slabs defined</td>
       </tr>
     </tbody>
   </table>
 
-  <!-- ADD SLAB (ACTIVE ONLY) -->
   <div *ngIf="selectedPlan.active" class="add-slab">
     <h4>Add Slab</h4>
 
-    <input type="number"
-           placeholder="Min Units"
-           [(ngModel)]="newSlab.minUnits" />
-
-    <input type="number"
-           placeholder="Max Units"
-           [(ngModel)]="newSlab.maxUnits" />
-
-    <input type="number"
-           placeholder="Rate"
-           [(ngModel)]="newSlab.rate" />
+    <input type="number" placeholder="Min Units" [(ngModel)]="newSlab.minUnits" />
+    <input type="number" placeholder="Max Units" [(ngModel)]="newSlab.maxUnits" />
+    <input type="number" placeholder="Rate" [(ngModel)]="newSlab.rate" />
 
     <button (click)="addSlab()">Add</button>
   </div>
 
   <button class="close" (click)="closeSlabs()">Close</button>
 </div>
+<app-confirm-dialog
+  [visible]="confirmVisible"
+  title="Deactivate Tariff Plan"
+  message="Are you sure you want to deactivate this tariff plan?"
+  confirmText="Deactivate"
+  cancelText="Cancel"
+  (confirm)="confirmDeactivate()"
+  (cancel)="cancelDeactivate()">
+</app-confirm-dialog>

@@ -32,32 +32,49 @@ export class BillingPaymentsComponent {
     private http: HttpClient,
     private cdr: ChangeDetectorRef
   ) {}
-
+ngOnInit() {
+  this.loadData(); // ✅ loads ALL bills by default
+}
   loadData() {
-    if (!this.consumerId) return;
+  this.loading = true;
+  this.error = '';
+  this.activeTab = 'BILLS';
+this.selectedBill = null;
+this.selectedInvoice = null;
+this.outstanding = null;
 
-    this.loading = true;
-    this.error = '';
+  // ------------------ BILLS ------------------
+  const billsUrl = this.consumerId
+    ? `${this.baseUrl}/bills/consumer/${this.consumerId}`
+    : `${this.baseUrl}/bills`;
 
-    this.http.get<any[]>(`${this.baseUrl}/bills/consumer/${this.consumerId}`)
-      .subscribe({
-        next: res => {
-          this.bills = res;
-          this.loading = false;
-          this.cdr.detectChanges();
-        },
-        error: () => {
-          this.error = 'No bills found for this consumer';
-          this.loading = false;
-        }
-      });
+  this.http.get<any[]>(billsUrl).subscribe({
+    next: res => {
+      this.bills = res;
+      this.loading = false;
+      this.cdr.detectChanges();
+    },
+    error: () => {
+      this.error = 'No bills found';
+      this.loading = false;
+    }
+  });
 
-    this.http.get<any[]>(`${this.baseUrl}/payments/consumer/${this.consumerId}`)
-      .subscribe(res => {
-        this.payments = res;
-        this.cdr.detectChanges();
-      });
-  }
+  // ------------------ PAYMENTS ------------------
+  const paymentsUrl = this.consumerId
+    ? `${this.baseUrl}/payments/consumer/${this.consumerId}`
+    : `${this.baseUrl}/payments`;
+
+  this.http.get<any[]>(paymentsUrl).subscribe({
+    next: res => {
+      this.payments = res;
+      this.cdr.detectChanges();
+    },
+    error: () => {
+      this.payments = [];
+    }
+  });
+}
 
   viewBill(bill: any) {
     this.selectedBill = bill;

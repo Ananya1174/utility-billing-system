@@ -47,3 +47,15 @@
     <button class="logout-btn" (click)="logout()">Logout</button>
   </div>
 </nav>
+
+<button (click)="confirmLogout()">Logout</button>
+
+<app-confirm-dialog
+  [visible]="logoutDialog"
+  title="Logout"
+  message="Are you sure you want to logout?"
+  confirmText="Logout"
+  cancelText="Stay"
+  (confirm)="logout()"
+  (cancel)="cancelLogout()">
+</app-confirm-dialog>
