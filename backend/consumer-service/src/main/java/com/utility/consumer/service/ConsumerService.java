@@ -10,6 +10,7 @@ import com.utility.consumer.dto.request.ConsumerRequestDTO;
 import com.utility.consumer.dto.response.ConsumerResponseDTO;
 import com.utility.consumer.exception.ApiException;
 import com.utility.consumer.model.Consumer;
+import com.utility.consumer.repository.ConnectionRequestRepository;
 import com.utility.consumer.repository.ConsumerRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class ConsumerService {
 
     private final ConsumerRepository consumerRepository;
+    
 
     public ConsumerResponseDTO createConsumer(ConsumerRequestDTO dto) {
 
