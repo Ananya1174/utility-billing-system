@@ -44,7 +44,7 @@
           Login
         </button>
 
-        <a class="forgot-password">Forgot Password?</a>
+        <a class="forgot-password" (click)="goToForgotPassword()">Forgot Password?</a>
 
         <p class="error" *ngIf="errorMessage">
           {{ errorMessage }}

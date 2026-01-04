@@ -7,6 +7,7 @@ import {
   FormGroup
 } from '@angular/forms';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth';
 
 @Component({
@@ -24,9 +25,9 @@ export class ForgotPasswordComponent {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private router: Router
   ) {
-    // ✅ Initialize form INSIDE constructor
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]]
     });
@@ -35,22 +36,21 @@ export class ForgotPasswordComponent {
   submit() {
     if (this.form.invalid) return;
 
-    const email = this.form.get('email')!.value;
-
+    const email = this.form.get('email')?.value;
     if (!email) return;
 
     this.loading = true;
 
     this.authService.forgotPassword({ email }).subscribe({
       next: (res: string) => {
-  this.loading = false;
-  this.snackBar.open(
-    res || 'Password reset link sent to email',
-    'OK',
-    { duration: 3000 }
-  );
-  this.form.reset();
-},
+        this.loading = false;
+        this.snackBar.open(
+          res || 'Password reset link sent to email',
+          'OK',
+          { duration: 3000 }
+        );
+        this.form.reset();
+      },
       error: (err) => {
         this.loading = false;
         this.snackBar.open(
@@ -63,5 +63,19 @@ export class ForgotPasswordComponent {
         );
       }
     });
+  }
+
+  /* NAVBAR ACTIONS */
+
+  goHome() {
+    this.router.navigate(['/']);
+  }
+
+  goToLogin() {
+    this.router.navigate(['/login']);
+  }
+
+  goToCreateAccount() {
+    this.router.navigate(['/create-account']);
   }
 }
