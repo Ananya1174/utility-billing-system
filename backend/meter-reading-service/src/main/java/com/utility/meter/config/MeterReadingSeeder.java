@@ -36,28 +36,37 @@ public class MeterReadingSeeder {
                 return;
             }
 
-            System.out.println(" Seeding Meter Readings (2024–2025)...");
+            System.out.println(" Seeding Meter Readings (Jun 2024 → Today)...");
 
-            List<ConnectionDto> connections = connectionClient.getAllConnections();
+            List<ConnectionDto> connections =
+                    connectionClient.getAllConnections();
+
+            // ✅ START FROM JUNE 2024
+            LocalDate start = LocalDate.of(2024, 6, 1);
+
+            // ✅ GO TILL CURRENT MONTH
+            LocalDate end = LocalDate.now().withDayOfMonth(1);
 
             for (ConnectionDto conn : connections) {
 
                 long previousReading = 0;
+                LocalDate cursor = start;
 
-                // -------- 2024 (FULL YEAR) --------
-                for (int month = 1; month <= 12; month++) {
-                    previousReading =
-                            saveReading(conn, 2024, month, previousReading);
-                }
+                while (!cursor.isAfter(end)) {
 
-                // -------- 2025 (JAN–JUN ONLY) --------
-                for (int month = 1; month <= 6; month++) {
                     previousReading =
-                            saveReading(conn, 2025, month, previousReading);
+                            saveReading(
+                                    conn,
+                                    cursor.getYear(),
+                                    cursor.getMonthValue(),
+                                    previousReading
+                            );
+
+                    cursor = cursor.plusMonths(1);
                 }
             }
 
-            System.out.println("Meter Reading seeding completed");
+            System.out.println(" Meter Reading seeding completed");
         };
     }
 

@@ -111,6 +111,13 @@ public class BillingDashboardService {
     public List<BillResponse> getConsumerBillingHistory(String consumerId) {
         return billingService.getBillsByConsumer(consumerId);
     }
+    public double getTotalBilledForMonth(int month, int year) {
+        return billRepository
+                .findByBillingMonthAndBillingYear(month, year)
+                .stream()
+                .mapToDouble(Bill::getTotalAmount)
+                .sum();
+    }
 
     /* ================= MAPPER ================= */
 

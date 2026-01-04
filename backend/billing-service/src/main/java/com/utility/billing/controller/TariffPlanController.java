@@ -1,55 +1,47 @@
 package com.utility.billing.controller;
 
-import com.utility.billing.dto.TariffResponseDto;
-import com.utility.billing.model.TariffPlan;
-import com.utility.billing.model.UtilityType;
-import com.utility.billing.repository.TariffPlanRepository;
-import com.utility.billing.service.TariffQueryService;
+import java.util.List;
+import java.util.Map;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
+import com.utility.billing.model.TariffPlan;
+import com.utility.billing.service.TariffPlanService;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/tariffs/plans")
 @RequiredArgsConstructor
 public class TariffPlanController {
 
-	private final TariffPlanRepository repository;
+    private final TariffPlanService tariffPlanService;
 
-	@PostMapping
-	@ResponseStatus(HttpStatus.CREATED)
-	public TariffPlan create(@RequestBody TariffPlan plan) {
 
-		if (repository.existsByUtilityTypeAndPlanCode(plan.getUtilityType(), plan.getPlanCode())) {
-			throw new RuntimeException("Tariff plan already exists");
-		}
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public TariffPlan create(@RequestBody TariffPlan plan) {
+        return tariffPlanService.createTariffPlan(plan);
+    }
 
-		plan.setActive(true);
-		return repository.save(plan);
-	}
 
-	@PutMapping("/{id}/deactivate")
-	public Map<String, String> deactivate(@PathVariable String id) {
+    @PutMapping("/{id}/deactivate")
+    public Map<String, String> deactivate(@PathVariable String id) {
+        return tariffPlanService.deactivateTariffPlan(id);
+    }
 
-		TariffPlan plan = repository.findById(id).orElseThrow(() -> new RuntimeException("Tariff plan not found"));
 
-		if (!plan.isActive()) {
-			return Map.of("message", "Tariff plan already inactive");
-		}
+    @GetMapping
+    public List<TariffPlan> getPlans(
+            @RequestParam(required = false) Boolean active
+    ) {
+        return tariffPlanService.getPlans(active);
+    }
 
-		plan.setActive(false);
-		repository.save(plan);
 
-		return Map.of("message", "Tariff plan " + plan.getPlanCode() + " deactivated successfully");
-	}
-
-	@GetMapping("/active")
-	public List<TariffPlan> activePlans() {
-		return repository.findByActiveTrue();
-	}
-
+    @GetMapping("/active")
+    public List<TariffPlan> activePlans() {
+        return tariffPlanService.getActivePlans();
+    }
 }

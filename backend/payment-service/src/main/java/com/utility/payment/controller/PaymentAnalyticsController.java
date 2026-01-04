@@ -43,6 +43,12 @@ public class PaymentAnalyticsController {
 
         return analyticsService.getFailedPaymentsSummary(month, year);
     }
+    @GetMapping("/outstanding-monthly")
+    public List<MonthlyOutstandingDto> monthlyOutstanding(
+            @RequestParam int year
+    ) {
+        return analyticsService.getMonthlyOutstanding(year);
+    }
 
     @GetMapping("/revenue-by-mode")
     public List<PaymentModeSummaryDto> revenueByMode(

@@ -31,4 +31,9 @@ public interface BillingClient {
     );
     @GetMapping("/dashboard/billing/total-billed")
     double getTotalBilled();
+    @GetMapping("/dashboard/billing/total-billed-monthly")
+    double getTotalBilledForMonth(
+            @RequestParam int month,
+            @RequestParam int year
+    );
 }

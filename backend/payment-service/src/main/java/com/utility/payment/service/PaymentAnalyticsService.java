@@ -9,6 +9,8 @@ import com.utility.payment.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Month;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -101,6 +103,44 @@ public class PaymentAnalyticsService {
                 failed.size(),
                 amount
         );
+    }
+    public List<MonthlyOutstandingDto> getMonthlyOutstanding(int year) {
+
+        List<MonthlyOutstandingDto> result = new ArrayList<>();
+
+        for (int month = 1; month <= 12; month++) {
+
+            // 🔹 Total Paid (SUCCESS payments only)
+            double totalPaid =
+                    paymentRepository
+                            .findByBillingMonthAndBillingYearAndStatus(
+                                    month,
+                                    year,
+                                    PaymentStatus.SUCCESS
+                            )
+                            .stream()
+                            .mapToDouble(Payment::getAmount)
+                            .sum();
+
+            // 🔹 Total Billed (from Billing Service)
+            double totalBilled =
+                    billingClient.getTotalBilledForMonth(month, year);
+
+            double outstanding =
+                    Math.max(0, totalBilled - totalPaid);
+
+            result.add(
+                    new MonthlyOutstandingDto(
+                            month,
+                            Month.of(month).name(),
+                            totalBilled,
+                            totalPaid,
+                            outstanding
+                    )
+            );
+        }
+
+        return result;
     }
 
     /* ================= REPORTS ================= */

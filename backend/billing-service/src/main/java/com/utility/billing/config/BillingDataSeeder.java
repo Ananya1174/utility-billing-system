@@ -1,6 +1,7 @@
 package com.utility.billing.config;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import org.springframework.boot.CommandLineRunner;
@@ -24,130 +25,182 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BillingDataSeeder {
 
-	private final BillRepository billRepo;
-	private final TariffSlabRepository slabRepo;
-	private final ConnectionClient connectionClient;
-	private final MeterReadingClient meterClient;
+    private final BillRepository billRepo;
+    private final TariffSlabRepository slabRepo;
+    private final ConnectionClient connectionClient;
+    private final MeterReadingClient meterClient;
 
-	@Bean
-	CommandLineRunner seedBills() {
+    @Bean
+    CommandLineRunner seedBills() {
 
-		return args -> {
+        return args -> {
 
-			System.out.println("🌱 Seeding Bills from meter readings...");
+            // ✅ SEED ONLY IF EMPTY
+            if (billRepo.count() > 0) {
+                System.out.println(" Bills already exist. Skipping bill seeding.");
+                return;
+            }
 
-			List<ConsumerConnectionResponse> connections = connectionClient.getAllConnections();
+            System.out.println("🌱 Seeding Bills from meter readings...");
 
-			for (ConsumerConnectionResponse conn : connections) {
+            List<ConsumerConnectionResponse> connections =
+                    connectionClient.getAllConnections();
 
-				if (!conn.isActive())
-					continue;
+            for (ConsumerConnectionResponse conn : connections) {
 
-				List<MeterReadingResponse> readings;
+                if (!conn.isActive()) continue;
 
-				try {
-					readings = meterClient.getByConnection(conn.getId());
+                List<MeterReadingResponse> readings;
 
-					if (readings == null || readings.isEmpty()) {
-						System.out.println("⚠No meter readings for connection ");
-						continue;
-					}
-				} catch (Exception e) {
-				    System.out.println(
-				            "Failed to fetch meter readings for connection " 
-				        );
-				        e.printStackTrace();
-				        continue;
-				    }
+                try {
+                    readings = meterClient.getByConnection(conn.getId());
 
-				for (MeterReadingResponse reading : readings) {
+                    if (readings == null || readings.isEmpty()) {
+                        System.out.println("⚠ No meter readings for connection");
+                        continue;
+                    }
+                } catch (Exception e) {
+                    System.out.println(
+                            "Failed to fetch meter readings for connection"
+                    );
+                    e.printStackTrace();
+                    continue;
+                }
 
-					boolean exists = billRepo.existsByConnectionIdAndBillingMonthAndBillingYear(conn.getId(),
-							reading.getReadingMonth(), reading.getReadingYear());
+                for (MeterReadingResponse reading : readings) {
 
-					if (exists)
-						continue;
+                    boolean exists =
+                            billRepo.existsByConnectionIdAndBillingMonthAndBillingYear(
+                                    conn.getId(),
+                                    reading.getReadingMonth(),
+                                    reading.getReadingYear()
+                            );
 
-					Bill bill = new Bill();
-					bill.setConsumerId(conn.getConsumerId());
-					bill.setConnectionId(conn.getId());
-					bill.setUtilityType(conn.getUtilityType());
-					bill.setTariffPlan(conn.getTariffPlan());
+                    if (exists) continue;
 
-					bill.setBillingMonth(reading.getReadingMonth());
-					bill.setBillingYear(reading.getReadingYear());
-					bill.setConsumptionUnits(reading.getConsumptionUnits());
+                    Bill bill = new Bill();
+                    bill.setConsumerId(conn.getConsumerId());
+                    bill.setConnectionId(conn.getId());
+                    bill.setUtilityType(conn.getUtilityType());
+                    bill.setTariffPlan(conn.getTariffPlan());
 
-					double energyCharge = calculateEnergyCharge(conn.getUtilityType(), conn.getTariffPlan(),
-							reading.getConsumptionUnits());
+                    bill.setBillingMonth(reading.getReadingMonth());
+                    bill.setBillingYear(reading.getReadingYear());
+                    bill.setConsumptionUnits(reading.getConsumptionUnits());
 
-					double fixedCharge = fixedCharge(conn.getUtilityType());
-					double tax = energyCharge * 0.05;
+                    double energyCharge =
+                            calculateEnergyCharge(
+                                    conn.getUtilityType(),
+                                    conn.getTariffPlan(),
+                                    reading.getConsumptionUnits()
+                            );
 
-					LocalDate billDate = LocalDate.of(reading.getReadingYear(), reading.getReadingMonth(), 1);
+                    double fixedCharge = fixedCharge(conn.getUtilityType());
+                    double tax = energyCharge * 0.05;
 
-					LocalDate dueDate = billDate.plusDays(15);
+                    // ✅ Bill date = 25th of reading month
+                    LocalDate billDate =
+                            LocalDate.of(
+                                    reading.getReadingYear(),
+                                    reading.getReadingMonth(),
+                                    25
+                            );
 
-					BillStatus status = calculateStatus(dueDate);
+                    LocalDate dueDate = billDate.plusDays(15);
 
-					double penalty = status == BillStatus.OVERDUE ? energyCharge * 0.10 : 0;
+                    BillStatus status = calculateStatus(dueDate);
 
-					bill.setEnergyCharge(energyCharge);
-					bill.setFixedCharge(fixedCharge);
-					bill.setTax(tax);
-					bill.setPenalty(penalty);
-					bill.setTotalAmount(energyCharge + fixedCharge + tax + penalty);
+                    double penalty =
+                            status == BillStatus.OVERDUE
+                                    ? energyCharge * 0.10
+                                    : 0;
 
-					bill.setStatus(status);
-					bill.setBillDate(billDate);
-					bill.setDueDate(dueDate);
+                    bill.setEnergyCharge(energyCharge);
+                    bill.setFixedCharge(fixedCharge);
+                    bill.setTax(tax);
+                    bill.setPenalty(penalty);
+                    bill.setTotalAmount(
+                            energyCharge + fixedCharge + tax + penalty
+                    );
 
-					billRepo.save(bill);
-				}
-			}
-		};
-	}
+                    bill.setStatus(status);
+                    bill.setBillDate(billDate);
+                    bill.setDueDate(dueDate);
 
-	/* ---------------- HELPERS ---------------- */
+                    billRepo.save(bill);
+                }
+            }
 
-	private double calculateEnergyCharge(UtilityType type, String plan, long units) {
+            System.out.println("✅ Bill seeding completed");
+        };
+    }
 
-		List<TariffSlab> slabs = slabRepo.findByUtilityTypeAndPlanCodeOrderByMinUnitsAsc(type, plan);
+    /* ---------------- HELPERS ---------------- */
 
-		double amount = 0;
-		long remaining = units;
+    private double calculateEnergyCharge(
+            UtilityType type,
+            String plan,
+            long units
+    ) {
 
-		for (TariffSlab slab : slabs) {
+        List<TariffSlab> slabs =
+                slabRepo.findByUtilityTypeAndPlanCodeOrderByMinUnitsAsc(
+                        type,
+                        plan
+                );
 
-			if (remaining <= 0)
-				break;
+        double amount = 0;
+        long remaining = units;
 
-			long slabUnits = Math.min(remaining, slab.getMaxUnits() - slab.getMinUnits() + 1);
+        for (TariffSlab slab : slabs) {
 
-			amount += slabUnits * slab.getRate();
-			remaining -= slabUnits;
-		}
+            if (remaining <= 0) break;
 
-		return amount;
-	}
+            long slabUnits =
+                    Math.min(
+                            remaining,
+                            slab.getMaxUnits() - slab.getMinUnits() + 1
+                    );
 
-	private double fixedCharge(UtilityType type) {
-		return switch (type) {
-		case ELECTRICITY -> 50;
-		case WATER -> 30;
-		case GAS -> 40;
-		case INTERNET -> 100;
-		};
-	}
+            amount += slabUnits * slab.getRate();
+            remaining -= slabUnits;
+        }
 
-	private BillStatus calculateStatus(LocalDate dueDate) {
+        return amount;
+    }
 
-		LocalDate today = LocalDate.now();
+    private double fixedCharge(UtilityType type) {
+        return switch (type) {
+            case ELECTRICITY -> 50;
+            case WATER -> 30;
+            case GAS -> 40;
+            case INTERNET -> 100;
+        };
+    }
 
-		if (today.isBefore(dueDate)) {
-			return BillStatus.DUE;
-		}
+    /**
+     * ✅ REALISTIC STATUS DISTRIBUTION
+     */
+    private BillStatus calculateStatus(LocalDate dueDate) {
 
-		return Math.random() < 0.8 ? BillStatus.PAID : BillStatus.OVERDUE;
-	}
+        LocalDate today = LocalDate.now();
+
+        if (today.isBefore(dueDate)) {
+            return BillStatus.DUE;
+        }
+
+        long overdueDays = ChronoUnit.DAYS.between(dueDate, today);
+
+        // Old bills → mostly PAID
+        if (overdueDays > 60) {
+            return Math.random() < 0.9
+                    ? BillStatus.PAID
+                    : BillStatus.OVERDUE;
+        }
+
+        // Recent overdue → mix
+        return Math.random() < 0.6
+                ? BillStatus.OVERDUE
+                : BillStatus.PAID;
+    }
 }

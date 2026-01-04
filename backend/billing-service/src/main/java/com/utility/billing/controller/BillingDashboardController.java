@@ -45,6 +45,13 @@ public class BillingDashboardController {
 
 		return dashboardService.getConsumerBillingSummary(month, year);
 	}
+	@GetMapping("/total-billed-monthly")
+	public double totalBilledMonthly(
+	        @RequestParam int month,
+	        @RequestParam int year
+	) {
+	    return dashboardService.getTotalBilledForMonth(month, year);
+	}
 
 	@GetMapping("/consumer/{consumerId}")
 	public List<BillResponse> consumerBillingHistory(@PathVariable String consumerId) {
