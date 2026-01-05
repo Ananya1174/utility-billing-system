@@ -16,7 +16,8 @@ import { ForcePasswordChangeGuard } from './core/guards/force-password-change-gu
 import { AuthLayoutComponent } from './shared/auth-layout';
 import { ForgotPasswordComponent } from './core/auth/forgot-password/forgot-password';
 import { ResetPasswordComponent } from './core/auth/reset-password/reset-password';
-
+import { MeterReadingsComponent } from './features/Billing/meter-readings/meter-readings';
+import { GenerateBillsComponent } from './features/Billing/generate-bills/generate-bills';
 // CONSUMER
 import { ConsumerDashboard } from './features/consumer/consumer-dashboard/consumer-dashboard';
 import { MyUtilitiesComponent } from './features/consumer/my-utilities/my-utilities';
@@ -60,6 +61,10 @@ export const routes: Routes = [
       { path: 'admin/utility-requests', component: UtilityRequestsComponent },
       { path: 'admin/tariffs', component: TariffManagementComponent },
       { path: 'admin/billing', component: BillingPaymentsComponent },
+
+      //------------Billing Officer-----
+      { path: 'billing/meter-readings', component: MeterReadingsComponent },
+      { path: 'billing/generate-bills', component: GenerateBillsComponent },
     ]
   },
 

@@ -1,0 +1,27 @@
+.form-card {
+  max-width: 400px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+label {
+  font-weight: 600;
+  margin-top: 12px;
+  display: block;
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+}
+
+.primary-btn {
+  margin-top: 16px;
+  width: 100%;
+}
+
+.message {
+  margin-top: 12px;
+  color: green;
+}

@@ -1,0 +1,37 @@
+.form-card {
+  max-width: 500px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+label {
+  font-weight: 600;
+  margin-top: 12px;
+  display: block;
+}
+
+input, select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 4px;
+}
+
+.primary-btn {
+  margin-top: 16px;
+  width: 100%;
+}
+
+.message {
+  margin-top: 12px;
+  color: green;
+}
+.snackbar-success {
+  background: #2e7d32;
+  color: #fff;
+}
+
+.snackbar-error {
+  background: #c62828;
+  color: #fff;
+}

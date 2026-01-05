@@ -1,0 +1,20 @@
+<h2>Generate Bills</h2>
+
+<div class="form-card">
+
+  <label>Consumer ID</label>
+  <input [(ngModel)]="consumerId" />
+
+  <label>Connection ID</label>
+  <input [(ngModel)]="connectionId" />
+
+  <button
+    class="primary-btn"
+    [disabled]="loading"
+    (click)="generateBill()">
+    Generate Bill
+  </button>
+
+  <p class="message">{{ message }}</p>
+
+</div>
