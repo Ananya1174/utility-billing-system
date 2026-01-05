@@ -1,5 +1,3 @@
-
-
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -11,7 +9,7 @@ import { ConfirmDialogComponent } from '../../../shared/confirm-dialog/confirm-d
   standalone: true,
   imports: [CommonModule, FormsModule, ConfirmDialogComponent],
   templateUrl: './tariff-management.html',
-  styleUrl: './tariff-management.css'
+  styleUrls: ['./tariff-management.css']
 })
 export class TariffManagementComponent implements OnInit {
 
@@ -21,7 +19,6 @@ export class TariffManagementComponent implements OnInit {
 
   plans: any[] = [];
   slabs: any[] = [];
-
   selectedPlan: any = null;
 
   utilityFilter: 'ALL' | 'ELECTRICITY' | 'WATER' | 'GAS' | 'INTERNET' = 'ALL';
@@ -31,7 +28,7 @@ export class TariffManagementComponent implements OnInit {
   error = '';
 
   /* ===================== */
-  /* MODALS / OVERLAY */
+  /* MODALS */
   /* ===================== */
 
   showAddPlan = false;
@@ -57,11 +54,11 @@ export class TariffManagementComponent implements OnInit {
   };
 
   /* ===================== */
-  /* DEACTIVATE CONFIRM */
+  /* CONFIRM DELETE SLAB */
   /* ===================== */
 
-  confirmVisible = false;
-  confirmPlanId: string | null = null;
+  confirmSlabVisible = false;
+  slabToDelete: string | null = null;
 
   /* ===================== */
   /* API */
@@ -74,7 +71,7 @@ export class TariffManagementComponent implements OnInit {
     private cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadPlans();
   }
 
@@ -82,15 +79,12 @@ export class TariffManagementComponent implements OnInit {
   /* LOAD PLANS */
   /* ===================== */
 
-  loadPlans() {
+  loadPlans(): void {
     this.loading = true;
     this.error = '';
 
     let url = `${this.baseUrl}/plans`;
-
-    if (this.activeOnly) {
-      url += '?active=true';
-    }
+    if (this.activeOnly) url += '?active=true';
 
     this.http.get<any[]>(url).subscribe({
       next: res => {
@@ -109,122 +103,93 @@ export class TariffManagementComponent implements OnInit {
     });
   }
 
-  onFilterChange() {
+  onFilterChange(): void {
     this.loadPlans();
   }
 
   /* ===================== */
-  /* ADD PLAN MODAL */
+  /* ADD PLAN */
   /* ===================== */
 
-  openAddPlan() {
-    this.showAddPlan = true;
+  addPlan(): void {
+    if (!this.newPlan.utilityType || !this.newPlan.planCode) return;
+
+    this.http.post(`${this.baseUrl}/plans`, this.newPlan).subscribe(() => {
+      this.showAddPlan = false;
+      this.newPlan = { utilityType: '', planCode: '' };
+      this.loadPlans();
+    });
   }
+  // =====================
+// DEACTIVATE PLAN (DIALOG)
+// =====================
 
-  closeAddPlan() {
-    this.showAddPlan = false;
-    this.newPlan = { utilityType: '', planCode: '' };
-  }
+confirmPlanVisible = false;
+confirmPlanId: string | null = null;
 
-  addPlan() {
-    if (!this.newPlan.utilityType || !this.newPlan.planCode) {
-      alert('All fields are required');
-      return;
-    }
+openDeactivateDialog(planId: string) {
+  this.confirmPlanId = planId;
+  this.confirmPlanVisible = true;
+}
 
-    this.http.post(`${this.baseUrl}/plans`, this.newPlan)
-      .subscribe(() => {
-        this.closeAddPlan();
-        this.loadPlans();
-      });
-  }
+confirmDeactivate() {
+  if (!this.confirmPlanId) return;
 
-  /* ===================== */
-  /* DEACTIVATE PLAN */
-  /* ===================== */
+  this.http
+    .put(`${this.baseUrl}/plans/${this.confirmPlanId}/deactivate`, {})
+    .subscribe(() => {
+      this.confirmPlanVisible = false;
+      this.confirmPlanId = null;
+      this.loadPlans();
+      this.closeSlabs();
+      this.cdr.detectChanges();
+    });
+}
 
-  openDeactivateDialog(planId: string) {
-    this.confirmPlanId = planId;
-    this.confirmVisible = true;
-  }
-
-  confirmDeactivate() {
-    if (!this.confirmPlanId) return;
-
-    this.http
-      .put(`${this.baseUrl}/plans/${this.confirmPlanId}/deactivate`, {})
-      .subscribe(() => {
-        this.confirmVisible = false;
-        this.confirmPlanId = null;
-        this.closeSlabs();
-        this.loadPlans();
-      });
-  }
-
-  cancelDeactivate() {
-    this.confirmVisible = false;
-    this.confirmPlanId = null;
-  }
+cancelDeactivate() {
+  this.confirmPlanVisible = false;
+  this.confirmPlanId = null;
+}
 
   /* ===================== */
   /* MANAGE SLABS */
   /* ===================== */
 
-  openSlabs(plan: any) {
+  openSlabs(plan: any): void {
     this.selectedPlan = plan;
     this.showSlabsModal = true;
     this.newSlab = { minUnits: null, maxUnits: null, rate: null };
+    this.loadSlabs();
+  }
 
+  closeSlabs(): void {
+    this.selectedPlan = null;
+    this.slabs = [];
+    this.showSlabsModal = false;
+  }
+
+  loadSlabs(): void {
     this.http
-      .get<any>(`${this.baseUrl}?utilityType=${plan.utilityType}`)
+      .get<any>(`${this.baseUrl}?utilityType=${this.selectedPlan.utilityType}`)
       .subscribe(res => {
         const planData = res.plans.find(
-          (p: any) => p.planCode === plan.planCode
+          (p: any) => p.planCode === this.selectedPlan.planCode
         );
         this.slabs = planData?.slabs || [];
         this.cdr.detectChanges();
       });
   }
 
-  closeSlabs() {
-    this.selectedPlan = null;
-    this.slabs = [];
-    this.showSlabsModal = false;
-  }
-
-  /* ===================== */
-  /* SLAB VALIDATION */
-  /* ===================== */
-
-  private isOverlapping(newMin: number, newMax: number): boolean {
-    return this.slabs.some(s =>
-      !(newMax < s.minUnits || newMin > s.maxUnits)
-    );
-  }
-
   /* ===================== */
   /* ADD SLAB */
   /* ===================== */
 
-  addSlab() {
+  addSlab(): void {
     if (!this.selectedPlan?.active) return;
 
     const { minUnits, maxUnits, rate } = this.newSlab;
-
-    if (
-      minUnits === null ||
-      maxUnits === null ||
-      rate === null ||
-      minUnits > maxUnits
-    ) {
-      alert('Invalid slab values');
-      return;
-    }
-
-    if (this.isOverlapping(minUnits, maxUnits)) {
-      alert('Slab range overlaps with existing slab');
-      return;
-    }
+    if (minUnits === null || maxUnits === null || rate === null) return;
+    if (minUnits > maxUnits) return;
 
     const payload = {
       utilityType: this.selectedPlan.utilityType,
@@ -235,21 +200,36 @@ export class TariffManagementComponent implements OnInit {
     };
 
     this.http.post(`${this.baseUrl}/slabs`, payload)
-      .subscribe(() => this.openSlabs(this.selectedPlan));
+      .subscribe(() => this.loadSlabs());
   }
 
   /* ===================== */
-  /* DELETE SLAB (FRONTEND) */
+  /* DELETE SLAB (DIALOG) */
   /* ===================== */
 
-  deleteSlab(slabId: string) {
-    if (!confirm('Delete this slab?')) return;
+  openDeleteSlabDialog(slabId: string): void {
+    this.slabToDelete = slabId;
+    this.confirmSlabVisible = true;
+  }
 
-    this.http
-      .delete(`${this.baseUrl}/slabs/${slabId}`)
-      .subscribe(() => {
-        this.slabs = this.slabs.filter(s => s.id !== slabId);
-        this.cdr.detectChanges();
-      });
+  confirmDeleteSlab(): void {
+  if (!this.slabToDelete) return;
+
+  this.http
+    .delete(`${this.baseUrl}/slabs/${this.slabToDelete}`)
+    .subscribe(() => {
+      this.slabToDelete = null;
+      this.confirmSlabVisible = false;
+
+      // ✅ ALWAYS reload from backend
+      this.loadSlabs();
+
+      this.cdr.detectChanges();
+    });
+}
+
+  cancelDeleteSlab(): void {
+    this.slabToDelete = null;
+    this.confirmSlabVisible = false;
   }
 }

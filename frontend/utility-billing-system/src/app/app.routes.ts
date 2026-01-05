@@ -23,7 +23,7 @@ import { ConsumerDashboard } from './features/consumer/consumer-dashboard/consum
 import { MyUtilitiesComponent } from './features/consumer/my-utilities/my-utilities';
 import { BillsComponent } from './features/consumer/bills/bills';
 import { PaymentsComponent } from './features/consumer/payments/payments';
-
+import { BillingOfficerDashboardComponent } from './features/Billing/billing-dashboard/billing-dashboard';
 export const routes: Routes = [
 
   // ---------- PUBLIC ----------
@@ -63,6 +63,7 @@ export const routes: Routes = [
       { path: 'admin/billing', component: BillingPaymentsComponent },
 
       //------------Billing Officer-----
+      { path: 'billing/dashboard', component: BillingOfficerDashboardComponent },
       { path: 'billing/meter-readings', component: MeterReadingsComponent },
       { path: 'billing/generate-bills', component: GenerateBillsComponent },
     ]

@@ -75,8 +75,10 @@ export class LoginComponent {
           // ROLE BASED REDIRECT
           if (res.role === 'ADMIN') {
             this.router.navigate(['/admin/dashboard']);
-          } else {
-            this.router.navigate(['/home']);
+          } else if(res.role=='CONSUMER'){
+            this.router.navigate(['consumer/dashboard']);
+          }else if(res.role=='BILLING_OFFICER'){
+            this.router.navigate(['billing/dashboard']);
           }
         },
         error: () => {
