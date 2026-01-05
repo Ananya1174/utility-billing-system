@@ -1,0 +1,34 @@
+.utilities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.utility-card {
+  padding: 16px;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid #ddd;
+}
+
+.status {
+  font-weight: bold;
+}
+
+.status.success {
+  color: green;
+}
+
+.status.failed {
+  color: red;
+}
+
+.status.initiated {
+  color: orange;
+}
+
+.actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+}

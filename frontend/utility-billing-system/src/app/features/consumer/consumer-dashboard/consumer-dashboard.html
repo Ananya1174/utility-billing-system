@@ -1,1 +1,75 @@
-<p>consumer-dashboard works!</p>
+<h2>Consumer Dashboard</h2>
+
+<div *ngIf="loading">Loading dashboard...</div>
+
+<div *ngIf="!loading && summary">
+
+  <!-- KPI -->
+  <div class="kpi-grid">
+    <div class="kpi-card highlight">
+      <p>Total Due</p>
+      <h3>₹{{ summary.totalOutstanding }}</h3>
+    </div>
+
+    <div class="kpi-card">
+      <p>Unpaid Bills</p>
+      <h3>{{ summary.unpaidBills }}</h3>
+    </div>
+
+    <div class="kpi-card">
+      <p>Last Payment</p>
+      <h3>₹{{ summary.lastPaymentAmount || 0 }}</h3>
+      <small *ngIf="summary.lastPaymentDate">
+        {{ summary.lastPaymentDate | date:'medium' }}
+      </small>
+    </div>
+
+    <div class="kpi-card">
+      <p>Total Bills</p>
+      <h3>{{ summary.totalBills }}</h3>
+    </div>
+  </div>
+
+  <!-- ALERTS -->
+  <div class="alert warning" *ngIf="summary.unpaidBills > 0">
+    ⚠️ You have {{ summary.unpaidBills }} unpaid bill(s)
+  </div>
+
+  <div class="alert info" *ngIf="summary.pendingRequests > 0">
+    ⏳ {{ summary.pendingRequests }} utility request(s) pending
+  </div>
+
+  <!-- CHARTS -->
+  <div class="charts-grid">
+
+    <div class="chart-card">
+      <h3>Consumption by Utility</h3>
+      <canvas baseChart [type]="pieChartType" [data]="pieChartData"></canvas>
+    </div>
+
+    <div class="chart-card">
+      <h3>Monthly Consumption</h3>
+      <canvas baseChart [type]="barChartType" [data]="barChartData"></canvas>
+    </div>
+
+    <div class="chart-card">
+      <h3>Paid vs Unpaid Bills</h3>
+      <canvas baseChart [type]="doughnutChartType" [data]="doughnutChartData"></canvas>
+    </div>
+
+    <div class="chart-card">
+      <h3>Amount Summary</h3>
+      <canvas baseChart [type]="amountBarChartType" [data]="amountBarChartData"></canvas>
+    </div>
+
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="actions">
+    <button class="primary-btn" (click)="goToBills()">View Bills</button>
+    <button class="primary-btn" *ngIf="summary.totalOutstanding > 0"
+            (click)="payDueBill()">Pay Due</button>
+    <button class="secondary-btn" (click)="goToUtilities()">My Utilities</button>
+  </div>
+
+</div>

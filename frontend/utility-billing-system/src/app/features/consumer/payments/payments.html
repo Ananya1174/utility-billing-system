@@ -1,0 +1,51 @@
+<h2>Payment History</h2>
+
+<div *ngIf="loading">Loading payments...</div>
+
+<div *ngIf="!loading && payments.length === 0">
+  No payment history available.
+</div>
+
+<div class="utilities-grid" *ngIf="!loading && payments.length > 0">
+
+  <div class="utility-card" *ngFor="let p of payments">
+
+    <h3>
+      {{ p.billingMonth }}/{{ p.billingYear }}
+    </h3>
+
+    <p><strong>Amount:</strong> ₹{{ p.amount }}</p>
+
+    <p><strong>Mode:</strong> {{ p.mode }}</p>
+
+    <p><strong>Status:</strong>
+      <span class="status" [ngClass]="p.status.toLowerCase()">
+        {{ p.status }}
+      </span>
+    </p>
+
+    <p><strong>Transaction ID:</strong><br />{{ p.transactionId }}</p>
+
+    <p>
+      <strong>Date:</strong>
+      {{ p.createdAt | date:'medium' }}
+    </p>
+
+    <!-- ACTIONS -->
+    <div class="actions" *ngIf="p.status === 'SUCCESS' && p.invoiceId">
+
+      <button class="secondary-btn"
+              (click)="viewInvoice(p.paymentId)">
+        View Invoice
+      </button>
+
+      <button class="secondary-btn"
+              (click)="downloadInvoice(p.paymentId)">
+        Download Invoice
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

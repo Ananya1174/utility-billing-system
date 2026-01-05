@@ -14,6 +14,11 @@ export class PaymentsService {
       payload
     );
   }
+  getPaymentsByConsumer(consumerId: string) {
+  return this.http.get<any[]>(
+    `${this.baseUrl}/consumer/${consumerId}`
+  );
+}
 
   confirmOnlinePayment(payload: any) {
     return this.http.post(

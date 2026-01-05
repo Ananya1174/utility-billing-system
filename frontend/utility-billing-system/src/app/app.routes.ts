@@ -21,7 +21,7 @@ import { ResetPasswordComponent } from './core/auth/reset-password/reset-passwor
 import { ConsumerDashboard } from './features/consumer/consumer-dashboard/consumer-dashboard';
 import { MyUtilitiesComponent } from './features/consumer/my-utilities/my-utilities';
 import { BillsComponent } from './features/consumer/bills/bills';
-// import { PaymentsComponent } from './features/consumer/payments/payments.component';
+import { PaymentsComponent } from './features/consumer/payments/payments';
 
 export const routes: Routes = [
 
@@ -49,7 +49,8 @@ export const routes: Routes = [
       { path: 'consumer/dashboard', component: ConsumerDashboard },
       { path: 'consumer/utilities', component: MyUtilitiesComponent },
       { path: 'consumer/bills', component: BillsComponent },
-      // { path: 'consumer/payments', component: PaymentsComponent },
+      { path: 'consumer/payments', component: PaymentsComponent },
+      { path: 'consumer', redirectTo: 'consumer/dashboard', pathMatch: 'full' },
 
       // ---------- ADMIN ----------
       { path: 'admin/dashboard', component: AdminDashboardComponent },
