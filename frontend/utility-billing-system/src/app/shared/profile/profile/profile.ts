@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+
 import { MyAccountComponent } from '../my-account/my-account';
 import { ProfileDetailsComponent } from '../profile-details/profile-details';
 import { ChangePasswordComponent } from '../change-password/change-password';
@@ -21,7 +22,7 @@ export class ProfileComponent {
 
   activeTab: 'account' | 'profile' | 'password' = 'account';
 
-  constructor(public authService: AuthService) {}
+  constructor(private authService: AuthService) {}
 
   isConsumer(): boolean {
     return this.authService.getRole() === 'CONSUMER';

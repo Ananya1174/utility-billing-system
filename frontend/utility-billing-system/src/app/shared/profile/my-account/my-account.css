@@ -1,75 +1,70 @@
-:host {
-  display: block;
-  padding: 24px;
-  background: #f8fafc;
-  min-height: 100vh;
+.password-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 32px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
 }
 
-/* Title */
 h2 {
-  margin-bottom: 4px;
+  margin: 0 0 4px;
+  font-size: 1.8rem;
   color: #1e3a8a;
 }
 
 .subtitle {
-  margin-bottom: 20px;
   color: #64748b;
+  margin-bottom: 24px;
 }
 
-/* Card */
-.account-card {
-  max-width: 520px;
-  background: #ffffff;
-  padding: 24px;
-  border-radius: 14px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+.form-group {
+  margin-bottom: 18px;
 }
 
-/* Rows */
-.row {
-  display: flex;
-  justify-content: space-between;
-  padding: 12px 0;
-  border-bottom: 1px solid #e5e7eb;
+label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 6px;
 }
 
-.row:last-child {
-  border-bottom: none;
+input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5f5;
+  font-size: 0.95rem;
 }
 
-.label {
+input:focus {
+  outline: none;
+  border-color: #1e40af;
+}
+
+.rules {
+  margin-top: 10px;
   font-size: 0.85rem;
-  color: #64748b;
 }
 
-.value {
-  font-weight: 600;
-  color: #0f172a;
-  max-width: 280px;
-  text-align: right;
-  word-break: break-all;
+.rules p {
+  margin: 4px 0;
+  color: #94a3b8;
 }
 
-/* Status */
-.value.active {
+.rules p.valid {
   color: #16a34a;
 }
 
-.value.inactive {
-  color: #dc2626;
+.primary-btn {
+  width: 100%;
+  padding: 12px;
+  background: #1e40af;
+  color: #fff;
+  border-radius: 10px;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
 }
 
-/* Role badge */
-.badge {
-  background: #e0e7ff;
-  color: #3730a3;
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 0.75rem;
-}
-
-/* Empty */
-.empty {
-  margin-top: 30px;
-  color: #64748b;
+.primary-btn:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
 }

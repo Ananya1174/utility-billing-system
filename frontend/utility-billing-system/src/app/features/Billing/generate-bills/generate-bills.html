@@ -1,20 +1,40 @@
-<h2>Generate Bills</h2>
+<div class="page-container">
 
-<div class="form-card">
+  <h2>Generate Bills</h2>
+  <p class="subtitle">Generate a bill for a consumer connection</p>
 
-  <label>Consumer ID</label>
-  <input [(ngModel)]="consumerId" />
+  <div class="form-card">
 
-  <label>Connection ID</label>
-  <input [(ngModel)]="connectionId" />
+    <div class="form-group">
+      <label>Consumer ID</label>
+      <input
+        type="text"
+        placeholder="Enter Consumer ID"
+        [(ngModel)]="consumerId" />
+    </div>
 
-  <button
-    class="primary-btn"
-    [disabled]="loading"
-    (click)="generateBill()">
-    Generate Bill
-  </button>
+    <div class="form-group">
+      <label>Connection ID</label>
+      <input
+        type="text"
+        placeholder="Enter Connection ID"
+        [(ngModel)]="connectionId" />
+    </div>
 
-  <p class="message">{{ message }}</p>
+    <button
+      class="primary-btn"
+      [disabled]="loading || !consumerId || !connectionId"
+      (click)="generateBill()">
+      {{ loading ? 'Generating...' : 'Generate Bill' }}
+    </button>
+
+    <p
+      class="message"
+      [class.success]="message.includes('successfully')"
+      [class.error]="message && !message.includes('successfully')">
+      {{ message }}
+    </p>
+
+  </div>
 
 </div>

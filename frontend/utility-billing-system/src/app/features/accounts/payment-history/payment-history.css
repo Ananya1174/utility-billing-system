@@ -1,73 +1,137 @@
+
+
+/* ================= PAGE LAYOUT ================= */
 :host {
   display: block;
-  padding: 24px;
-  background: #f8fafc;
+  min-height: 100vh;
+  background: #f6f8fb;
+  padding: 24px 28px;
 }
+
+/* ================= HEADER ================= */
 
 h2 {
+  /* margin: 0; */
+  font-size: 1.8rem;
+  font-weight: 600;
   color: #1e3a8a;
-  margin-bottom: 4px;
 }
 
+
 .subtitle {
-  color: #64748b;
+  margin-top: -6px;
   margin-bottom: 20px;
+  color: #475569;
+  font-size: 0.95rem;
 }
+
+/* ================= FILTERS ================= */
 
 .filters {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
-  margin-bottom: 20px;
-}
-
-.filters select {
-  padding: 8px 10px;
-  border-radius: 6px;
-  border: 1px solid #cbd5e1;
-}
-
-.summary {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
   margin-bottom: 24px;
 }
 
-.card {
-  padding: 16px;
-  border-radius: 12px;
-  background: white;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+.filters select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  font-size: 0.9rem;
+  min-width: 140px;
+  cursor: pointer;
 }
 
-.card.success { border-left: 4px solid #16a34a; }
-.card.failed  { border-left: 4px solid #dc2626; }
-.card.total   { border-left: 4px solid #2563eb; }
+.filters select:focus {
+  outline: none;
+  border-color: #1e3a8a;
+  box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.15);
+}
+
+/* ================= SUMMARY CARDS ================= */
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.summary .card {
+  padding: 16px;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.summary .card p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.summary .card h3 {
+  margin-top: 6px;
+  font-size: 1.5rem;
+}
+
+/* Status colors */
+.summary .success {
+  border-left: 5px solid #16a34a;
+}
+
+.summary .failed {
+  border-left: 5px solid #dc2626;
+}
+
+.summary .total {
+  border-left: 5px solid #1e3a8a;
+}
+
+/* ================= TABLE ================= */
 
 table {
   width: 100%;
   border-collapse: collapse;
-  background: white;
+  background: #ffffff;
   border-radius: 12px;
   overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+}
+
+thead {
+  background: #f1f5f9;
 }
 
 th, td {
-  padding: 12px;
+  padding: 12px 14px;
   text-align: left;
-  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.9rem;
 }
 
 th {
-  background: #f1f5f9;
+  color: #1e293b;
   font-weight: 600;
 }
 
+tbody tr {
+  border-top: 1px solid #e5e7eb;
+}
+
+tbody tr:hover {
+  background: #f8fafc;
+}
+
+/* ================= STATUS BADGES ================= */
+
 .status {
   padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 0.8rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
   font-weight: 600;
+  display: inline-block;
 }
 
 .status.success {
@@ -81,25 +145,72 @@ th {
 }
 
 .status.initiated {
-  background: #fef3c7;
-  color: #92400e;
+  background: #e0e7ff;
+  color: #3730a3;
 }
 
-button {
-  padding: 6px 12px;
-  border: none;
+/* ================= EMPTY STATE ================= */
+
+.empty {
+  margin-top: 24px;
+  padding: 20px;
+  text-align: center;
+  background: #f8fafc;
+  border-radius: 12px;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 900px) {
+  table {
+    font-size: 0.85rem;
+  }
+
+  th, td {
+    padding: 10px;
+  }
+}
+/* ================= PAGINATION ================= */
+
+.pagination {
+  margin-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.page-size select {
+  padding: 6px 10px;
   border-radius: 6px;
-  background: #2563eb;
-  color: white;
+  border: 1px solid #cbd5e1;
+}
+
+.page-controls {
+  display: flex;
+  gap: 6px;
+}
+
+.page-controls button {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
   cursor: pointer;
 }
 
-button:hover {
-  background: #1d4ed8;
+.page-controls button.active {
+  background: #1e3a8a;
+  color: #ffffff;
+  border-color: #1e3a8a;
 }
 
-.empty {
-  margin-top: 20px;
-  color: #64748b;
-  text-align: center;
+.page-controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
+/* ================= CONTENT WRAPPER SPACING ================= */
+

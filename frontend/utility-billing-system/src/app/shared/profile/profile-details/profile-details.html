@@ -1,48 +1,43 @@
 <h2>Profile Details</h2>
-<p class="subtitle">Manage your personal information</p>
+<p class="subtitle">Personal information</p>
 
-<div *ngIf="loading">Loading profile...</div>
+<div *ngIf="loading">Loading...</div>
 
-<form *ngIf="!loading" class="profile-card" (ngSubmit)="updateProfile()">
+<div class="card" *ngIf="!loading">
 
-  <label>
-    Full Name
-    <input type="text"
-           [(ngModel)]="profile.fullName"
-           name="fullName"
-           required />
-  </label>
-
-  <label>
-    Email
-    <input type="email"
-           [(ngModel)]="profile.email"
-           name="email"
-           required />
-  </label>
-
-  <label>
-    Mobile Number
-    <input type="text"
-           [(ngModel)]="profile.mobileNumber"
-           name="mobileNumber"
-           maxlength="10"
-           required />
-  </label>
-
-  <label>
-    Address
-    <textarea rows="3"
-              [(ngModel)]="profile.address"
-              name="address"
-              required></textarea>
-  </label>
-
-  <button type="submit" [disabled]="saving">
-    {{ saving ? 'Saving...' : 'Update Profile' }}
+  <button class="edit-btn" *ngIf="!editing" (click)="enableEdit()">
+    Edit Profile
   </button>
 
-  <p class="success" *ngIf="successMsg">{{ successMsg }}</p>
-  <p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>
+  <form *ngIf="editing" (ngSubmit)="updateProfile()">
 
-</form>
+    <label>Full Name</label>
+    <input [(ngModel)]="profile.fullName" name="fullName" required />
+
+    <label>Email</label>
+    <input [(ngModel)]="profile.email" name="email" required />
+
+    <label>Mobile</label>
+    <input [(ngModel)]="profile.mobileNumber" name="mobile" required />
+
+    <label>Address</label>
+    <textarea [(ngModel)]="profile.address" name="address"></textarea>
+
+    <div class="actions">
+      <button class="primary-btn" type="submit" [disabled]="saving">
+        Save
+      </button>
+      <button class="secondary-btn" type="button" (click)="cancelEdit()">
+        Cancel
+      </button>
+    </div>
+  </form>
+
+  <div *ngIf="!editing">
+    <p><strong>Name:</strong> {{ profile.fullName }}</p>
+    <p><strong>Email:</strong> {{ profile.email }}</p>
+    <p><strong>Mobile:</strong> {{ profile.mobileNumber }}</p>
+    <p><strong>Address:</strong> {{ profile.address }}</p>
+  </div>
+
+</div>

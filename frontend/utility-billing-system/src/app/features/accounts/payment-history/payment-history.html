@@ -1,3 +1,4 @@
+<div class="fullpage">
 <h2>Payment History</h2>
 <p class="subtitle">Accounts Officer – All Transactions</p>
 
@@ -62,7 +63,7 @@
   </thead>
 
   <tbody>
-    <tr *ngFor="let p of filteredPayments">
+    <tr *ngFor="let p of paginatedPayments">
       <td>{{ p.paymentId }}</td>
       <td>{{ p.consumerId }}</td>
       <td>{{ p.billId }}</td>
@@ -77,7 +78,38 @@
     </tr>
   </tbody>
 </table>
+<!-- PAGINATION -->
+<div class="pagination" *ngIf="totalPages > 1">
+
+  <div class="page-size">
+    <label>Rows:</label>
+    <select [(ngModel)]="pageSize" (change)="changePageSize()">
+      <option *ngFor="let s of pageSizeOptions" [value]="s">
+        {{ s }}
+      </option>
+    </select>
+  </div>
+
+  <div class="page-controls">
+    <button (click)="changePage(currentPage - 1)"
+            [disabled]="currentPage === 1">
+      Prev
+    </button>
+
+    <button *ngFor="let p of getVisiblePages()"
+            (click)="changePage(p)"
+            [class.active]="p === currentPage">
+      {{ p }}
+    </button>
+
+    <button (click)="changePage(currentPage + 1)"
+            [disabled]="currentPage === totalPages">
+      Next
+    </button>
+  </div>
+</div>
 
 <div *ngIf="!loading && filteredPayments.length === 0" class="empty">
   No payment records found.
+</div>
 </div>

@@ -1,14 +1,11 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-
 import {
   ReactiveFormsModule,
+  FormBuilder,
   Validators,
-  NonNullableFormBuilder,
   FormGroup
 } from '@angular/forms';
-
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from '../../../services/auth';
 
@@ -25,14 +22,15 @@ import { AuthService } from '../../../services/auth';
 })
 export class ChangePasswordComponent {
 
-  form: FormGroup;
+  form!: FormGroup;
+  submitting = false;
 
   constructor(
-    private fb: NonNullableFormBuilder,
+    private fb: FormBuilder,
     private authService: AuthService,
-    private snackBar: MatSnackBar,
-    private router: Router
+    private snackBar: MatSnackBar
   ) {
+    // ✅ SAFE INITIALIZATION
     this.form = this.fb.group({
       oldPassword: ['', Validators.required],
       newPassword: ['', [Validators.required, Validators.minLength(12)]],
@@ -40,94 +38,40 @@ export class ChangePasswordComponent {
     });
   }
 
-  get oldPassword(): string {
-    return this.form.get('oldPassword')!.value;
-  }
-
-  get newPassword(): string {
-    return this.form.get('newPassword')!.value;
-  }
-
-  get confirmPassword(): string {
-    return this.form.get('confirmPassword')!.value;
-  }
-
-  hasMinLength = () => this.newPassword.length >= 12;
-  hasUppercase = () => /[A-Z]/.test(this.newPassword);
-  hasLowercase = () => /[a-z]/.test(this.newPassword);
-  hasNumber    = () => /\d/.test(this.newPassword);
-  hasSpecial   = () => /[^A-Za-z0-9]/.test(this.newPassword);
-
-  passwordsMatch = () =>
-    this.newPassword === this.confirmPassword &&
-    this.confirmPassword.length > 0;
-
-  oldNewDifferent = () =>
-    this.oldPassword !== this.newPassword;
-
-  canSubmit(): boolean {
+  passwordsMatch(): boolean {
     return (
-      this.form.valid &&
-      this.hasMinLength() &&
-      this.hasUppercase() &&
-      this.hasLowercase() &&
-      this.hasNumber() &&
-      this.hasSpecial() &&
-      this.passwordsMatch() &&
-      this.oldNewDifferent()
+      this.form.value.newPassword === this.form.value.confirmPassword
     );
   }
 
   submit(): void {
-    if (!this.canSubmit()) return;
+    if (this.form.invalid || !this.passwordsMatch()) return;
+
+    this.submitting = true;
 
     const payload = {
-      oldPassword: this.oldPassword,
-      newPassword: this.newPassword
+      oldPassword: this.form.value.oldPassword,
+      newPassword: this.form.value.newPassword
     };
 
     this.authService.changePassword(payload).subscribe({
       next: () => {
-        localStorage.removeItem('passwordChangeRequired');
+        this.submitting = false;
         this.snackBar.open(
-          'Password updated successfully',
+          'Password changed successfully',
           'OK',
           { duration: 3000 }
         );
-
         this.form.reset();
-        setTimeout(() => {
-          this.router.navigate(['/profile']);
-        }, 1500);
       },
-
       error: (err) => {
-
-  let message = 'Something went wrong. Please try again';
-
-  if (err.status === 400) {
-    // 👇 When backend returns JSON but responseType is 'text'
-    if (typeof err.error === 'string') {
-      try {
-        const parsed = JSON.parse(err.error);
-        message = parsed.message || message;
-      } catch {
-        message = err.error;
+        this.submitting = false;
+        this.snackBar.open(
+          err?.error?.message || 'Failed to change password',
+          'OK',
+          { duration: 3000 }
+        );
       }
-    } else {
-      message = err.error?.message || message;
-    }
-  }
-
-  this.snackBar.open(
-    message,
-    'OK',
-    {
-      duration: 3000,
-      panelClass: ['error-snackbar']
-    }
-  );
-}
     });
   }
 }

@@ -1,15 +1,36 @@
+
+
+/* ================= PAGE WRAPPER ================= */
+
+:host {
+  display: block;
+  padding: 24px 28px;
+  background: #f6f8fb;
+  min-height: 100vh;
+}
+
+/* ================= HEADER ================= */
+
 h2 {
-  margin-bottom: 16px;
-  font-weight: 600;
+  margin: 20px 0 16px;
+  font-size: 1.8rem;
+  color: #1e3a8a;
 }
 
 /* ================= FILTERS ================= */
 
+.filters {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 22px;
+}
 
 .filters select {
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  font-size: 14px;
   cursor: pointer;
 }
 
@@ -17,59 +38,84 @@ h2 {
 
 .charts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
-  gap: 20px;
-  margin-bottom: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 22px;
+  margin-bottom: 26px;
 }
+
+/* ================= CARD ================= */
 
 .card {
   background: #ffffff;
-  border-radius: 10px;
-  padding: 16px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  border-radius: 14px;
+  padding: 18px 20px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
 }
 
+.card.small {
+  padding: 16px 18px;
+}
+
+/* ================= CARD TITLE ================= */
+
 .card h3 {
-  margin-bottom: 12px;
-  font-size: 16px;
+  margin: 0 0 14px;
+  font-size: 15px;
   font-weight: 600;
+  color: #374151;
+}
+
+/* ================= CHART SIZE CONTROL ================= */
+
+.card canvas {
+  max-height: 220px !important;
 }
 
 /* ================= TABLE ================= */
 
-.filters {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.charts-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-  margin-bottom: 24px;
-}
-
-.card {
-  background: #fff;
-  padding: 16px;
-  border-radius: 10px;
-}
-
-.card.small {
-  height: 320px;
-}
-
-canvas {
-  max-height: 240px;
-}
-
 table {
   width: 100%;
   border-collapse: collapse;
+  margin-top: 6px;
 }
 
-th, td {
-  padding: 10px;
-  border-bottom: 1px solid #eaeaea;
+thead {
+  background: #f3f4f6;
+}
+
+th {
+  text-align: left;
+  padding: 12px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+td {
+  padding: 12px 14px;
+  font-size: 14px;
+  color: #1f2937;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+tbody tr:hover {
+  background: #f9fafb;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 768px) {
+  :host {
+    padding: 18px;
+  }
+
+  .filters {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .card canvas {
+    max-height: 200px !important;
+  }
 }

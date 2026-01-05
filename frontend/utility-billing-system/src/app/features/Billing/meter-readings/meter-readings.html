@@ -1,109 +1,116 @@
-<h2>Meter Reading Entry</h2>
 
-<div class="form-container">
+<div class="page-container">
 
-  <form (ngSubmit)="submitReading()" #readingForm="ngForm">
+  <!-- HEADER -->
+  <div class="page-header">
+    <h2>Meter Reading Entry</h2>
+    <p class="subtitle">
+      Enter monthly meter readings for a consumer utility connection.
+      Ensure values are accurate before submission.
+    </p>
+  </div>
 
-    <!-- Consumer ID -->
-    <div class="form-group">
-      <label>Consumer ID</label>
-      <input
-        type="text"
-        name="consumerId"
-        [(ngModel)]="reading.consumerId"
-        required
-        placeholder="Enter Consumer ID"
-      />
-    </div>
+  <!-- FORM CARD -->
+  <div class="card">
 
-    <!-- Connection ID -->
-    <div class="form-group">
-      <label>Connection ID</label>
-      <input
-        type="text"
-        name="connectionId"
-        [(ngModel)]="reading.connectionId"
-        required
-        placeholder="Enter Connection ID"
-      />
-    </div>
+    <form (ngSubmit)="submitReading()" #readingForm="ngForm">
 
-    <!-- Utility Type -->
-    <div class="form-group">
-      <label>Utility Type</label>
-      <select
-        name="utilityType"
-        [(ngModel)]="reading.utilityType"
-        required
-      >
-        <option value="">Select Utility</option>
-        <option value="ELECTRICITY">Electricity</option>
-        <option value="WATER">Water</option>
-        <option value="GAS">Gas</option>
-        <option value="INTERNET">Internet</option>
-      </select>
-    </div>
-
-    <!-- Meter Number -->
-    <div class="form-group">
-      <label>Meter Number</label>
-      <input
-        type="text"
-        name="meterNumber"
-        [(ngModel)]="reading.meterNumber"
-        required
-        placeholder="Enter Meter Number"
-      />
-    </div>
-
-    <!-- Current Reading -->
-    <div class="form-group">
-      <label>Current Reading</label>
-      <input
-        type="number"
-        name="currentReading"
-        [(ngModel)]="reading.currentReading"
-        required
-        min="0"
-        placeholder="Enter Current Reading"
-      />
-    </div>
-
-    <!-- Month & Year -->
-    <div class="row">
+      <!-- Consumer ID -->
       <div class="form-group">
-        <label>Reading Month</label>
+        <label>Consumer ID</label>
         <input
-          type="number"
-          name="readingMonth"
-          [(ngModel)]="reading.readingMonth"
-          min="1"
-          max="12"
+          type="text"
+          name="consumerId"
+          [(ngModel)]="reading.consumerId"
           required
-        />
+          placeholder="Enter Consumer ID" />
       </div>
 
+      <!-- Connection ID -->
       <div class="form-group">
-        <label>Reading Year</label>
+        <label>Connection ID</label>
+        <input
+          type="text"
+          name="connectionId"
+          [(ngModel)]="reading.connectionId"
+          required
+          placeholder="Enter Connection ID" />
+      </div>
+
+      <!-- Utility Type -->
+      <div class="form-group">
+        <label>Utility Type</label>
+        <select
+          name="utilityType"
+          [(ngModel)]="reading.utilityType"
+          required>
+          <option value="">Select Utility</option>
+          <option value="ELECTRICITY">Electricity</option>
+          <option value="WATER">Water</option>
+          <option value="GAS">Gas</option>
+          <option value="INTERNET">Internet</option>
+        </select>
+      </div>
+
+      <!-- Meter Number -->
+      <div class="form-group">
+        <label>Meter Number</label>
+        <input
+          type="text"
+          name="meterNumber"
+          [(ngModel)]="reading.meterNumber"
+          required
+          placeholder="Enter Meter Number" />
+      </div>
+
+      <!-- Current Reading -->
+      <div class="form-group">
+        <label>Current Reading</label>
         <input
           type="number"
-          name="readingYear"
-          [(ngModel)]="reading.readingYear"
-          min="2000"
+          name="currentReading"
+          [(ngModel)]="reading.currentReading"
           required
-        />
+          min="0"
+          placeholder="Enter Current Reading" />
       </div>
-    </div>
 
-    <!-- Submit -->
-    <button
-      type="submit"
-      class="primary-btn"
-      [disabled]="submitting || !readingForm.valid"
-    >
-      {{ submitting ? 'Submitting...' : 'Submit Reading' }}
-    </button>
+      <!-- MONTH / YEAR -->
+      <div class="row">
+        <div class="form-group">
+          <label>Reading Month</label>
+          <input
+            type="number"
+            name="readingMonth"
+            [(ngModel)]="reading.readingMonth"
+            min="1"
+            max="12"
+            required />
+        </div>
 
-  </form>
+        <div class="form-group">
+          <label>Reading Year</label>
+          <input
+            type="number"
+            name="readingYear"
+            [(ngModel)]="reading.readingYear"
+            min="2000"
+            required />
+        </div>
+      </div>
+
+      <!-- ACTION -->
+      <div class="actions">
+        <button
+          type="submit"
+          class="primary-btn"
+          [disabled]="submitting || !readingForm.valid">
+          {{ submitting ? 'Submitting…' : 'Submit Reading' }}
+        </button>
+      </div>
+
+    </form>
+
+  </div>
 
 </div>

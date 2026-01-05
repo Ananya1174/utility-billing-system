@@ -13,19 +13,12 @@ import { AuthService } from '../../../services/auth';
 })
 export class ProfileDetailsComponent implements OnInit {
 
-  profile: any = {
-    fullName: '',
-    email: '',
-    mobileNumber: '',
-    address: ''
-  };
-
+  profile: any = {};
   loading = true;
+  editing = false;
   saving = false;
   successMsg = '';
   errorMsg = '';
-
-  private baseUrl = 'http://localhost:8032';
 
   constructor(
     private http: HttpClient,
@@ -37,11 +30,10 @@ export class ProfileDetailsComponent implements OnInit {
   }
 
   loadProfile(): void {
-    const consumerId = this.authService.getUserId();
-    if (!consumerId) return;
+    const id = this.authService.getUserId();
+    if (!id) return;
 
-    this.http
-      .get<any>(`${this.baseUrl}/consumers/${consumerId}`)
+    this.http.get<any>(`http://localhost:8032/consumers/${id}`)
       .subscribe({
         next: res => {
           this.profile = res;
@@ -49,36 +41,34 @@ export class ProfileDetailsComponent implements OnInit {
         },
         error: () => {
           this.loading = false;
-          this.errorMsg = 'Unable to load profile details';
+          this.errorMsg = 'Failed to load profile';
         }
       });
   }
 
+  enableEdit(): void {
+    this.editing = true;
+  }
+
+  cancelEdit(): void {
+    this.editing = false;
+    this.loadProfile();
+  }
+
   updateProfile(): void {
-    const consumerId = this.authService.getUserId();
-    if (!consumerId) return;
-
     this.saving = true;
-    this.successMsg = '';
-    this.errorMsg = '';
 
-    const payload = {
-      fullName: this.profile.fullName,
-      email: this.profile.email,
-      mobileNumber: this.profile.mobileNumber,
-      address: this.profile.address
-    };
-
-    this.http
-      .put(`${this.baseUrl}/consumers/${consumerId}`, payload)
+    const id = this.authService.getUserId();
+    this.http.put(`http://localhost:8032/consumers/${id}`, this.profile)
       .subscribe({
         next: () => {
           this.saving = false;
+          this.editing = false;
           this.successMsg = 'Profile updated successfully';
         },
         error: () => {
           this.saving = false;
-          this.errorMsg = 'Failed to update profile';
+          this.errorMsg = 'Update failed';
         }
       });
   }

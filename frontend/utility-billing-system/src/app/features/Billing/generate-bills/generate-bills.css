@@ -1,27 +1,102 @@
+
+/* ================= PAGE ================= */
+
+.page-container {
+  padding: 24px 32px;
+  background: #f9fafb;
+  min-height: 100vh;
+}
+
+h2 {
+  margin: 20px 0 16px;
+  font-size: 1.8rem;
+  color: #1e3a8a;
+}
+
+
+.subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 22px;
+}
+
+/* ================= CARD ================= */
+
 .form-card {
-  max-width: 400px;
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
+  background: #ffffff;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+/* ================= FORM ================= */
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
 }
 
 label {
+  font-size: 13px;
   font-weight: 600;
-  margin-top: 12px;
-  display: block;
+  color: #374151;
 }
 
 input {
-  width: 100%;
-  padding: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
 }
+
+input:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+/* ================= BUTTON ================= */
 
 .primary-btn {
-  margin-top: 16px;
   width: 100%;
+  margin-top: 6px;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
 }
 
+.primary-btn:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.primary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ================= MESSAGE ================= */
+
 .message {
-  margin-top: 12px;
-  color: green;
+  margin-top: 14px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.message.success {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.message.error {
+  color: #dc2626;
+  font-weight: 600;
 }

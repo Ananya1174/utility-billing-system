@@ -23,6 +23,13 @@ export class PaymentHistoryComponent implements OnInit {
   summary: any = null;
   loading = true;
 
+  // ================= PAGINATION STATE =================
+  pageSizeOptions = [10, 25, 50];
+  pageSize = 10;
+  currentPage = 1;
+  totalPages = 0;
+  paginatedPayments: any[] = [];
+
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
@@ -55,11 +62,55 @@ export class PaymentHistoryComponent implements OnInit {
 
       return matchStatus && matchMode;
     });
+
+    this.currentPage = 1;   // ✅ reset page
+    this.updatePagination();
   }
 
   getStatusClass(status: string): string {
     if (status === 'SUCCESS') return 'status success';
     if (status === 'FAILED') return 'status failed';
     return 'status initiated';
+  }
+
+  // ================= PAGINATION LOGIC =================
+
+  updatePagination(): void {
+    this.totalPages = Math.ceil(this.filteredPayments.length / this.pageSize);
+    this.paginate();
+  }
+
+  paginate(): void {
+    const start = (this.currentPage - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    this.paginatedPayments = this.filteredPayments.slice(start, end);
+  }
+
+  changePage(page: number): void {
+    if (page < 1 || page > this.totalPages) return;
+    this.currentPage = page;
+    this.paginate();
+  }
+
+  changePageSize(): void {
+    this.currentPage = 1;
+    this.updatePagination();
+  }
+
+  getVisiblePages(): number[] {
+    const pages: number[] = [];
+
+    let start = Math.max(1, this.currentPage - 1);
+    let end = Math.min(this.totalPages, start + 2);
+
+    if (end - start < 2) {
+      start = Math.max(1, end - 2);
+    }
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+
+    return pages;
   }
 }

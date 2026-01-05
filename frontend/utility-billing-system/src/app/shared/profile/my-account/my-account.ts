@@ -12,8 +12,8 @@ import { AuthService } from '../../../services/auth';
 })
 export class MyAccountComponent implements OnInit {
 
-  account: any = null;
   loading = true;
+  account: any = null;
 
   constructor(
     private http: HttpClient,
@@ -21,25 +21,16 @@ export class MyAccountComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadAccount();
-  }
-
-  loadAccount(): void {
     const userId = this.authService.getUserId();
     if (!userId) return;
 
-    this.http
-      .get<any>(`http://localhost:8030/auth/users/${userId}`)
+    this.http.get<any>(`http://localhost:8031/users/${userId}`)
       .subscribe({
         next: res => {
           this.account = res;
           this.loading = false;
         },
-        error: () => {
-          this.loading = false;
-        }
+        error: () => this.loading = false
       });
   }
-
-
 }
