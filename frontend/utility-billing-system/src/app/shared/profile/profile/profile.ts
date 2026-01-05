@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
+import { Navbar } from '../../navbar/navbar';
 import { MyAccountComponent } from '../my-account/my-account';
 import { ProfileDetailsComponent } from '../profile-details/profile-details';
 import { ChangePasswordComponent } from '../change-password/change-password';
@@ -11,6 +11,7 @@ import { AuthService } from '../../../services/auth';
   standalone: true,
   imports: [
     CommonModule,
+    Navbar,
     MyAccountComponent,
     ProfileDetailsComponent,
     ChangePasswordComponent

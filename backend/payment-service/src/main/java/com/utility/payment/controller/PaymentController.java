@@ -50,31 +50,31 @@ public class PaymentController {
 	}
 
 	@GetMapping("/bill/{billId}")
-	public List<PaymentResponse> getPaymentsByBill(@PathVariable String billId) {
+	public List<PaymentResponse> getPaymentsByBill(@PathVariable("billId") String billId) {
 
 		return paymentService.getPaymentsByBill(billId);
 	}
 
 	@GetMapping("/consumer/{consumerId}")
-	public List<PaymentResponse> getPaymentsByConsumer(@PathVariable String consumerId) {
+	public List<PaymentResponse> getPaymentsByConsumer(@PathVariable("consumerId") String consumerId) {
 
 		return paymentService.getPaymentsByConsumer(consumerId);
 	}
 
 	@GetMapping("/outstanding/{billId}")
-	public OutstandingResponse outstanding(@PathVariable String billId) {
+	public OutstandingResponse outstanding(@PathVariable("billId") String billId) {
 
 		return paymentService.getOutstanding(billId);
 	}
 
 	@GetMapping("/invoice/{paymentId}")
-	public Invoice getInvoice(@PathVariable String paymentId) {
+	public Invoice getInvoice(@PathVariable("paymentId") String paymentId) {
 
 		return invoiceService.getInvoiceByPaymentId(paymentId);
 	}
 
 	@GetMapping("/invoice/{paymentId}/download")
-	public ResponseEntity<byte[]> downloadInvoice(@PathVariable String paymentId) {
+	public ResponseEntity<byte[]> downloadInvoice(@PathVariable("paymentId") String paymentId) {
 
 		byte[] pdf = invoicePdfService.generateInvoicePdf(paymentId);
 

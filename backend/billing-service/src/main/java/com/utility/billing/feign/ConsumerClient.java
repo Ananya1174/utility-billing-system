@@ -13,6 +13,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 	    @GetMapping("/{id}")
 	    ConsumerResponse getConsumerById(
-	            @PathVariable String id
+	    		@PathVariable("id") String id
 	    );
 	}

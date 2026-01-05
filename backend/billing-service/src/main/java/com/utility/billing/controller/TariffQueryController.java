@@ -16,7 +16,7 @@ public class TariffQueryController {
 
     @GetMapping
     public TariffResponseDto getTariffsByUtility(
-            @RequestParam UtilityType utilityType
+    		@RequestParam(name = "utilityType") UtilityType utilityType
     ) {
         return tariffQueryService.getTariffsByUtility(utilityType);
     }

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 	    @GetMapping("/{id}")
 	    ConsumerConnectionResponse getConnectionById(
-	            @PathVariable String id
+	    		@PathVariable("id") String id
 	    );
 	    @GetMapping("/internal/all")
 	    List<ConsumerConnectionResponse> getAllConnections();

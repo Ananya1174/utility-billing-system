@@ -1,43 +1,84 @@
 <h2>Profile Details</h2>
-<p class="subtitle">Personal information</p>
+<p class="subtitle">Manage your personal information</p>
 
-<div *ngIf="loading">Loading...</div>
+<div *ngIf="loading">Loading profile...</div>
 
-<div class="card" *ngIf="!loading">
+<div *ngIf="!loading" class="profile-card">
 
-  <button class="edit-btn" *ngIf="!editing" (click)="enableEdit()">
-    Edit Profile
-  </button>
+  <!-- ACTION BAR -->
+  <div class="profile-header">
+    <button
+      *ngIf="!editMode"
+      class="primary-btn"
+      (click)="enableEdit()">
+      ✏️ Edit Profile
+    </button>
+  </div>
 
-  <form *ngIf="editing" (ngSubmit)="updateProfile()">
+  <!-- FORM -->
+  <form (ngSubmit)="updateProfile()">
 
-    <label>Full Name</label>
-    <input [(ngModel)]="profile.fullName" name="fullName" required />
+    <div class="form-grid">
 
-    <label>Email</label>
-    <input [(ngModel)]="profile.email" name="email" required />
+      <div class="form-group">
+        <label>Full Name</label>
+        <input
+          type="text"
+          [(ngModel)]="profile.fullName"
+          name="fullName"
+          [readonly]="!editMode" />
+      </div>
 
-    <label>Mobile</label>
-    <input [(ngModel)]="profile.mobileNumber" name="mobile" required />
+      <div class="form-group">
+        <label>Email</label>
+        <input
+          type="email"
+          [(ngModel)]="profile.email"
+          name="email"
+          [readonly]="!editMode" />
+      </div>
 
-    <label>Address</label>
-    <textarea [(ngModel)]="profile.address" name="address"></textarea>
+      <div class="form-group">
+        <label>Mobile Number</label>
+        <input
+          type="text"
+          maxlength="10"
+          [(ngModel)]="profile.mobileNumber"
+          name="mobileNumber"
+          [readonly]="!editMode" />
+      </div>
 
-    <div class="actions">
-      <button class="primary-btn" type="submit" [disabled]="saving">
-        Save
+      <div class="form-group full">
+        <label>Address</label>
+        <textarea
+          rows="3"
+          [(ngModel)]="profile.address"
+          name="address"
+          [readonly]="!editMode"></textarea>
+      </div>
+
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="actions" *ngIf="editMode">
+      <button
+        type="submit"
+        class="primary-btn"
+        [disabled]="saving">
+        {{ saving ? 'Saving...' : 'Save Changes' }}
       </button>
-      <button class="secondary-btn" type="button" (click)="cancelEdit()">
+
+      <button
+        type="button"
+        class="secondary-btn"
+        (click)="cancelEdit()">
         Cancel
       </button>
     </div>
+
+    <!-- STATUS -->
+    <p class="success" *ngIf="successMsg">{{ successMsg }}</p>
+    <p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>
+
   </form>
-
-  <div *ngIf="!editing">
-    <p><strong>Name:</strong> {{ profile.fullName }}</p>
-    <p><strong>Email:</strong> {{ profile.email }}</p>
-    <p><strong>Mobile:</strong> {{ profile.mobileNumber }}</p>
-    <p><strong>Address:</strong> {{ profile.address }}</p>
-  </div>
-
 </div>

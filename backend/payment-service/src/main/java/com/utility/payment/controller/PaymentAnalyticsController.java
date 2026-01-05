@@ -16,8 +16,8 @@ public class PaymentAnalyticsController {
 
     @GetMapping("/revenue-summary")
     public RevenueSummaryDto revenueSummary(
-            @RequestParam int month,
-            @RequestParam int year) {
+    		 @RequestParam(name = "month") int month,
+             @RequestParam(name = "year") int year) {
 
         return analyticsService.getMonthlyRevenue(month, year);
     }
@@ -30,45 +30,45 @@ public class PaymentAnalyticsController {
 
     @GetMapping("/payments-summary")
     public PaymentsSummaryDto paymentsSummary(
-            @RequestParam int month,
-            @RequestParam int year) {
+    		 @RequestParam(name = "month") int month,
+             @RequestParam(name = "year") int year) {
 
         return analyticsService.getPaymentsSummary(month, year);
     }
 
     @GetMapping("/failed-summary")
     public FailedPaymentSummaryDto failedPayments(
-            @RequestParam int month,
-            @RequestParam int year) {
+    		 @RequestParam(name = "month") int month,
+             @RequestParam(name = "year") int year) {
 
         return analyticsService.getFailedPaymentsSummary(month, year);
     }
     @GetMapping("/outstanding-monthly")
     public List<MonthlyOutstandingDto> monthlyOutstanding(
-            @RequestParam int year
+    		@RequestParam(name = "year") int year
     ) {
         return analyticsService.getMonthlyOutstanding(year);
     }
 
     @GetMapping("/revenue-by-mode")
     public List<PaymentModeSummaryDto> revenueByMode(
-            @RequestParam int month,
-            @RequestParam int year) {
+    		 @RequestParam(name = "month") int month,
+             @RequestParam(name = "year") int year) {
 
         return analyticsService.getRevenueByMode(month, year);
     }
 
     @GetMapping("/consumer-summary")
     public List<ConsumerPaymentSummaryDto> consumerPaymentSummary(
-            @RequestParam int month,
-            @RequestParam int year) {
+    		 @RequestParam(name = "month") int month,
+             @RequestParam(name = "year") int year) {
 
         return analyticsService.getConsumerPaymentSummary(month, year);
     }
 
     @GetMapping("/revenue-yearly")
     public List<RevenueSummaryDto> yearlyRevenue(
-            @RequestParam int year) {
+    		@RequestParam(name = "year") int year) {
 
         return analyticsService.getYearlyRevenue(year);
     }

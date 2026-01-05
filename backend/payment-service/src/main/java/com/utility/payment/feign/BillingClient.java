@@ -16,24 +16,24 @@ import com.utility.payment.model.BillStatus;
 public interface BillingClient {
 
     @PutMapping("/bills/{billId}/mark-paid")
-    void markPaid(@PathVariable String billId);
+    void markPaid(@PathVariable("billId") String billId);
 
     @GetMapping("/bills/{billId}")
-    BillResponse getBill(@PathVariable String billId);
+    BillResponse getBill(@PathVariable("billId") String billId);
 
     // ✅ ADD THIS (matches controller exactly)
     @GetMapping("/bills")
     List<BillResponse> getAllBills(
-        @RequestParam(required = false) BillStatus status,
-        @RequestParam(required = false) Integer month,
-        @RequestParam(required = false) Integer year,
-        @RequestParam(required = false) String consumerId
+        @RequestParam(value = "status", required = false) BillStatus status,
+        @RequestParam(value = "month", required = false) Integer month,
+        @RequestParam(value = "year", required = false) Integer year,
+        @RequestParam(value = "consumerId", required = false) String consumerId
     );
     @GetMapping("/dashboard/billing/total-billed")
     double getTotalBilled();
     @GetMapping("/dashboard/billing/total-billed-monthly")
     double getTotalBilledForMonth(
-            @RequestParam int month,
-            @RequestParam int year
+    		@RequestParam("month") int month,
+            @RequestParam("year") int year
     );
 }

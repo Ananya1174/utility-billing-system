@@ -3,18 +3,24 @@ package com.utility.consumer.controller;
 import java.security.Principal;
 import java.util.List;
 
-import jakarta.validation.Valid;
-
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.utility.consumer.dto.request.ApproveConnectionRequestDto;
 import com.utility.consumer.dto.request.CreateConnectionRequestDto;
 import com.utility.consumer.model.ConnectionRequest;
 import com.utility.consumer.service.ConnectionRequestService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -42,7 +48,7 @@ public class ConnectionRequestController {
     @PutMapping("/{id}/approve")
     @PreAuthorize("hasRole('ADMIN')")
     public void approve(
-            @PathVariable String id,
+    		@PathVariable("id") String id,
             @Valid @RequestBody ApproveConnectionRequestDto dto,
             Principal principal
     ) {
@@ -53,7 +59,7 @@ public class ConnectionRequestController {
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.OK)
     public void reject(
-            @PathVariable String id,
+    		@PathVariable("id") String id,
             Principal principal
     ) {
         requestService.rejectRequest(id, principal.getName());

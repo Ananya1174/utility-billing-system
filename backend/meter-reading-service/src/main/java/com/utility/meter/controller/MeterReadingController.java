@@ -33,7 +33,7 @@ public class MeterReadingController {
 
     @GetMapping("/consumer/{consumerId}")
     public ResponseEntity<List<MeterReadingResponse>> byConsumer(
-            @PathVariable String consumerId) {
+    		@PathVariable("consumerId") String consumerId) {
 
         List<MeterReadingResponse> readings =
                 service.getByConsumer(consumerId);
@@ -50,8 +50,8 @@ public class MeterReadingController {
 
     @GetMapping("/month")
     public ResponseEntity<List<MeterReadingResponse>> byMonth(
-            @RequestParam int month,
-            @RequestParam int year) {
+    		 @RequestParam("month") int month,
+    		 @RequestParam("year") int year) {
 
         List<MeterReadingResponse> readings =
                 service.getByMonth(month, year);
@@ -68,14 +68,14 @@ public class MeterReadingController {
 
     @GetMapping("/latest/{connectionId}")
     public MeterReadingResponse latest(
-            @PathVariable String connectionId) {
+    		@PathVariable("connectionId") String connectionId) {
 
         return service.getLatest(connectionId);
     }
 
     @GetMapping("/connection/{connectionId}")
     public ResponseEntity<List<MeterReadingResponse>> byConnection(
-            @PathVariable String connectionId) {
+    		 @PathVariable("connectionId") String connectionId) {
 
         List<MeterReadingResponse> readings =
                 service.getByConnection(connectionId);

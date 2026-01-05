@@ -13,5 +13,5 @@ import com.utility.payment.dto.ConsumerResponse;
 public interface ConsumerClient {
 
 	 @GetMapping("/{consumerId}")
-	    ConsumerResponse getConsumerById(@PathVariable String consumerId);
+	    ConsumerResponse getConsumerById(@PathVariable("consumerId") String consumerId);
 }

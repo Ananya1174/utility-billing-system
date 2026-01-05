@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 	    @GetMapping("/connection/{connectionId}")
 	    List<MeterReadingResponse> getByConnection(
-	            @PathVariable String connectionId
+	    		@PathVariable("connectionId") String connectionId
 	    );
 
 	    @GetMapping("/latest/{connectionId}")
 	    MeterReadingResponse getLatest(
-	            @PathVariable String connectionId
+	    		@PathVariable("connectionId") String connectionId
 	    );
 	}

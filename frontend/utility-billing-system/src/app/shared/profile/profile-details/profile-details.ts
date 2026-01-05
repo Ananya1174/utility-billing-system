@@ -13,12 +13,23 @@ import { AuthService } from '../../../services/auth';
 })
 export class ProfileDetailsComponent implements OnInit {
 
-  profile: any = {};
+  profile = {
+    fullName: '',
+    email: '',
+    mobileNumber: '',
+    address: ''
+  };
+
+  originalProfile: any = {};
+
   loading = true;
-  editing = false;
   saving = false;
+  editMode = false;
+
   successMsg = '';
   errorMsg = '';
+
+  private baseUrl = 'http://localhost:8032';
 
   constructor(
     private http: HttpClient,
@@ -30,45 +41,54 @@ export class ProfileDetailsComponent implements OnInit {
   }
 
   loadProfile(): void {
-    const id = this.authService.getUserId();
-    if (!id) return;
+    const userId = this.authService.getUserId();
+    if (!userId) return;
 
-    this.http.get<any>(`http://localhost:8032/consumers/${id}`)
-      .subscribe({
-        next: res => {
-          this.profile = res;
-          this.loading = false;
-        },
-        error: () => {
-          this.loading = false;
-          this.errorMsg = 'Failed to load profile';
-        }
-      });
+    this.http.get<any>(`${this.baseUrl}/consumers/${userId}`).subscribe({
+      next: res => {
+        this.profile = { ...res };
+        this.originalProfile = { ...res };
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+        this.errorMsg = 'Unable to load profile';
+      }
+    });
   }
 
   enableEdit(): void {
-    this.editing = true;
+    this.editMode = true;
+    this.successMsg = '';
+    this.errorMsg = '';
   }
 
   cancelEdit(): void {
-    this.editing = false;
-    this.loadProfile();
+    this.profile = { ...this.originalProfile };
+    this.editMode = false;
   }
 
   updateProfile(): void {
-    this.saving = true;
+    if (!this.editMode) return;
 
-    const id = this.authService.getUserId();
-    this.http.put(`http://localhost:8032/consumers/${id}`, this.profile)
+    const userId = this.authService.getUserId();
+    if (!userId) return;
+
+    this.saving = true;
+    this.successMsg = '';
+    this.errorMsg = '';
+
+    this.http.put(`${this.baseUrl}/consumers/${userId}`, this.profile)
       .subscribe({
         next: () => {
+          this.originalProfile = { ...this.profile };
+          this.editMode = false;
           this.saving = false;
-          this.editing = false;
           this.successMsg = 'Profile updated successfully';
         },
         error: () => {
           this.saving = false;
-          this.errorMsg = 'Update failed';
+          this.errorMsg = 'Failed to update profile';
         }
       });
   }

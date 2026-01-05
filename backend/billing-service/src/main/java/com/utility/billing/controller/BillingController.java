@@ -25,24 +25,24 @@ public class BillingController {
     }
 
     @GetMapping("/consumer/{consumerId}")
-    public List<BillResponse> byConsumer(@PathVariable String consumerId) {
+    public List<BillResponse> byConsumer(@PathVariable("consumerId") String consumerId) {
         return service.getBillsByConsumer(consumerId);
     }
     @PutMapping("/{billId}/mark-paid")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void markBillAsPaid(@PathVariable String billId) {
+    public void markBillAsPaid(@PathVariable("billId") String billId) {
         service.markBillAsPaid(billId);
     }
     @GetMapping("/{billId}")
-    public BillResponse getBillById(@PathVariable String billId) {
+    public BillResponse getBillById(@PathVariable("billId") String billId) {
         return service.getBillById(billId);
     }
     @GetMapping
     public List<BillResponse> getAllBills(
-            @RequestParam(required = false) BillStatus status,
-            @RequestParam(required = false) Integer month,
-            @RequestParam(required = false) Integer year,
-            @RequestParam(required = false) String consumerId
+            @RequestParam(name = "status", required = false) BillStatus status,
+            @RequestParam(name = "month", required = false) Integer month,
+            @RequestParam(name = "year", required = false) Integer year,
+            @RequestParam(name = "consumerId", required = false) String consumerId
     ) {
         return service.getAllBills(status, month, year, consumerId);
     }

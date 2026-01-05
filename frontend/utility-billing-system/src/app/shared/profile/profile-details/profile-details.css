@@ -1,41 +1,86 @@
+/* CARD */
 .profile-card {
-  max-width: 560px;
-  background: #fff;
+  background: #ffffff;
   padding: 28px;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  border-radius: 14px;
+  max-width: 720px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
 }
 
-.row {
+/* HEADER */
+.profile-header {
   display: flex;
-  justify-content: space-between;
-  padding: 10px 0;
+  justify-content: flex-end;
+  margin-bottom: 16px;
 }
 
-.label {
-  color: #555;
-  font-weight: 500;
+/* GRID */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
 }
 
-.value {
-  font-weight: 600;
-}
-
-label {
+.form-group {
   display: flex;
   flex-direction: column;
-  margin-bottom: 14px;
 }
 
-input, textarea {
-  padding: 10px;
+.form-group.full {
+  grid-column: span 2;
+}
+
+/* LABEL */
+label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+/* INPUTS */
+input,
+textarea {
+  padding: 10px 12px;
   border-radius: 8px;
-  border: 1px solid #ccc;
-  width: 100%;
+  border: 1px solid #d1d5db;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  background: #f9fafb;
 }
 
+/* READONLY */
+input[readonly],
+textarea[readonly] {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+/* EDITABLE FOCUS */
+input:not([readonly]):focus,
+textarea:not([readonly]):focus {
+  outline: none;
+  border-color: #2563eb;
+  background: #ffffff;
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
+}
+
+/* ACTIONS */
 .actions {
   display: flex;
   gap: 12px;
+  margin-top: 20px;
+}
+
+/* STATUS */
+.success {
   margin-top: 12px;
+  color: #059669;
+  font-weight: 500;
+}
+
+.error {
+  margin-top: 12px;
+  color: #dc2626;
+  font-weight: 500;
 }

@@ -1,4 +1,4 @@
-package com.utility.auth.service;
+package com.utility.auth.event;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;

@@ -31,7 +31,7 @@ public class UtilityConnectionController {
 	}
 
 	@GetMapping("/{id}")
-	public ConnectionResponseDto getConnectionById(@PathVariable String id) {
+	public ConnectionResponseDto getConnectionById(@PathVariable("id") String id) {
 
 		return connectionService.getConnectionById(id);
 	}
