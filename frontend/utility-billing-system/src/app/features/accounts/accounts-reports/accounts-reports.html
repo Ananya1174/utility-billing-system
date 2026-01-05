@@ -1,0 +1,58 @@
+<h2>Accounts Reports</h2>
+
+<div class="filters">
+  <select [(ngModel)]="month" (change)="onFilterChange()">
+    <option *ngFor="let m of months" [value]="m.value">
+      {{ m.name }}
+    </option>
+  </select>
+
+  <select [(ngModel)]="year" (change)="onFilterChange()">
+    <option *ngFor="let y of [2024,2025,2026]" [value]="y">
+      {{ y }}
+    </option>
+  </select>
+</div>
+
+<div class="charts-grid">
+
+  <!-- PAYMENT MODE PIE -->
+  <div class="card small">
+    <h3>Revenue by Payment Mode (Monthly)</h3>
+    <canvas baseChart
+      [type]="'pie'"
+      [data]="paymentModePie">
+    </canvas>
+  </div>
+
+  <!-- MONTHLY REVENUE LINE -->
+  <div class="card small">
+    <h3>Monthly Revenue Trend (Year)</h3>
+    <canvas baseChart
+      [type]="'line'"
+      [data]="monthlyRevenueLine">
+    </canvas>
+  </div>
+
+</div>
+
+<div class="card">
+  <h3>Consumer Payment Summary (Monthly)</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Consumer ID</th>
+        <th>Payments</th>
+        <th>Total Paid</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let c of consumerSummary">
+        <td>{{ c.consumerId }}</td>
+        <td>{{ c.paymentCount }}</td>
+        <td>₹{{ c.totalPaid }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

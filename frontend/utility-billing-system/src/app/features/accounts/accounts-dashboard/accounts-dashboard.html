@@ -1,0 +1,50 @@
+<h2>Accounts Officer Dashboard</h2>
+
+<div class="filters">
+  <select [(ngModel)]="month" (change)="onFilterChange()">
+  <option *ngFor="let m of months" [value]="m.value">
+    {{ m.name }}
+  </option>
+</select>
+
+  <select [(ngModel)]="year" (change)="onFilterChange()">
+    <option *ngFor="let y of [2024,2025,2026]" [value]="y">
+      {{ y }}
+    </option>
+  </select>
+</div>
+
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <p>Total Billed</p>
+    <h3>₹{{ totalBilled }}</h3>
+  </div>
+
+  <div class="kpi-card success">
+    <p>Total Paid</p>
+    <h3>₹{{ totalPaid }}</h3>
+  </div>
+
+  <div class="kpi-card danger">
+    <p>Outstanding</p>
+    <h3>₹{{ outstanding }}</h3>
+  </div>
+</div>
+
+<div class="charts-grid">
+  <div class="card">
+    <h3>Payment Status (Monthly)</h3>
+    <canvas baseChart
+      [type]="pieType"
+      [data]="paymentPieData">
+    </canvas>
+  </div>
+
+  <div class="card">
+    <h3>Outstanding Trend (Year)</h3>
+    <canvas baseChart
+      [type]="lineType"
+      [data]="outstandingLineData">
+    </canvas>
+  </div>
+</div>

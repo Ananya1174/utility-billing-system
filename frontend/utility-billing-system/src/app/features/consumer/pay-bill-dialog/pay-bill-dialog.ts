@@ -8,14 +8,18 @@ import { AuthService } from '../../../services/auth';
 @Component({
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './pay-bill-dialog.html'
+  templateUrl: './pay-bill-dialog.html',
+  styleUrls: ['./pay-bill-dialog.css']
 })
 export class PayBillDialogComponent {
 
+  step: 'SEND' | 'OTP' = 'SEND';
+
   otp = '';
   paymentId: string | null = null;
+
+  loading = false;
   error = '';
-  step = 1; // 1 = send OTP, 2 = enter OTP
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public bill: any,
@@ -25,14 +29,16 @@ export class PayBillDialogComponent {
     private cdr: ChangeDetectorRef
   ) {}
 
+  /* ================= SEND OTP ================= */
+
   sendOtp(): void {
     const consumerId = this.authService.getUserId();
-
     if (!consumerId) {
       this.error = 'Session expired. Please login again.';
       return;
     }
 
+    this.loading = true;
     this.error = '';
 
     this.billService.initiateOnlinePayment({
@@ -40,28 +46,37 @@ export class PayBillDialogComponent {
       consumerId
     }).subscribe({
       next: (res: any) => {
-        this.paymentId = res.paymentId;   // ✅ SOURCE OF TRUTH
-        this.step = 2;
+        this.paymentId = res.paymentId;
+        this.step = 'OTP';
+        this.loading = false;
+        this.otp = '';
         this.cdr.detectChanges();
       },
       error: (err) => {
-        const msg = err.error?.message || '';
+        const msg = err.error?.message || 'Failed to send OTP';
 
-        if (msg.includes('OTP already sent')) {
-          this.error = 'OTP already sent. Please enter the OTP.';
-          this.step = 2;
+        // backend says OTP already sent → still allow OTP entry
+        if (msg.toLowerCase().includes('otp')) {
+          this.step = 'OTP';
         } else {
-          this.error = msg || 'Failed to send OTP';
+          this.error = msg;
         }
 
+        this.loading = false;
         this.cdr.detectChanges();
       }
     });
   }
 
-  confirmPayment(): void {
-    if (!this.paymentId) return;
+  /* ================= CONFIRM OTP ================= */
 
+  confirmPayment(): void {
+    if (!this.paymentId || this.otp.length !== 6) {
+      this.error = 'Please enter 6-digit OTP';
+      return;
+    }
+
+    this.loading = true;
     this.error = '';
 
     this.billService.confirmOnlinePayment({
@@ -71,23 +86,26 @@ export class PayBillDialogComponent {
       next: () => {
         this.dialogRef.close({
           paid: true,
-          paymentId: this.paymentId   // ✅ RETURN TO PARENT
+          paymentId: this.paymentId
         });
       },
       error: (err) => {
-        const msg = err.error?.message || '';
+        const msg = err.error?.message || 'Invalid OTP';
 
-        if (msg.includes('OTP expired')) {
-          this.error = 'OTP expired. Please resend OTP.';
-          this.step = 1;
+        if (msg.toLowerCase().includes('expired')) {
+          this.step = 'SEND';
           this.paymentId = null;
           this.otp = '';
-        } else {
-          this.error = msg || 'Invalid OTP';
         }
 
+        this.error = msg;
+        this.loading = false;
         this.cdr.detectChanges();
       }
     });
+  }
+
+  close(): void {
+    this.dialogRef.close(false);
   }
 }

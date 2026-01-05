@@ -1,0 +1,76 @@
+.dialog-container {
+  background: #ffffff;
+  padding: 22px 24px;
+  border-radius: 14px;
+  min-width: 420px;
+}
+
+/* HEADER */
+.dialog-header h2 {
+  margin-bottom: 18px;
+  color: #1e3a8a;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* CONTENT */
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ROW */
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border-radius: 10px;
+  font-size: 0.92rem;
+}
+
+.row span {
+  color: #475569;
+}
+
+.row strong {
+  color: #0f172a;
+}
+
+/* HIGHLIGHT */
+.row.highlight {
+  background: #fff7ed;
+}
+
+.row.highlight strong {
+  color: #dc2626;
+}
+
+/* STATUS */
+.status {
+  font-weight: 600;
+}
+
+.status.paid {
+  color: #16a34a;
+}
+
+.status.due,
+.status.overdue {
+  color: #dc2626;
+}
+
+/* ACTIONS */
+.dialog-actions {
+  margin-top: 22px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* LOADING */
+.loading {
+  color: #64748b;
+  font-size: 0.9rem;
+}

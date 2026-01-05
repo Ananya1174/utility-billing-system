@@ -1,36 +1,77 @@
-<h2>Invoice</h2>
 
-<div *ngIf="loading">Loading invoice...</div>
 
-<div *ngIf="!loading && invoice">
+<div class="invoice-dialog">
 
-  <p><strong>Invoice Number:</strong> {{ invoice.invoiceNumber }}</p>
-  <p><strong>Invoice ID:</strong> {{ invoice.id }}</p>
+  <!-- HEADER -->
+  <div class="dialog-header">
+    <h2>Invoice</h2>
+    <button class="close-btn" (click)="close()">✕</button>
+  </div>
 
-  <hr />
+  <div *ngIf="loading" class="loading">
+    Loading invoice...
+  </div>
 
-  <p><strong>Bill ID:</strong> {{ invoice.billId }}</p>
-  <p><strong>Payment ID:</strong> {{ invoice.paymentId }}</p>
+  <div *ngIf="!loading && invoice" class="dialog-body">
 
-  <hr />
+    <!-- META -->
+    <div class="meta-grid">
+      <div>
+        <label>Invoice Number</label>
+        <p class="mono">{{ invoice.invoiceNumber }}</p>
+      </div>
 
-  <p>
-    <strong>Billing Period:</strong>
-    {{ invoice.billingMonth }}/{{ invoice.billingYear }}
-  </p>
+      <div>
+        <label>Invoice Date</label>
+        <p>{{ invoice.invoiceDate | date:'medium' }}</p>
+      </div>
 
-  <p><strong>Invoice Date:</strong>
-    {{ invoice.invoiceDate | date:'medium' }}
-  </p>
+      <div>
+        <label>Bill ID</label>
+        <p class="mono">{{ invoice.billId }}</p>
+      </div>
 
-  <hr />
+      <div>
+        <label>Payment ID</label>
+        <p class="mono">{{ invoice.paymentId }}</p>
+      </div>
 
-  <p><strong>Energy Charge:</strong> ₹{{ invoice.energyCharge }}</p>
-  <p><strong>Tax:</strong> ₹{{ invoice.tax }}</p>
-  <p><strong>Penalty:</strong> ₹{{ invoice.penalty }}</p>
+      <div>
+        <label>Billing Period</label>
+        <p>{{ invoice.billingMonth }}/{{ invoice.billingYear }}</p>
+      </div>
+    </div>
 
-  <hr />
+    <!-- DIVIDER -->
+    <hr />
 
-  <h3>Total Amount Paid: ₹{{ invoice.amountPaid }}</h3>
+    <!-- CHARGES -->
+    <h3 class="section-title">Charges</h3>
+
+    <table class="charges-table">
+      <tr>
+        <td>Energy Charge</td>
+        <td>₹ {{ invoice.energyCharge }}</td>
+      </tr>
+      <tr>
+        <td>Tax</td>
+        <td>₹ {{ invoice.tax }}</td>
+      </tr>
+      <tr>
+        <td>Penalty</td>
+        <td>₹ {{ invoice.penalty }}</td>
+      </tr>
+      <tr class="total">
+        <td>Total Paid</td>
+        <td>₹ {{ invoice.amountPaid }}</td>
+      </tr>
+    </table>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="dialog-footer">
+    <button class="secondary-btn" (click)="close()">Close</button>
+  </div>
 
 </div>

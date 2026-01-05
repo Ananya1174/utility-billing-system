@@ -2,7 +2,6 @@ import { Routes } from '@angular/router';
 import { LandingComponent } from './landing/landing';
 import { LoginComponent } from './core/auth/login/login';
 import { CreateAccountComponent } from './core/auth/create-account/create-account';
-import { Home } from './shared/home/home';
 import { ProfileComponent } from './shared/profile/profile/profile';
 import { ChangePasswordComponent } from './shared/profile/change-password/change-password';
 import { AdminDashboardComponent } from './features/admin/admin-dashboard/admin-dashboard';
@@ -25,6 +24,10 @@ import { BillsComponent } from './features/consumer/bills/bills';
 import { PaymentsComponent } from './features/consumer/payments/payments';
 import { BillingOfficerDashboardComponent } from './features/Billing/billing-dashboard/billing-dashboard';
 import { BillingLogsComponent } from './features/Billing/billing-logs/billing-logs';
+import { AccountsDashboardComponent } from './features/accounts/accounts-dashboard/accounts-dashboard';
+import { AccountsReportsComponent } from './features/accounts/accounts-reports/accounts-reports';
+
+
 export const routes: Routes = [
 
   // ---------- PUBLIC ----------
@@ -41,9 +44,6 @@ export const routes: Routes = [
     component: AuthLayoutComponent,
     canActivateChild: [ForcePasswordChangeGuard],
     children: [
-
-      // TEMP (remove later)
-      { path: 'home', component: Home },
 
       { path: 'change-password', component: ChangePasswordComponent },
 
@@ -68,6 +68,10 @@ export const routes: Routes = [
       { path: 'billing/meter-readings', component: MeterReadingsComponent },
       { path: 'billing/generate-bills', component: GenerateBillsComponent },
       { path: 'billing/logs', component: BillingLogsComponent },
+
+      //----------Accounts Officer------
+      { path: 'accounts/dashboard', component: AccountsDashboardComponent },
+      { path: 'accounts/reports', component: AccountsReportsComponent },
     ]
   },
 

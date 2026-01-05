@@ -1,57 +1,54 @@
-<h2>Bills</h2>
+<div class="page-container">
 
-<div *ngIf="loading">Loading bills...</div>
+  <h2>Bills</h2>
 
-<div *ngIf="!loading && bills.length === 0">
-  No bills available.
-</div>
+  <div *ngIf="loading">Loading bills...</div>
 
-<div class="utilities-grid" *ngIf="!loading && bills.length > 0">
+  <div *ngIf="!loading && bills.length === 0">
+    No bills available.
+  </div>
 
-  <div class="utility-card" *ngFor="let bill of bills">
+  <div class="utilities-grid" *ngIf="!loading && bills.length > 0">
 
-    <h3>
-      {{ bill.utilityType }} - {{ bill.billingMonth }}/{{ bill.billingYear }}
-    </h3>
+    <div class="utility-card" *ngFor="let bill of bills">
 
-    <p><strong>Units:</strong> {{ bill.consumptionUnits }}</p>
-    <p><strong>Payable:</strong> ₹{{ bill.payableAmount }}</p>
-    <p><strong>Due Date:</strong> {{ bill.dueDate | date }}</p>
+      <h3>
+        {{ bill.utilityType }} - {{ bill.billingMonth }}/{{ bill.billingYear }}
+      </h3>
 
-    <span class="status" [ngClass]="bill.status.toLowerCase()">
-      {{ bill.status }}
-    </span>
+      <p><strong>Units:</strong> {{ bill.consumptionUnits }}</p>
+      <p><strong>Payable:</strong> ₹{{ bill.payableAmount }}</p>
+      <p><strong>Due Date:</strong> {{ bill.dueDate | date }}</p>
 
-    <div class="actions">
+      <span class="status" [ngClass]="bill.status.toLowerCase()">
+        {{ bill.status }}
+      </span>
 
-      <!-- VIEW BILL -->
-      <button class="secondary-btn"
-              (click)="viewBill(bill.id)">
-        View Bill
-      </button>
+      <div class="actions">
+        <button class="secondary-btn" (click)="viewBill(bill.id)">
+          View Bill
+        </button>
 
-      <!-- PAY NOW -->
-      <button *ngIf="isPayable(bill.status)"
-              class="primary-btn"
-              (click)="payBill(bill)">
-        Pay Now
-      </button>
+        <button *ngIf="isPayable(bill.status)"
+                class="primary-btn"
+                (click)="payBill(bill)">
+          Pay Now
+        </button>
 
-      <!-- INVOICE (PAID ONLY + paymentId REQUIRED) -->
-      <button *ngIf="bill.status === 'PAID' && bill.paymentId"
-              class="secondary-btn"
-              (click)="viewInvoice(bill.paymentId)">
-        View Invoice
-      </button>
+        <button *ngIf="bill.status === 'PAID' && bill.paymentId"
+                class="secondary-btn"
+                (click)="viewInvoice(bill.paymentId)">
+          View Invoice
+        </button>
 
-      <button *ngIf="bill.status === 'PAID' && bill.paymentId"
-              class="secondary-btn"
-              (click)="downloadInvoice(bill.paymentId)">
-        Download Invoice
-      </button>
+        <button *ngIf="bill.status === 'PAID' && bill.paymentId"
+                class="secondary-btn"
+                (click)="downloadInvoice(bill.paymentId)">
+          Download Invoice
+        </button>
+      </div>
 
     </div>
-
   </div>
 
 </div>

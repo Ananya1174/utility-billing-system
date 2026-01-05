@@ -1,0 +1,96 @@
+.dialog-container {
+  width: 100%;
+  max-width: 420px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.dialog-title {
+  margin-bottom: 14px;
+  color: #1e3a8a;
+  font-size: 1.3rem;
+}
+
+.amount {
+  font-size: 1rem;
+  margin-bottom: 16px;
+}
+
+.amount span {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.otp-label {
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.otp-boxes {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.otp-boxes input {
+  width: 44px;
+  height: 48px;
+  text-align: center;
+  font-size: 1.2rem;
+  border-radius: 8px;
+  border: 1px solid #cbd5f5;
+}
+
+.primary-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.primary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.secondary-btn {
+  background: #e5e7eb;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: #2563eb;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.resend {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.error {
+  color: #dc2626;
+  font-size: 0.85rem;
+  margin-top: 10px;
+}
+
+.footer {
+  margin-top: 18px;
+  text-align: right;
+}

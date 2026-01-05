@@ -1,45 +1,78 @@
 <div class="page-container">
 
+  <!-- HEADER -->
   <div class="page-header">
     <h2>My Utilities</h2>
 
     <button
       class="primary-btn"
-      *ngIf="canAddUtility"
+      [disabled]="!canAddUtility"
       (click)="openRequestDialog()">
-      ➕ Add Utility
+      ➕ Request Utility
     </button>
   </div>
 
-  <div *ngIf="loading">Loading...</div>
+  <!-- LOADING -->
+  <div class="loading" *ngIf="loading">
+    Loading utilities...
+  </div>
 
+  <!-- EMPTY -->
   <div class="empty-state" *ngIf="!loading && !hasUtilities">
-    <p>No utilities found.</p>
+    <p>You don’t have any utilities yet.</p>
     <button class="primary-btn" (click)="openRequestDialog()">
       Request Utility
     </button>
   </div>
 
+  <!-- GRID -->
   <div class="utilities-grid" *ngIf="!loading && hasUtilities">
+
     <div class="utility-card" *ngFor="let u of utilities">
 
-      <h3>{{ u.utilityType }}</h3>
+      <!-- HEADER -->
+      <div class="utility-header">
+        <h3>{{ u.utilityType }}</h3>
 
-      <p><strong>Tariff:</strong> {{ u.tariffPlan }}</p>
+        <span
+          class="status"
+          [ngClass]="(u.status || u.connectionStatus)?.toLowerCase()">
+          {{ u.status || u.connectionStatus }}
+        </span>
+      </div>
 
-      <p *ngIf="u.meterNumber">
-        <strong>Meter No:</strong> {{ u.meterNumber }}
-      </p>
+      <!-- DETAILS -->
+      <div class="details">
 
-      <span class="status" [ngClass]="u.status.toLowerCase()">
-        {{ u.status }}
-      </span>
-      <p class="hint" *ngIf="u.status === 'PENDING'">
+        <p>
+          <strong>Tariff Plan:</strong>
+          {{ u.tariffPlan || u.tariffPlanCode || '—' }}
+        </p>
+
+        <p *ngIf="u.meterNumber">
+          <strong>Meter Number:</strong>
+          {{ u.meterNumber }}
+        </p>
+
+        <p *ngIf="u.activatedAt">
+          <strong>Activated On:</strong>
+          {{ u.activatedAt | date:'mediumDate' }}
+        </p>
+
+        <p *ngIf="!u.activatedAt && u.requestedAt">
+          <strong>Requested On:</strong>
+          {{ u.requestedAt | date:'mediumDate' }}
+        </p>
+
+      </div>
+
+      <!-- PENDING INFO -->
+      <p class="hint" *ngIf="(u.status || u.connectionStatus) === 'PENDING'">
         Waiting for admin approval
       </p>
 
     </div>
-  </div>
 
+  </div>
 
 </div>

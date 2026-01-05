@@ -1,22 +1,60 @@
-<h3>Pay Bill</h3>
+<div class="dialog-card">
 
-<div *ngIf="step === 'INIT'">
-  <p><strong>Amount:</strong> ₹{{ bill.payableAmount }}</p>
+  <div class="dialog-header">
+    <h3>Pay Bill</h3>
+    <button class="close-btn" (click)="cancel()">✕</button>
+  </div>
 
-  <button class="primary-btn" (click)="initiatePayment()" [disabled]="loading">
-    Send OTP
-  </button>
+  <div class="dialog-body">
+
+    <!-- STEP: INIT -->
+    <div *ngIf="step === 'INIT'" class="step">
+      <p class="amount">
+        Amount Payable
+        <span>₹{{ bill.payableAmount }}</span>
+      </p>
+
+      <button class="primary-btn"
+              (click)="initiatePayment()"
+              [disabled]="loading">
+        Send OTP
+      </button>
+    </div>
+
+    <!-- STEP: OTP -->
+    <div *ngIf="step === 'OTP'" class="step">
+
+      <label class="otp-label">Enter OTP</label>
+
+      <div class="otp-boxes">
+        <input *ngFor="let d of otpDigits; let i = index"
+               maxlength="1"
+               inputmode="numeric"
+               (input)="onOtpInput($event, i)"
+               [(ngModel)]="otpDigits[i]" />
+      </div>
+
+      <button class="primary-btn"
+              (click)="confirmOtp()"
+              [disabled]="loading || otp.length !== 6">
+        Confirm Payment
+      </button>
+
+      <button class="link-btn"
+              *ngIf="resendCounter > 0"
+              disabled>
+        Resend OTP in {{ resendCounter }}s
+      </button>
+
+      <button class="link-btn"
+              *ngIf="resendCounter === 0"
+              (click)="resendOtp()">
+        Resend OTP
+      </button>
+    </div>
+
+    <p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>
+
+  </div>
+
 </div>
-
-<div *ngIf="step === 'OTP'">
-  <label>Enter OTP</label>
-  <input type="text" [(ngModel)]="otp" maxlength="6" />
-
-  <button class="primary-btn" (click)="confirmOtp()" [disabled]="loading">
-    Confirm Payment
-  </button>
-</div>
-
-<p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>
-
-<button class="secondary-btn" (click)="cancel()">Cancel</button>

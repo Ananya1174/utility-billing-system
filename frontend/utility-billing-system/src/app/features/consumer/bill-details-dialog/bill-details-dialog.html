@@ -1,14 +1,55 @@
-<h3>Bill Details</h3>
+<div class="dialog-container">
 
-<div *ngIf="bill; else loading">
-  <p><strong>Utility:</strong> {{ bill.utilityType }}</p>
-  <p><strong>Tariff:</strong> {{ bill.tariffPlan }}</p>
-  <p><strong>Period:</strong> {{ bill.billingMonth }}/{{ bill.billingYear }}</p>
-  <p><strong>Units:</strong> {{ bill.consumptionUnits }}</p>
-  <p><strong>Total:</strong> ₹{{ bill.totalAmount }}</p>
-  <p><strong>Status:</strong> {{ bill.status }}</p>
+  <!-- HEADER -->
+  <div class="dialog-header">
+    <h2>Bill Details</h2>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="dialog-content" *ngIf="!loading && bill">
+
+    <div class="row">
+      <span>Utility</span>
+      <strong>{{ bill.utilityType }}</strong>
+    </div>
+
+    <div class="row">
+      <span>Tariff Plan</span>
+      <strong>{{ bill.tariffPlan }}</strong>
+    </div>
+
+    <div class="row">
+      <span>Billing Period</span>
+      <strong>{{ bill.billingMonth }}/{{ bill.billingYear }}</strong>
+    </div>
+
+    <div class="row">
+      <span>Units Consumed</span>
+      <strong>{{ bill.consumptionUnits }}</strong>
+    </div>
+
+    <div class="row highlight">
+      <span>Total Amount</span>
+      <strong>₹ {{ bill.totalAmount }}</strong>
+    </div>
+
+    <div class="row">
+      <span>Status</span>
+      <span class="status" [ngClass]="bill.status.toLowerCase()">
+        {{ bill.status }}
+      </span>
+    </div>
+
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading" *ngIf="loading">
+    Loading bill details...
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="dialog-actions">
+    <button class="secondary-btn" (click)="close()">Close</button>
+  </div>
+
 </div>
-
-<ng-template #loading>
-  <p>Loading bill details...</p>
-</ng-template>

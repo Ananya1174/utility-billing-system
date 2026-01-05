@@ -1,15 +1,111 @@
-form {
+/* OVERLAY */
+.dialog-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+/* CARD */
+.dialog-card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px 26px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.18);
+}
+
+/* TITLE */
+.dialog-title {
+  margin-bottom: 6px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1e3a8a;
+}
+
+.dialog-subtitle {
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+/* FORM */
+.dialog-form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334155;
 }
 
 select {
-  padding: 6px;
+  padding: 10px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #cbd5f5;
+  background: #ffffff;
 }
 
-.actions {
+select:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+/* ERROR */
+.error {
+  color: #dc2626;
+  font-size: 0.85rem;
+}
+
+/* ACTIONS */
+.dialog-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+/* BUTTONS */
+.primary-btn {
+  padding: 10px 18px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primary-btn:hover {
+  background: #1d4ed8;
+}
+
+.primary-btn:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+.secondary-btn {
+  padding: 10px 18px;
+  background: transparent;
+  border: 1px solid #2563eb;
+  color: #2563eb;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.secondary-btn:hover {
+  background: #eff6ff;
 }

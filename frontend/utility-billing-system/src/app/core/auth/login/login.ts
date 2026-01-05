@@ -79,6 +79,8 @@ export class LoginComponent {
             this.router.navigate(['consumer/dashboard']);
           }else if(res.role=='BILLING_OFFICER'){
             this.router.navigate(['billing/dashboard']);
+          }else if(res.role=='ACCOUNTS_OFFICER'){
+            this.router.navigate(['accounts/dashboard']);
           }
         },
         error: () => {
