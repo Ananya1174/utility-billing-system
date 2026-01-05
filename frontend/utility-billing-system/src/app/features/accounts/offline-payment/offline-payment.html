@@ -1,0 +1,61 @@
+<h2>Offline Payment</h2>
+<p class="subtitle">
+  Record cash / counter payments made by consumers.
+</p>
+
+<div class="card">
+
+  <form [formGroup]="paymentForm" (ngSubmit)="submit()">
+
+    <!-- BILL ID -->
+    <div class="form-group">
+      <label>Bill ID</label>
+      <input
+        type="text"
+        formControlName="billId"
+        placeholder="Enter Bill ID" />
+      <small *ngIf="f['billId'].touched && f['billId'].invalid">
+        Bill ID is required
+      </small>
+    </div>
+
+    <!-- CONSUMER ID -->
+    <div class="form-group">
+      <label>Consumer ID</label>
+      <input
+        type="text"
+        formControlName="consumerId"
+        placeholder="Enter Consumer ID" />
+      <small *ngIf="f['consumerId'].touched && f['consumerId'].invalid">
+        Consumer ID is required
+      </small>
+    </div>
+
+    <!-- REMARKS -->
+    <div class="form-group">
+      <label>Remarks</label>
+      <textarea
+        rows="3"
+        formControlName="remarks"
+        placeholder="Payment remarks"></textarea>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="actions">
+      <button class="primary-btn" type="submit" [disabled]="loading">
+        {{ loading ? 'Processing...' : 'Confirm Offline Payment' }}
+      </button>
+    </div>
+
+  </form>
+
+</div>
+
+<!-- STATUS MESSAGES -->
+<div class="alert success" *ngIf="successMsg">
+  {{ successMsg }}
+</div>
+
+<div class="alert error" *ngIf="errorMsg">
+  {{ errorMsg }}
+</div>

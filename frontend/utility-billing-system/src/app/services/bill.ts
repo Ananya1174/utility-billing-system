@@ -55,4 +55,10 @@ getPaymentsByBillId(billId: string) {
       { responseType: 'blob' }
     );
   }
+  // ✅ GET ALL PAYMENTS (Accounts Officer)
+getAllPayments() {
+  return this.http.get<any[]>(
+    `${this.baseUrl}/payments`
+  );
+}
 }

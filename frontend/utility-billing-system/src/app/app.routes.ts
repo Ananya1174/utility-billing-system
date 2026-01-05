@@ -26,8 +26,8 @@ import { BillingOfficerDashboardComponent } from './features/Billing/billing-das
 import { BillingLogsComponent } from './features/Billing/billing-logs/billing-logs';
 import { AccountsDashboardComponent } from './features/accounts/accounts-dashboard/accounts-dashboard';
 import { AccountsReportsComponent } from './features/accounts/accounts-reports/accounts-reports';
-
-
+import { OfflinePaymentComponent } from './features/accounts/offline-payment/offline-payment';
+import { PaymentHistoryComponent } from './features/accounts/payment-history/payment-history';
 export const routes: Routes = [
 
   // ---------- PUBLIC ----------
@@ -72,6 +72,8 @@ export const routes: Routes = [
       //----------Accounts Officer------
       { path: 'accounts/dashboard', component: AccountsDashboardComponent },
       { path: 'accounts/reports', component: AccountsReportsComponent },
+      { path: 'accounts/offline', component: OfflinePaymentComponent },
+      { path: 'accounts/history', component: PaymentHistoryComponent },
     ]
   },
 
