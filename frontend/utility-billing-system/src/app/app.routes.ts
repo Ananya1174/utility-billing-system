@@ -24,6 +24,7 @@ import { MyUtilitiesComponent } from './features/consumer/my-utilities/my-utilit
 import { BillsComponent } from './features/consumer/bills/bills';
 import { PaymentsComponent } from './features/consumer/payments/payments';
 import { BillingOfficerDashboardComponent } from './features/Billing/billing-dashboard/billing-dashboard';
+import { BillingLogsComponent } from './features/Billing/billing-logs/billing-logs';
 export const routes: Routes = [
 
   // ---------- PUBLIC ----------
@@ -66,6 +67,7 @@ export const routes: Routes = [
       { path: 'billing/dashboard', component: BillingOfficerDashboardComponent },
       { path: 'billing/meter-readings', component: MeterReadingsComponent },
       { path: 'billing/generate-bills', component: GenerateBillsComponent },
+      { path: 'billing/logs', component: BillingLogsComponent },
     ]
   },
 

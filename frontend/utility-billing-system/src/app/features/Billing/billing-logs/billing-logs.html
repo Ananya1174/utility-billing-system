@@ -1,0 +1,87 @@
+<h2>Billing Logs</h2>
+<p class="subtitle">All generated bills with status and details</p>
+
+<!-- ================= FILTERS ================= -->
+
+<div class="filters">
+
+  <select [(ngModel)]="status">
+    <option value="">All Status</option>
+    <option value="DUE">Due</option>
+    <option value="PAID">Paid</option>
+    <option value="OVERDUE">Overdue</option>
+  </select>
+
+  <select [(ngModel)]="month">
+    <option [ngValue]="null">All Months</option>
+    <option *ngFor="let m of months" [ngValue]="m">
+      Month {{ m }}
+    </option>
+  </select>
+
+  <select [(ngModel)]="year">
+    <option [ngValue]="null">All Years</option>
+    <option *ngFor="let y of years" [ngValue]="y">
+      {{ y }}
+    </option>
+  </select>
+
+  <input
+    type="text"
+    placeholder="Consumer ID"
+    [(ngModel)]="consumerId" />
+
+  <button class="primary-btn" (click)="loadBills()">
+    Apply Filters
+  </button>
+
+  <button class="ghost-btn" (click)="clearFilters()">
+    Clear
+  </button>
+
+</div>
+
+<!-- ================= TABLE ================= -->
+
+<div *ngIf="loading">Loading bills...</div>
+<div *ngIf="error" class="error">{{ error }}</div>
+
+<div class="card" *ngIf="!loading && bills.length">
+
+  <table>
+    <thead>
+      <tr>
+        <th>Bill ID</th>
+        <th>Consumer</th>
+        <th>Utility</th>
+        <th>Month</th>
+        <th>Units</th>
+        <th>Amount</th>
+        <th>Status</th>
+        <th>Due Date</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let b of bills">
+        <td class="mono">{{ b.id }}</td>
+        <td class="mono">{{ b.consumerId }}</td>
+        <td>{{ b.utilityType }}</td>
+        <td>{{ b.billingMonth }}/{{ b.billingYear }}</td>
+        <td>{{ b.consumptionUnits }}</td>
+        <td>₹{{ b.totalAmount }}</td>
+        <td>
+          <span class="status" [class]="statusClass(b.status)">
+            {{ b.status }}
+          </span>
+        </td>
+        <td>{{ b.dueDate }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<div *ngIf="!loading && !bills.length" class="empty">
+  No billing records found
+</div>
