@@ -1,0 +1,43 @@
+<h2>My Account</h2>
+<p class="subtitle">Account information (read-only)</p>
+
+<div *ngIf="loading">Loading account details...</div>
+
+<div *ngIf="!loading && account" class="account-card">
+
+  <div class="row">
+    <span class="label">User ID</span>
+    <span class="value">{{ account.userId }}</span>
+  </div>
+
+  <div class="row">
+    <span class="label">Email</span>
+    <span class="value">{{ account.email }}</span>
+  </div>
+
+  <div class="row">
+    <span class="label">Role</span>
+    <span class="value badge">{{ account.role }}</span>
+  </div>
+
+  <div class="row">
+    <span class="label">Account Status</span>
+    <span class="value"
+          [class.active]="account.status"
+          [class.inactive]="!account.status">
+      {{ (account.status) }}
+    </span>
+  </div>
+
+  <div class="row">
+    <span class="label">Created On</span>
+    <span class="value">
+      {{ account.createdAt | date:'medium' }}
+    </span>
+  </div>
+
+</div>
+
+<div *ngIf="!loading && !account" class="empty">
+  Unable to load account information.
+</div>

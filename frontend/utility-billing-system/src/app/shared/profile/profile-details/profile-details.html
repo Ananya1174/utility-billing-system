@@ -1,0 +1,48 @@
+<h2>Profile Details</h2>
+<p class="subtitle">Manage your personal information</p>
+
+<div *ngIf="loading">Loading profile...</div>
+
+<form *ngIf="!loading" class="profile-card" (ngSubmit)="updateProfile()">
+
+  <label>
+    Full Name
+    <input type="text"
+           [(ngModel)]="profile.fullName"
+           name="fullName"
+           required />
+  </label>
+
+  <label>
+    Email
+    <input type="email"
+           [(ngModel)]="profile.email"
+           name="email"
+           required />
+  </label>
+
+  <label>
+    Mobile Number
+    <input type="text"
+           [(ngModel)]="profile.mobileNumber"
+           name="mobileNumber"
+           maxlength="10"
+           required />
+  </label>
+
+  <label>
+    Address
+    <textarea rows="3"
+              [(ngModel)]="profile.address"
+              name="address"
+              required></textarea>
+  </label>
+
+  <button type="submit" [disabled]="saving">
+    {{ saving ? 'Saving...' : 'Update Profile' }}
+  </button>
+
+  <p class="success" *ngIf="successMsg">{{ successMsg }}</p>
+  <p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>
+
+</form>

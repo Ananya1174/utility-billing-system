@@ -1,11 +1,35 @@
-<h2>My Profile</h2>
+<div class="profile-layout">
 
-<div class="tabs">
-  <button (click)="activeTab='profile'">Profile</button>
-  <button (click)="activeTab='password'">Change Password</button>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h3>My Profile</h3>
+
+    <button
+      [class.active]="activeTab === 'account'"
+      (click)="activeTab = 'account'">
+      My Account
+    </button>
+
+    <!-- Only for CONSUMER -->
+    <button
+      *ngIf="isConsumer()"
+      [class.active]="activeTab === 'profile'"
+      (click)="activeTab = 'profile'">
+      Profile Details
+    </button>
+
+    <button
+      [class.active]="activeTab === 'password'"
+      (click)="activeTab = 'password'">
+      Change Password
+    </button>
+  </aside>
+
+  <!-- CONTENT -->
+  <section class="content">
+    <app-my-account *ngIf="activeTab === 'account'"></app-my-account>
+    <app-profile-details *ngIf="activeTab === 'profile'"></app-profile-details>
+    <app-change-password *ngIf="activeTab === 'password'"></app-change-password>
+  </section>
+
 </div>
-
-<hr />
-
-<app-update-profile *ngIf="activeTab === 'profile'"></app-update-profile>
-<app-change-password *ngIf="activeTab === 'password'"></app-change-password>
