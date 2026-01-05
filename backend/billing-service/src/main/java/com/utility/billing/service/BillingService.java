@@ -50,11 +50,6 @@ public class BillingService {
 
 		var lastBillOpt = billRepository
 				.findTopByConnectionIdOrderByBillingYearDescBillingMonthDesc(request.getConnectionId());
-
-		if (lastBillOpt.isPresent() && lastBillOpt.get().getStatus() != BillStatus.PAID) {
-			throw new ApiException("Unpaid bill already exists for this connection", HttpStatus.BAD_REQUEST);
-		}
-
 		var reading = fetchLatestMeterReading(request.getConnectionId());
 
 		if (reading == null) {

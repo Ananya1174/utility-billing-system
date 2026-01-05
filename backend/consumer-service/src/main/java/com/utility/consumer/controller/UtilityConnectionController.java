@@ -31,7 +31,6 @@ public class UtilityConnectionController {
 	}
 
 	@GetMapping("/{id}")
-	@PreAuthorize("hasRole('BILLING_OFFICER')")
 	public ConnectionResponseDto getConnectionById(@PathVariable String id) {
 
 		return connectionService.getConnectionById(id);

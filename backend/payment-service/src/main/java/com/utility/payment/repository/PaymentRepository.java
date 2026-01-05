@@ -6,6 +6,7 @@ import com.utility.payment.model.PaymentStatus;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PaymentRepository
 extends MongoRepository<Payment, String> {
@@ -30,4 +31,9 @@ List<Payment> findByBillingMonthAndBillingYearAndStatus(
         int billingYear,
         PaymentStatus status
 );
+Optional<Payment> findByBillIdAndStatus(
+	    String billId,
+	    PaymentStatus status
+	);
+List<Payment> findAllByOrderByCreatedAtDesc();
 }

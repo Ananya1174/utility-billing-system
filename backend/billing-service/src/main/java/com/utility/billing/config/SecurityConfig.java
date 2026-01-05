@@ -56,16 +56,16 @@ public class SecurityConfig {
                     /* ================= DASHBOARD ================= */
 
                     .requestMatchers(HttpMethod.GET, "/dashboard/bills-summary")
-                        .hasRole("ADMIN")
+                        .hasAnyRole("ADMIN","BILLING_OFFICER")
 
                     .requestMatchers(HttpMethod.GET, "/dashboard/consumption-summary")
-                        .hasRole("ADMIN")
+                        .hasAnyRole("ADMIN","BILLING_OFFICER")
 
                     .requestMatchers(HttpMethod.GET, "/dashboard/consumption-average")
                         .hasRole("ADMIN")
 
                     .requestMatchers(HttpMethod.GET, "/dashboard/consumption/utility")
-                        .hasRole("ADMIN")
+                        .hasAnyRole("ADMIN","BILLING_OFFICER")
 
                     .requestMatchers(HttpMethod.GET, "/dashboard/billing/consumer-summary")
                         .hasRole("ADMIN")

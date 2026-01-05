@@ -53,19 +53,20 @@ public class SecurityConfig {
                 /* ================= PAYMENT VIEW ================= */
                 .requestMatchers(
                         HttpMethod.GET,
+                        "/payments",
                         "/payments/bill/**",
                         "/payments/consumer/**",
                         "/payments/outstanding/**",
                         "/payments/invoice/**"
-                ).hasAnyRole("CONSUMER", "ACCOUNTS_OFFICER", "ADMIN")
+                ).hasAnyRole("CONSUMER", "ACCOUNTS_OFFICER", "ADMIN","BILLING_OFFICER")
 
                 /* ================= PAYMENT DASHBOARD (CARDS) ================= */
                 .requestMatchers(
                         HttpMethod.GET,
                         "/dashboard/payments/revenue-summary",
                         "/dashboard/payments/outstanding-summary",
-                        "/dashboard/payments/payments-summary"
-                ).hasAnyRole("ADMIN", "ACCOUNTS_OFFICER")
+                        "/dashboard/payments/outstanding-monthly"
+                ).hasAnyRole("ADMIN", "ACCOUNTS_OFFICER","BILLING_OFFICER")
 
                 /* ================= PAYMENT REPORTS / ANALYTICS ================= */
                 .requestMatchers(
@@ -74,7 +75,7 @@ public class SecurityConfig {
                         "/dashboard/payments/revenue-by-mode",
                         "/dashboard/payments/consumer-summary",
                         "/dashboard/payments/revenue-yearly"
-                ).hasRole("ADMIN")
+                ).hasAnyRole("ADMIN","ACCOUNTS_OFFICER")
 
                 /* ================= FALLBACK ================= */
                 .anyRequest().authenticated()

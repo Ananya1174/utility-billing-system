@@ -82,5 +82,9 @@ public class PaymentController {
 				.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=invoice-" + paymentId + ".pdf")
 				.body(pdf);
 	}
-	
+
+    @GetMapping
+    public List<PaymentResponse> getAllPayments() {
+        return paymentService.getAllPayments();
+    }
 }

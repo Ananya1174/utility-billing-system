@@ -32,7 +32,7 @@ public class SecurityConfig {
                 ).permitAll()
 
                 // 🔒 EVERYTHING ELSE → ONLY BILLING_OFFICER
-                .anyRequest().hasRole("BILLING_OFFICER")
+                .anyRequest().authenticated()
             )
             .addFilterBefore(
                 new JwtAuthenticationFilter(jwtUtil),

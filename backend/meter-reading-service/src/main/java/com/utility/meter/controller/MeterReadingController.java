@@ -5,6 +5,7 @@ import com.utility.meter.dto.MeterReadingResponse;
 import com.utility.meter.exception.ApiException;
 import com.utility.meter.service.MeterReadingService;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ public class MeterReadingController {
     private final MeterReadingService service;
 
     @PostMapping
+    @PreAuthorize("hasRole('BILLING_OFFICER')")
     public ResponseEntity<MeterReadingResponse> add(
             @Valid @RequestBody CreateMeterReadingRequest request) {
 

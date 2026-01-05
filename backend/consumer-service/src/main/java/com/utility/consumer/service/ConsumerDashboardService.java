@@ -55,9 +55,10 @@ public class ConsumerDashboardService {
        
         var payments = paymentClient.getPaymentsByConsumer(consumerId);
 
-        var lastPayment = payments.isEmpty()
-                ? null
-                : payments.get(0); 
+        var lastPayment = payments.stream()
+                .filter(p -> p.getConfirmedAt() != null)
+                .findFirst()
+                .orElse(null);
 
         return new ConsumerDashboardSummaryDto(
                 activeUtilities,

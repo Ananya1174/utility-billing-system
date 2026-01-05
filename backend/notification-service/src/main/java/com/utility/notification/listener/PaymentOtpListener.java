@@ -18,6 +18,7 @@ public class PaymentOtpListener {
     @RabbitListener(queues = RabbitMQConfig.PAYMENT_OTP_QUEUE)
     public void handlePaymentOtp(PaymentOtpEvent event) {
 
+    	System.out.println("✅ OTP EVENT RECEIVED FOR: " + event.getEmail());
         emailService.sendPaymentOtpEmail(
                 event.getEmail(),
                 event.getOtp(),

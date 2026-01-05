@@ -32,6 +32,7 @@ public class SecurityConfig {
                 	    HttpMethod.GET,
                 	    "/connections/internal/**"
                 	).permitAll()
+                .requestMatchers(HttpMethod.GET, "/connections/*").permitAll()
 
                 .anyRequest().authenticated()
             )

@@ -36,71 +36,91 @@ public class PaymentService {
 	private final ConsumerClient consumerClient;
     private final RabbitTemplate rabbitTemplate; 
 
-	public PaymentResponse initiateOnline(InitiateOnlinePaymentRequest request) {
+    public PaymentResponse initiateOnline(InitiateOnlinePaymentRequest request) {
 
-		BillResponse bill = billingClient.getBill(request.billId());
+        BillResponse bill = billingClient.getBill(request.billId());
 
-		if (bill.getStatus() == BillStatus.PAID)  {
-			throw new ApiException("Bill already paid", HttpStatus.BAD_REQUEST);
-		}
-		boolean hasPending =
-			    repository.existsByBillIdAndStatus(
-			        request.billId(),
-			        PaymentStatus.INITIATED
-			    );
+        if (bill.getStatus() == BillStatus.PAID) {
+            throw new ApiException("Bill already paid", HttpStatus.BAD_REQUEST);
+        }
 
-			if (hasPending) {
-			    throw new ApiException(
-			        "OTP already sent. Please confirm the existing payment",
-			        HttpStatus.BAD_REQUEST
-			    );
-			}
+        // 1️⃣ Check outstanding
+        double totalPaid = repository.findByBillId(request.billId()).stream()
+                .filter(p -> p.getStatus() == PaymentStatus.SUCCESS)
+                .mapToDouble(Payment::getAmount)
+                .sum();
 
-		double totalPaid = repository.findByBillId(request.billId()).stream()
-				.filter(p -> p.getStatus() == PaymentStatus.SUCCESS).mapToDouble(Payment::getAmount).sum();
+        double outstanding = bill.getTotalAmount() - totalPaid;
 
-		double outstanding = bill.getTotalAmount() - totalPaid;
+        if (outstanding <= 0) {
+            throw new ApiException("No outstanding amount", HttpStatus.BAD_REQUEST);
+        }
 
-		if (outstanding <= 0) {
-			throw new ApiException("No outstanding amount", HttpStatus.BAD_REQUEST);
-		}
+        // 2️⃣ Check existing INITIATED payment
+        Payment payment = repository
+                .findByBillIdAndStatus(request.billId(), PaymentStatus.INITIATED)
+                .orElseGet(() -> {
+                    Payment p = new Payment();
+                    p.setBillId(request.billId());
+                    p.setConsumerId(request.consumerId());
+                    p.setAmount(outstanding);
+                    p.setMode(PaymentMode.ONLINE);
+                    p.setStatus(PaymentStatus.INITIATED);
+                    p.setTransactionId(UUID.randomUUID().toString());
+                    p.setBillingMonth(bill.getBillingMonth());
+                    p.setBillingYear(bill.getBillingYear());
+                    p.setCreatedAt(LocalDateTime.now());
+                    return p;
+                });
 
-		String otp = String.valueOf(100000 + new Random().nextInt(900000));
+        // 3️⃣ ALWAYS generate NEW OTP
+        String otp = String.valueOf(100000 + new Random().nextInt(900000));
+        payment.setOtp(otp);
+        payment.setOtpExpiry(Instant.now().plusSeconds(300));
 
-		Payment payment = new Payment();
-		payment.setBillId(request.billId());
-		payment.setConsumerId(request.consumerId());
-		payment.setAmount(outstanding);
-		payment.setMode(PaymentMode.ONLINE);
-		payment.setStatus(PaymentStatus.INITIATED);
-		payment.setOtp(otp);
-		payment.setOtpExpiry(Instant.now().plusSeconds(300));
-		payment.setTransactionId(UUID.randomUUID().toString());
-		payment.setBillingMonth(bill.getBillingMonth());
-		payment.setBillingYear(bill.getBillingYear());
-		payment.setCreatedAt(LocalDateTime.now());
+        repository.save(payment);
 
-		repository.save(payment);
+        // 4️⃣ Fetch consumer email
+        ConsumerResponse consumer = consumerClient.getConsumerById(payment.getConsumerId());
+        String email = consumer.getEmail();
 
-		System.out.println("OTP: " + otp);
-		ConsumerResponse consumer =
-		        consumerClient.getConsumerById(request.consumerId());
+        // 5️⃣ Send OTP event
+        PaymentOtpEvent event = new PaymentOtpEvent();
+        event.setEmail(email);
+        event.setOtp(otp);
+        event.setValidMinutes(5);
 
-		String email = consumer.getEmail();
-		PaymentOtpEvent event = new PaymentOtpEvent();
-		event.setEmail(email);
-		event.setOtp(otp);
-		event.setValidMinutes(5);
+        rabbitTemplate.convertAndSend(
+                RabbitMQConfig.EXCHANGE,
+                RabbitMQConfig.PAYMENT_OTP_KEY,
+                event
+        );
 
-		rabbitTemplate.convertAndSend(
-		    RabbitMQConfig.EXCHANGE,
-		    RabbitMQConfig.PAYMENT_OTP_KEY,
-		    event
-		);
+        System.out.println("📤 NEW OTP SENT TO " + email + " | OTP = " + otp);
 
-		return PaymentResponse.from(payment, bill, null);
-	}
+        return PaymentResponse.from(payment, bill, null);
+    }
+    public List<PaymentResponse> getAllPayments() {
 
+        List<Payment> payments = repository.findAllByOrderByCreatedAtDesc();
+
+        if (payments.isEmpty()) {
+            throw new ApiException("No payments found", HttpStatus.NOT_FOUND);
+        }
+
+        return payments.stream().map(payment -> {
+            BillResponse bill = billingClient.getBill(payment.getBillId());
+            Invoice invoice = invoiceRepository
+                    .findByPaymentId(payment.getId())
+                    .orElse(null);
+
+            return PaymentResponse.from(
+                    payment,
+                    bill,
+                    invoice != null ? invoice.getId() : null
+            );
+        }).toList();
+    }
 	public PaymentResponse confirmOtp(ConfirmOtpRequest request) {
 
 		Payment payment = repository.findById(request.paymentId())
