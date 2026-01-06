@@ -1,23 +1,10 @@
 <h2>Consumer Dashboard</h2>
 
-<div class="filters">
-  <select [(ngModel)]="month" (change)="onFilterChange()">
-    <option *ngFor="let m of months" [value]="m.value">
-      {{ m.name }}
-    </option>
-  </select>
-
-  <select [(ngModel)]="year" (change)="onFilterChange()">
-    <option *ngFor="let y of [2024,2025,2026]" [value]="y">
-      {{ y }}
-    </option>
-  </select>
-</div>
-
 <div *ngIf="loading">Loading dashboard...</div>
 
 <div *ngIf="!loading && summary">
 
+  <!-- ================= KPI ================= -->
   <div class="kpi-grid">
     <div class="kpi-card highlight">
       <p>Total Due</p>
@@ -40,33 +27,92 @@
     </div>
   </div>
 
+  <!-- ================= CHARTS (2 × 2 GRID) ================= -->
   <div class="charts-grid">
 
+    <!-- 1️⃣ Consumption by Utility -->
     <div class="chart-card">
-      <h3>Consumption by Utility</h3>
-      <canvas baseChart [type]="pieChartType" [data]="pieChartData"></canvas>
+      <div class="chart-header">
+        <h3>Consumption by Utility</h3>
+        <div class="chart-filters">
+          <select [(ngModel)]="month" (change)="onPieFilterChange()">
+            <option *ngFor="let m of months" [value]="m.value">{{ m.name }}</option>
+          </select>
+          <select [(ngModel)]="year" (change)="onPieFilterChange()">
+            <option *ngFor="let y of [2024, 2025, 2026]" [value]="y">{{ y }}</option>
+          </select>
+        </div>
+      </div>
+      <canvas
+        #pieChart
+        baseChart
+        [type]="pieChartType"
+        [data]="pieChartData">
+      </canvas>
     </div>
 
+    <!-- 2️⃣ Monthly Consumption -->
     <div class="chart-card">
-      <h3>Monthly Consumption</h3>
-      <canvas baseChart [type]="barChartType" [data]="barChartData"></canvas>
+      <div class="chart-header">
+        <h3>Monthly Consumption</h3>
+        <div class="chart-filters">
+          <select [(ngModel)]="selectedUtility" (change)="onBarFilterChange()">
+            <option *ngFor="let u of availableUtilities" [value]="u">{{ u }}</option>
+          </select>
+          <select [(ngModel)]="year" (change)="onBarFilterChange()">
+            <option *ngFor="let y of [2024, 2025, 2026]" [value]="y">{{ y }}</option>
+          </select>
+        </div>
+      </div>
+      <canvas
+        #barChart
+        baseChart
+        [type]="barChartType"
+        [data]="barChartData">
+      </canvas>
     </div>
 
+    <!-- 3️⃣ Paid vs Unpaid -->
     <div class="chart-card">
       <h3>Paid vs Unpaid</h3>
-      <canvas baseChart [type]="doughnutChartType" [data]="doughnutChartData"></canvas>
+      <canvas
+        baseChart
+        [type]="doughnutChartType"
+        [data]="doughnutChartData">
+      </canvas>
     </div>
 
+    <!-- 4️⃣ Utility Cost Distribution -->
     <div class="chart-card">
-      <h3>Amount Summary</h3>
-      <canvas baseChart [type]="amountBarChartType" [data]="amountBarChartData"></canvas>
+      <div class="chart-header">
+        <h3>Utility Cost Distribution (%)</h3>
+        <div class="chart-filters">
+          <select [(ngModel)]="utilityCostYear"
+                  (change)="onUtilityCostYearChange()">
+            <option *ngFor="let y of [2024, 2025, 2026]" [value]="y">
+              {{ y }}
+            </option>
+          </select>
+        </div>
+      </div>
+      <canvas
+        #utilityCostChart
+        baseChart
+        [type]="utilityCostChartType"
+        [data]="utilityCostChartData"
+        [options]="utilityCostChartOptions">
+      </canvas>
     </div>
 
   </div>
 
+  <!-- ================= ACTIONS ================= -->
   <div class="actions">
     <button class="primary-btn" (click)="goToBills()">View Bills</button>
-    <button class="primary-btn" *ngIf="summary.totalOutstanding > 0" (click)="payDueBill()">Pay Due</button>
+    <button class="primary-btn"
+            *ngIf="summary.totalOutstanding > 0"
+            (click)="payDueBill()">Pay Due</button>
     <button class="secondary-btn" (click)="goToUtilities()">My Utilities</button>
   </div>
+
 </div>

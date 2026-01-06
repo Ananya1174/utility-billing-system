@@ -1,6 +1,10 @@
 package com.utility.billing.service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -10,9 +14,17 @@ import com.utility.billing.dto.dashboard.AverageConsumptionDto;
 import com.utility.billing.dto.dashboard.BillsSummaryDto;
 import com.utility.billing.dto.dashboard.ConsumerBillingSummaryDto;
 import com.utility.billing.dto.dashboard.ConsumptionSummaryDto;
+import com.utility.billing.dto.dashboard.DashboardConsumptionResponse;
+import com.utility.billing.dto.dashboard.MonthlyConsumptionDto;
+import com.utility.billing.dto.dashboard.UtilityConsumptionDto;
 import com.utility.billing.model.Bill;
 import com.utility.billing.model.BillStatus;
+import com.utility.billing.model.UtilityType;
 import com.utility.billing.repository.BillRepository;
+import com.utility.billing.dto.dashboard.UtilityCostDistributionDto;
+import com.utility.billing.model.Bill;
+import com.utility.billing.model.UtilityType;
+
 
 import lombok.RequiredArgsConstructor;
 
@@ -89,6 +101,41 @@ public class BillingDashboardService {
                 )
                 .toList();
     }
+    public List<UtilityCostDistributionDto> getUtilityCostDistribution(
+            String consumerId,
+            int year
+    ) {
+        List<Bill> bills =
+                billRepository.findByConsumerIdAndBillingYear(consumerId, year);
+
+        if (bills.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Map<UtilityType, Double> costMap = new HashMap<>();
+        double totalCost = 0;
+
+        for (Bill bill : bills) {
+            double amount = bill.getTotalAmount(); // ✅ CORRECT FIELD
+            costMap.merge(bill.getUtilityType(), amount, Double::sum);
+            totalCost += amount;
+        }
+
+        final double finalTotalCost = totalCost; // ✅ REQUIRED FOR LAMBDA
+        List<UtilityCostDistributionDto> result = new ArrayList<>();
+
+        for (Map.Entry<UtilityType, Double> entry : costMap.entrySet()) {
+            double percentage =
+                    Math.round((entry.getValue() / finalTotalCost) * 100);
+
+            result.add(new UtilityCostDistributionDto(
+                    entry.getKey(),
+                    percentage
+            ));
+        }
+
+        return result;
+    }
 
     public List<ConsumerBillingSummaryDto> getConsumerBillingSummary(
             int month,
@@ -118,6 +165,59 @@ public class BillingDashboardService {
                 .stream()
                 .mapToDouble(Bill::getTotalAmount)
                 .sum();
+    }
+    public DashboardConsumptionResponse getConsumptionData(
+            String consumerId,
+            int year,
+            Integer month,
+            UtilityType utilityType
+    ) {
+
+        // 🔹 Fetch once
+        List<Bill> bills = billRepository.findByConsumerId(consumerId);
+
+        // ===============================
+        // PIE → Consumption by Utility
+        // ===============================
+        Map<UtilityType, Long> utilityMap =
+                bills.stream()
+                        .filter(b -> b.getBillingYear() == year)
+                        .filter(b -> month == null || b.getBillingMonth() == month)
+                        .collect(Collectors.groupingBy(
+                                Bill::getUtilityType,
+                                Collectors.summingLong(Bill::getConsumptionUnits)
+                        ));
+
+        List<UtilityConsumptionDto> byUtility =
+                utilityMap.entrySet().stream()
+                        .map(e -> new UtilityConsumptionDto(
+                                e.getKey(),
+                                e.getValue()
+                        ))
+                        .toList();
+
+        // ===============================
+        // BAR → Monthly consumption
+        // ===============================
+        Map<Integer, Long> monthMap =
+                bills.stream()
+                        .filter(b -> b.getBillingYear() == year)
+                        .filter(b -> utilityType == null || b.getUtilityType() == utilityType)
+                        .collect(Collectors.groupingBy(
+                                Bill::getBillingMonth,
+                                Collectors.summingLong(Bill::getConsumptionUnits)
+                        ));
+
+        List<MonthlyConsumptionDto> monthly =
+                monthMap.entrySet().stream()
+                        .sorted(Map.Entry.comparingByKey())
+                        .map(e -> new MonthlyConsumptionDto(
+                                e.getKey(),
+                                e.getValue()
+                        ))
+                        .toList();
+
+        return new DashboardConsumptionResponse(byUtility, monthly);
     }
 
     private ConsumerBillingSummaryDto buildConsumerSummary(

@@ -110,11 +110,23 @@ public class SecurityConfig {
                                 HttpMethod.GET,
                                 "/dashboard/consumption-average"
                         ).hasRole(ADMIN)
+                        .requestMatchers(
+                        	    HttpMethod.GET,
+                        	    "/dashboard/billing/utility-cost"
+                        	).hasRole(CONSUMER)
 
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/dashboard/consumption/utility"
                         ).hasAnyRole(ADMIN, BILLING_OFFICER)
+                        .requestMatchers(
+                        	    HttpMethod.GET,
+                        	    "/dashboard/billing/consumption"
+                        	).hasAnyRole(
+                        	    ADMIN,
+                        	    BILLING_OFFICER,
+                        	    CONSUMER
+                        	)
 
                         .requestMatchers(
                                 HttpMethod.GET,

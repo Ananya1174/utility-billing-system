@@ -5,6 +5,9 @@ import com.utility.billing.dto.dashboard.AverageConsumptionDto;
 import com.utility.billing.dto.dashboard.BillsSummaryDto;
 import com.utility.billing.dto.dashboard.ConsumerBillingSummaryDto;
 import com.utility.billing.dto.dashboard.ConsumptionSummaryDto;
+import com.utility.billing.dto.dashboard.DashboardConsumptionResponse;
+import com.utility.billing.dto.dashboard.UtilityCostDistributionDto;
+import com.utility.billing.model.UtilityType;
 import com.utility.billing.service.BillingDashboardService;
 import com.utility.billing.service.BillingService;
 
@@ -71,5 +74,27 @@ public class BillingDashboardController {
 	@GetMapping("/total-billed")
 	public double getTotalBilled() {
 	    return billingService.getTotalBilledAmount();
+	}
+
+	@GetMapping("/consumption")
+    public DashboardConsumptionResponse getConsumption(
+            @RequestParam String consumerId,
+            @RequestParam int year,
+            @RequestParam(required = false) Integer month,
+            @RequestParam(required = false) UtilityType utilityType
+    ) {
+        return dashboardService.getConsumptionData(
+                consumerId,
+                year,
+                month,
+                utilityType
+        );
+    }
+	@GetMapping("/utility-cost")
+	public List<UtilityCostDistributionDto> utilityCostDistribution(
+	        @RequestParam String consumerId,
+	        @RequestParam int year
+	) {
+	    return dashboardService.getUtilityCostDistribution(consumerId, year);
 	}
 }

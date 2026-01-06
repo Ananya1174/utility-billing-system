@@ -1,27 +1,42 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectorRef,
+  ViewChild
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { BaseChartDirective } from 'ng2-charts';
+import { ChartData, ChartType, ChartOptions } from 'chart.js';
+
+
 import { ConsumerService } from '../../../services/consumer';
 import { BillService } from '../../../services/bill';
 import { AuthService } from '../../../services/auth';
-import { FormsModule } from '@angular/forms';
-import { BaseChartDirective } from 'ng2-charts';
-import { ChartData, ChartType } from 'chart.js';
 
 @Component({
   selector: 'app-consumer-dashboard',
   standalone: true,
-  imports: [CommonModule, BaseChartDirective,FormsModule],
+  imports: [CommonModule, BaseChartDirective, FormsModule],
   templateUrl: './consumer-dashboard.html',
   styleUrls: ['./consumer-dashboard.css']
 })
 export class ConsumerDashboard implements OnInit {
 
+  @ViewChild('pieChart') pieChart?: BaseChartDirective;
+  @ViewChild('barChart') barChart?: BaseChartDirective;
+  @ViewChild('utilityCostChart') utilityCostChart?: BaseChartDirective;
+
   loading = true;
-  summary: any = null;
+  summary: any;
 
   month = new Date().getMonth() + 1;
   year = new Date().getFullYear();
+  utilityCostYear = new Date().getFullYear();
+  selectedUtility = '';
+
+  availableUtilities: string[] = [];
 
   months = [
     { value: 1, name: 'January' },
@@ -38,9 +53,47 @@ export class ConsumerDashboard implements OnInit {
     { value: 12, name: 'December' }
   ];
 
-  /* ================= PIE ================= */
+  /* ================= CHART TYPES ================= */
   pieChartType: ChartType = 'pie';
+  barChartType: ChartType = 'bar';
+  doughnutChartType: ChartType = 'doughnut';
+  utilityCostChartType: ChartType = 'doughnut';
+
+  /* ================= CHART OPTIONS ================= */
+  utilityCostChartOptions: ChartOptions = {
+  responsive: true,
+  plugins: {
+    legend: {
+      position: 'bottom'
+    },
+    tooltip: {
+      callbacks: {
+        label: function (context: any) {
+          const label = context.label || '';
+          const value = context.raw || 0;
+          return `${label}: ${value}%`;
+        }
+      }
+    }
+  }
+};
+  /* ================= CHART DATA ================= */
   pieChartData: ChartData<'pie', number[], string> = {
+    labels: [],
+    datasets: [{ data: [] }]
+  };
+
+  barChartData: ChartData<'bar', number[], string> = {
+    labels: [],
+    datasets: [{ label: 'Units', data: [] }]
+  };
+
+  doughnutChartData: ChartData<'doughnut', number[], string> = {
+    labels: ['Paid', 'Unpaid'],
+    datasets: [{ data: [] }]
+  };
+
+  utilityCostChartData: ChartData<'doughnut', number[], string> = {
     labels: [],
     datasets: [{
       data: [],
@@ -49,127 +102,129 @@ export class ConsumerDashboard implements OnInit {
         '#16a34a',
         '#dc2626',
         '#f59e0b',
-        '#7c3aed',
-        '#0ea5e9'
+        '#7c3aed'
       ]
     }]
   };
 
-  /* ================= BAR ================= */
-  barChartType: ChartType = 'bar';
-  barChartData: ChartData<'bar', number[], string> = {
-    labels: [],
-    datasets: [{
-      label: 'Units',
-      data: [],
-      backgroundColor: '#2563eb'
-    }]
-  };
-
-  /* ================= DOUGHNUT ================= */
-  doughnutChartType: ChartType = 'doughnut';
-  doughnutChartData: ChartData<'doughnut', number[], string> = {
-    labels: ['Paid Bills', 'Unpaid Bills'],
-    datasets: [{
-      data: [],
-      backgroundColor: ['#16a34a', '#dc2626']
-    }]
-  };
-
-  /* ================= AMOUNT ================= */
-  amountBarChartType: ChartType = 'bar';
-  amountBarChartData: ChartData<'bar', number[], string> = {
-    labels: ['Paid', 'Outstanding'],
-    datasets: [{
-      label: 'Amount (₹)',
-      data: [],
-      backgroundColor: ['#16a34a', '#dc2626']
-    }]
-  };
-
   constructor(
-    private readonly consumerService: ConsumerService,
-    private readonly billService: BillService,
-    private readonly authService: AuthService,
-    private readonly router: Router,
-    private readonly cdr: ChangeDetectorRef
+    private consumerService: ConsumerService,
+    private billService: BillService,
+    private authService: AuthService,
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.loadSummary();
   }
 
-  onFilterChange(): void {
-    this.loadCharts();
-  }
-
+  /* ================= SUMMARY ================= */
   loadSummary(): void {
-    this.consumerService.getDashboardSummary().subscribe({
-      next: res => {
-        this.summary = res;
-        this.loading = false;
-        this.loadCharts();
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.loading = false;
-        this.cdr.detectChanges();
-      }
+    this.consumerService.getDashboardSummary().subscribe(res => {
+      this.summary = res;
+      this.loadUtilities();
+      this.loadUtilityCostDistribution();
     });
   }
 
-  loadCharts(): void {
-    const userId = this.authService.getUserId();
-    if (!userId) return;
+  /* ================= UTILITIES ================= */
+  loadUtilities(): void {
+    const consumerId = this.authService.getUserId();
+    if (!consumerId) return;
 
-    this.billService.getConsumerBills(userId).subscribe(bills => {
+    this.billService.getConsumerBills(consumerId).subscribe(bills => {
+      this.availableUtilities = [...new Set(bills.map(b => b.utilityType))];
+      this.selectedUtility = this.availableUtilities[0];
 
-      /* PIE */
-      const utilityMap: Record<string, number> = {};
-      bills.forEach(b =>
-        utilityMap[b.utilityType] =
-          (utilityMap[b.utilityType] || 0) + (b.consumptionUnits || 0)
-      );
+      this.loadPieChart();
+      this.loadBarChart();
+      this.calculatePaidVsUnpaid(bills);
 
-      this.pieChartData.labels = Object.keys(utilityMap);
-      this.pieChartData.datasets[0].data = Object.values(utilityMap);
-
-      /* MONTHLY */
-      const monthMap: Record<string, number> = {};
-      bills.forEach(b => {
-        if (b.billingMonth === this.month && b.billingYear === this.year) {
-          const key = `${b.billingMonth}/${b.billingYear}`;
-          monthMap[key] = (monthMap[key] || 0) + (b.consumptionUnits || 0);
-        }
-      });
-
-      this.barChartData.labels = Object.keys(monthMap);
-      this.barChartData.datasets[0].data = Object.values(monthMap);
-
-      /* PAID vs UNPAID */
-      const paid = bills.filter(b => b.status === 'PAID').length;
-      const unpaid = bills.filter(b => b.status !== 'PAID').length;
-      this.doughnutChartData.datasets[0].data = [paid, unpaid];
-
-      /* AMOUNT */
-      this.amountBarChartData.datasets[0].data = [
-        this.summary.lastPaymentAmount || 0,
-        this.summary.totalOutstanding || 0
-      ];
-
+      this.loading = false;
       this.cdr.detectChanges();
     });
   }
 
-  goToBills() {
-    this.router.navigate(['/consumer/bills']);
+  /* ================= PIE ================= */
+  loadPieChart(): void {
+    const consumerId = this.authService.getUserId();
+    if (!consumerId) return;
+
+    this.billService.getConsumptionDashboard(
+      consumerId,
+      this.year,
+      this.month,
+      null
+    ).subscribe(res => {
+      this.pieChartData = {
+        labels: res.byUtility.map(u => u.utilityType),
+        datasets: [{ data: res.byUtility.map(u => u.units) }]
+      };
+      this.pieChart?.update();
+    });
   }
 
-  goToUtilities() {
-    this.router.navigate(['/consumer/utilities']);
+  /* ================= BAR ================= */
+  loadBarChart(): void {
+    const consumerId = this.authService.getUserId();
+    if (!consumerId) return;
+
+    this.billService.getConsumptionDashboard(
+      consumerId,
+      this.year,
+      null,
+      this.selectedUtility
+    ).subscribe(res => {
+      const map: Record<number, number> = {};
+      res.monthly.forEach(m => map[m.month] = m.units);
+
+      this.barChartData = {
+        labels: this.months.map(m => m.name),
+        datasets: [{
+          label: 'Units',
+          data: this.months.map(m => map[m.value] || 0)
+        }]
+      };
+      this.barChart?.update();
+    });
   }
 
-  payDueBill() {
-    this.router.navigate(['/consumer/bills']);
+  /* ================= PAID / UNPAID ================= */
+  calculatePaidVsUnpaid(bills: any[]): void {
+    const paid = bills.filter(b => b.status === 'PAID').length;
+    const unpaid = bills.length - paid;
+
+    this.doughnutChartData = {
+      labels: ['Paid', 'Unpaid'],
+      datasets: [{ data: [paid, unpaid] }]
+    };
   }
+
+  /* ================= UTILITY COST ================= */
+  loadUtilityCostDistribution(): void {
+    const consumerId = this.authService.getUserId();
+    if (!consumerId) return;
+
+    this.billService.getUtilityCostDistribution(
+      consumerId,
+      this.utilityCostYear
+    ).subscribe(res => {
+      this.utilityCostChartData = {
+        labels: res.map(r => r.utilityType),
+        datasets: [{ data: res.map(r => r.percentage) }]
+      };
+      this.utilityCostChart?.update();
+    });
+  }
+
+  /* ================= EVENTS ================= */
+  onPieFilterChange() { this.loadPieChart(); }
+  onBarFilterChange() { this.loadBarChart(); }
+  onUtilityCostYearChange() { this.loadUtilityCostDistribution(); }
+
+  /* ================= NAV ================= */
+  goToBills() { this.router.navigate(['/consumer/bills']); }
+  goToUtilities() { this.router.navigate(['/consumer/utilities']); }
+  payDueBill() { this.router.navigate(['/consumer/bills']); }
 }

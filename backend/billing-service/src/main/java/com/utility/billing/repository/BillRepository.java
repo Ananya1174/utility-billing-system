@@ -31,6 +31,7 @@ public interface BillRepository extends MongoRepository<Bill, String> {
 
 	List<Bill> findByConsumerIdAndBillingMonthAndBillingYear(String consumerId, int month, int year);
 	List<Bill> findByConsumerIdAndStatus(String consumerId, BillStatus status);
+	   List<Bill> findByConsumerIdAndBillingYear(String consumerId, int billingYear);
 	boolean existsByConnectionIdAndBillingMonthAndBillingYear(
 	        String connectionId,
 	        int billingMonth,
