@@ -1,14 +1,13 @@
 package com.utility.payment.config;
 
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
 import com.utility.payment.dto.BillResponse;
 import com.utility.payment.feign.BillingClient;
@@ -20,66 +19,69 @@ import com.utility.payment.model.PaymentStatus;
 import com.utility.payment.repository.InvoiceRepository;
 import com.utility.payment.repository.PaymentRepository;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 
-@Configuration
+@Component
 @RequiredArgsConstructor
 public class PaymentDataSeeder {
 
-    private static final Random RANDOM = new Random(); // reused
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     private final PaymentRepository paymentRepository;
     private final InvoiceRepository invoiceRepository;
     private final BillingClient billingClient;
 
-    @Bean
-    CommandLineRunner seedPayments() {
-        return args -> {
+    private boolean seeded = false;
 
-            if (paymentRepository.count() > 0) {
-                return;
-            }
+    @Scheduled(initialDelay = 30000, fixedDelay = 30000)
+    public void seedPaymentsSafely() {
 
-            List<BillResponse> paidBills =
-                    billingClient.getAllBills(
-                            BillStatus.PAID,
-                            null,
-                            null,
-                            null
-                    );
-
-            LocalDate today = LocalDate.now();
-
-            for (BillResponse bill : paidBills) {
-
-                LocalDate paymentDate = generatePaymentDate(bill.getDueDate());
-
-                long ageInDays =
-                        ChronoUnit.DAYS.between(paymentDate, today);
-
-                boolean success = isPaymentSuccessful(ageInDays);
-
-                Payment payment = buildPayment(bill, paymentDate, success);
-                paymentRepository.save(payment);
-
-                if (success) {
-                    Invoice invoice = buildInvoice(bill, payment);
-                    invoiceRepository.save(invoice);
-                }
-            }
-        };
-    }
-
-    // ---------- Helper Methods ----------
-
-    private LocalDate generatePaymentDate(LocalDate dueDate) {
-    	return dueDate.plusDays(RANDOM.nextInt(10) - 5L);    }
-
-    private boolean isPaymentSuccessful(long ageInDays) {
-        if (ageInDays > 60) {
-            return RANDOM.nextDouble() < 0.9;
+        if (seeded || paymentRepository.count() > 0) {
+            return;
         }
-        return RANDOM.nextDouble() < 0.7;
+
+        List<BillResponse> paidBills;
+
+        try {
+            paidBills = billingClient.getAllBills(
+                    BillStatus.PAID,
+                    null,
+                    null,
+                    null
+            );
+        } catch (FeignException ex) {
+            return; // billing not ready yet → retry later
+        }
+
+        if (paidBills.isEmpty()) {
+            return;
+        }
+
+        LocalDate today = LocalDate.now();
+
+        for (BillResponse bill : paidBills) {
+
+            LocalDate paymentDate =
+                    bill.getDueDate().plusDays(RANDOM.nextInt(10) - 5L);
+
+            long ageInDays =
+                    ChronoUnit.DAYS.between(paymentDate, today);
+
+            boolean success =
+                    ageInDays > 60
+                            ? RANDOM.nextDouble() < 0.9
+                            : RANDOM.nextDouble() < 0.7;
+
+            Payment payment = buildPayment(bill, paymentDate, success);
+            paymentRepository.save(payment);
+
+            if (success) {
+                invoiceRepository.save(buildInvoice(bill, payment));
+            }
+        }
+
+        seeded = true;
     }
 
     private Payment buildPayment(
@@ -87,12 +89,18 @@ public class PaymentDataSeeder {
             LocalDate paymentDate,
             boolean success
     ) {
+
         Payment payment = new Payment();
+
         payment.setBillId(bill.getId());
         payment.setConsumerId(bill.getConsumerId());
         payment.setAmount(bill.getPayableAmount());
-        payment.setMode(selectPaymentMode());
-        payment.setStatus(success ? PaymentStatus.SUCCESS : PaymentStatus.FAILED);
+        payment.setMode(RANDOM.nextDouble() < 0.6
+                ? PaymentMode.ONLINE
+                : PaymentMode.OFFLINE);
+        payment.setStatus(success
+                ? PaymentStatus.SUCCESS
+                : PaymentStatus.FAILED);
         payment.setTransactionId(UUID.randomUUID().toString());
         payment.setBillingMonth(bill.getBillingMonth());
         payment.setBillingYear(bill.getBillingYear());
@@ -102,22 +110,16 @@ public class PaymentDataSeeder {
         );
 
         payment.setConfirmedAt(
-                success
-                        ? payment.getCreatedAt().plusMinutes(2)
-                        : null
+                success ? payment.getCreatedAt().plusMinutes(2) : null
         );
 
         return payment;
     }
 
-    private PaymentMode selectPaymentMode() {
-        return RANDOM.nextDouble() < 0.6
-                ? PaymentMode.ONLINE
-                : PaymentMode.OFFLINE;
-    }
-
     private Invoice buildInvoice(BillResponse bill, Payment payment) {
+
         Invoice invoice = new Invoice();
+
         invoice.setInvoiceNumber("INV-" + System.currentTimeMillis());
         invoice.setBillId(bill.getId());
         invoice.setPaymentId(payment.getId());
@@ -130,6 +132,7 @@ public class PaymentDataSeeder {
         invoice.setAmountPaid(payment.getAmount());
         invoice.setTotalAmount(payment.getAmount());
         invoice.setInvoiceDate(payment.getConfirmedAt());
+
         return invoice;
     }
 }

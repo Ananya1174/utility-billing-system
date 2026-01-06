@@ -5,9 +5,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
 import com.utility.meter.dto.ConnectionDto;
 import com.utility.meter.feign.ConsumerConnectionClient;
@@ -15,9 +15,11 @@ import com.utility.meter.model.MeterReading;
 import com.utility.meter.model.UtilityType;
 import com.utility.meter.repository.MeterReadingRepository;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 
-@Configuration
+@Component
+@EnableScheduling
 @RequiredArgsConstructor
 public class MeterReadingSeeder {
 
@@ -25,24 +27,20 @@ public class MeterReadingSeeder {
     private final ConsumerConnectionClient connectionClient;
 
     private final Random random = new Random();
+    private boolean seeded = false;
 
-    @Bean
-    CommandLineRunner seedMeterReadings() {
+    @Scheduled(initialDelay = 20000, fixedDelay = 30000)
+    public void seedMeterReadingsSafely() {
 
-        return args -> {
+        if (seeded || meterRepo.count() > 0) {
+            return;
+        }
 
-            if (meterRepo.count() > 0) {
-                return;
-            }
-
-
+        try {
             List<ConnectionDto> connections =
                     connectionClient.getAllConnections();
 
-            // ✅ START FROM JUNE 2024
             LocalDate start = LocalDate.of(2024, 6, 1);
-
-            // ✅ GO TILL CURRENT MONTH
             LocalDate end = LocalDate.now().withDayOfMonth(1);
 
             for (ConnectionDto conn : connections) {
@@ -64,7 +62,10 @@ public class MeterReadingSeeder {
                 }
             }
 
-        };
+            seeded = true;
+
+        } catch (FeignException ignored) {
+        }
     }
 
     private long saveReading(
@@ -78,6 +79,7 @@ public class MeterReadingSeeder {
         long currentReading = previousReading + consumption;
 
         MeterReading reading = new MeterReading();
+
         reading.setConsumerId(conn.getConsumerId());
         reading.setConnectionId(conn.getId());
         reading.setUtilityType(conn.getUtilityType());
@@ -102,11 +104,10 @@ public class MeterReadingSeeder {
     private long generateConsumption(UtilityType type) {
 
         return switch (type) {
-
-            case ELECTRICITY -> 100 + random.nextInt(300); // 100–400
-            case WATER -> 10 + random.nextInt(40);         // 10–50
-            case GAS -> 5 + random.nextInt(25);            // 5–30
-            case INTERNET -> 1;                             // flat monthly
+            case ELECTRICITY -> 100 + random.nextInt(300);
+            case WATER -> 10 + random.nextInt(40);
+            case GAS -> 5 + random.nextInt(25);
+            case INTERNET -> 1;
         };
     }
 }

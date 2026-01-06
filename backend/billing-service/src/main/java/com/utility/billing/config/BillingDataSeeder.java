@@ -4,10 +4,11 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
 import com.utility.billing.feign.ConnectionClient;
 import com.utility.billing.feign.ConsumerConnectionResponse;
@@ -23,7 +24,8 @@ import com.utility.billing.repository.TariffSlabRepository;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 
-@Configuration
+@Component
+@EnableScheduling
 @RequiredArgsConstructor
 public class BillingDataSeeder {
 
@@ -32,30 +34,32 @@ public class BillingDataSeeder {
     private final ConnectionClient connectionClient;
     private final MeterReadingClient meterClient;
 
-    @Bean
-    CommandLineRunner seedBills() {
+    private boolean seeded = false;
 
-        return args -> {
+    @Scheduled(initialDelay = 20000, fixedDelay = 30000)
+    public void seedBillsSafely() {
 
-            if (billRepo.count() > 0) {
-                return;
-            }
+        if (seeded || billRepo.count() > 0) {
+            return;
+        }
 
+        try {
             List<ConsumerConnectionResponse> connections =
                     connectionClient.getAllConnections();
 
             for (ConsumerConnectionResponse conn : connections) {
-
                 if (conn.isActive()) {
                     seedBillsForConnection(conn);
                 }
             }
-        };
+
+            seeded = true;
+
+        } catch (FeignException ignored) {
+        }
     }
 
-    private void seedBillsForConnection(
-            ConsumerConnectionResponse conn
-    ) {
+    private void seedBillsForConnection(ConsumerConnectionResponse conn) {
 
         List<MeterReadingResponse> readings =
                 fetchReadings(conn.getId());
@@ -65,18 +69,13 @@ public class BillingDataSeeder {
         }
 
         for (MeterReadingResponse reading : readings) {
-
             if (!billExists(conn, reading)) {
-                Bill bill = buildBill(conn, reading);
-                billRepo.save(bill);
+                billRepo.save(buildBill(conn, reading));
             }
         }
     }
 
-    private List<MeterReadingResponse> fetchReadings(
-            String connectionId
-    ) {
-
+    private List<MeterReadingResponse> fetchReadings(String connectionId) {
         try {
             return meterClient.getByConnection(connectionId);
         } catch (FeignException ex) {
@@ -88,7 +87,6 @@ public class BillingDataSeeder {
             ConsumerConnectionResponse conn,
             MeterReadingResponse reading
     ) {
-
         return billRepo.existsByConnectionIdAndBillingMonthAndBillingYear(
                 conn.getId(),
                 reading.getReadingMonth(),
@@ -183,7 +181,6 @@ public class BillingDataSeeder {
     }
 
     private double fixedCharge(UtilityType type) {
-
         return switch (type) {
             case ELECTRICITY -> 50;
             case WATER -> 30;
@@ -203,13 +200,15 @@ public class BillingDataSeeder {
         long overdueDays =
                 ChronoUnit.DAYS.between(dueDate, today);
 
+        double chance = ThreadLocalRandom.current().nextDouble();
+
         if (overdueDays > 60) {
-            return Math.random() < 0.9
+            return chance < 0.9
                     ? BillStatus.PAID
                     : BillStatus.OVERDUE;
         }
 
-        return Math.random() < 0.6
+        return chance < 0.6
                 ? BillStatus.OVERDUE
                 : BillStatus.PAID;
     }

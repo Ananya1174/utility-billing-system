@@ -17,6 +17,9 @@
     <artifactId>config-server</artifactId>
     <name>config-server</name>
     <packaging>jar</packaging>
+    <properties>
+    <spring-boot.repackage.skip>false</spring-boot.repackage.skip>
+</properties>
 
     <dependencies>
         <!-- Config Server -->
@@ -48,14 +51,20 @@
         	<artifactId>spring-boot-devtools</artifactId>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+<build>
+  <plugins>
+    <plugin>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-maven-plugin</artifactId>
+      <executions>
+        <execution>
+          <goals>
+            <goal>repackage</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+</build>
 
 </project>

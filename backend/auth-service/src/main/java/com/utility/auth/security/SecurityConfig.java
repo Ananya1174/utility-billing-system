@@ -55,22 +55,29 @@ public class SecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-		http.csrf(csrf -> csrf.disable())
-				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authorizeHttpRequests(auth -> auth
-					    .requestMatchers(
-					        "/auth/login",
-					        "/auth/forgot-password",
-					        "/auth/reset-password",
-					        "/auth/account-requests",
-					        "/auth/users/**"
-					    ).permitAll()
+	    http
+	 // CSRF is disabled because this application uses JWT-based stateless authentication.
+	 // Tokens are sent via Authorization headers and no cookies or HTTP sessions are used.
+	 .csrf(csrf -> csrf.disable())
 
-					    .anyRequest().authenticated()
-					)
-				.authenticationProvider(authenticationProvider())
-				.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+	        .sessionManagement(session ->
+	            session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+	        )
 
-		return http.build();
+	        .authorizeHttpRequests(auth -> auth
+	            .requestMatchers(
+	                "/auth/login",
+	                "/auth/forgot-password",
+	                "/auth/reset-password",
+	                "/auth/account-requests",
+	                "/auth/users/**"
+	            ).permitAll()
+	            .anyRequest().authenticated()
+	        )
+
+	        .authenticationProvider(authenticationProvider())
+	        .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+
+	    return http.build();
 	}
 }

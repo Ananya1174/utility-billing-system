@@ -1,0 +1,256 @@
+# version: "3.9"
+
+services:
+
+  # ===============================
+  # MongoDBs
+  # ===============================
+  mongo-auth:
+    image: mongo:6
+    container_name: mongo-auth
+    restart: unless-stopped
+    ports:
+      - "27018:27017"
+    networks:
+      - backend
+
+  mongo-consumer:
+    image: mongo:6
+    container_name: mongo-consumer
+    restart: unless-stopped
+    ports:
+      - "27019:27017"
+    networks:
+      - backend
+
+  mongo-billing:
+    image: mongo:6
+    container_name: mongo-billing
+    restart: unless-stopped
+    ports:
+      - "27020:27017"
+    networks:
+      - backend
+
+  mongo-meter:
+    image: mongo:6
+    container_name: mongo-meter
+    restart: unless-stopped
+    ports:
+      - "27021:27017"
+    networks:
+      - backend
+
+  mongo-payment:
+    image: mongo:6
+    container_name: mongo-payment
+    restart: unless-stopped
+    ports:
+      - "27022:27017"
+    networks:
+      - backend
+
+  # ===============================
+  # RabbitMQ
+  # ===============================
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - backend
+
+  # ===============================
+  # Service Registry (Eureka)
+  # ===============================
+  service-registry:
+    build: ./service-registry
+    container_name: service-registry
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    ports:
+      - "8761:8761"
+    networks:
+      - backend
+
+  # ===============================
+  # Config Server
+  # ===============================
+  config-server:
+    build: ./config-server
+    container_name: config-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    ports:
+      - "8888:8888"
+    depends_on:
+      service-registry:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8888/actuator/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+    networks:
+      - backend
+
+  # ===============================
+  # Auth Service
+  # ===============================
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CLOUD_CONFIG_FAIL_FAST=true
+    ports:
+      - "8030:8030"
+    depends_on:
+      config-server:
+        condition: service_healthy
+      service-registry:
+        condition: service_started
+      mongo-auth:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+    networks:
+      - backend
+
+  # ===============================
+  # Consumer Service
+  # ===============================
+  consumer-service:
+    build: ./consumer-service
+    container_name: consumer-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CLOUD_CONFIG_FAIL_FAST=true
+    ports:
+      - "8032:8032"
+    depends_on:
+      config-server:
+        condition: service_healthy
+      service-registry:
+        condition: service_started
+      mongo-consumer:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+    networks:
+      - backend
+
+  # ===============================
+  # Billing Service
+  # ===============================
+  billing-service:
+    build: ./billing-service
+    container_name: billing-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CLOUD_CONFIG_FAIL_FAST=true
+    ports:
+      - "8034:8034"
+    depends_on:
+      config-server:
+        condition: service_healthy
+      service-registry:
+        condition: service_started
+      mongo-billing:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+    networks:
+      - backend
+
+  # ===============================
+  # Meter Reading Service
+  # ===============================
+  meter-reading-service:
+    build: ./meter-reading-service
+    container_name: meter-reading-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CLOUD_CONFIG_FAIL_FAST=true
+    ports:
+      - "8033:8033"
+    depends_on:
+      config-server:
+        condition: service_healthy
+      service-registry:
+        condition: service_started
+      mongo-meter:
+        condition: service_started
+    networks:
+      - backend
+
+  # ===============================
+  # Payment Service
+  # ===============================
+  payment-service:
+    build: ./payment-service
+    container_name: payment-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CLOUD_CONFIG_FAIL_FAST=true
+    ports:
+      - "8035:8035"
+    depends_on:
+      config-server:
+        condition: service_healthy
+      service-registry:
+        condition: service_started
+      mongo-payment:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+    networks:
+      - backend
+
+  # ===============================
+  # Notification Service
+  # ===============================
+  notification-service:
+    build: ./notification-service
+    container_name: notification-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CLOUD_CONFIG_FAIL_FAST=true
+    ports:
+      - "8036:8036"
+    depends_on:
+      config-server:
+        condition: service_healthy
+      service-registry:
+        condition: service_started
+      rabbitmq:
+        condition: service_started
+    networks:
+      - backend
+
+  # ===============================
+  # API Gateway
+  # ===============================
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CLOUD_CONFIG_FAIL_FAST=true
+    ports:
+      - "8031:8031"
+    depends_on:
+      config-server:
+        condition: service_healthy
+      service-registry:
+        condition: service_started
+    networks:
+      - backend
+
+
+networks:
+  backend:
+    driver: bridge
