@@ -47,16 +47,16 @@ export class AdminDashboardComponent implements OnInit {
   constructor(
     private dashboardService: AdminDashboardService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.loadDashboard();
-     this.updateSelectedMonthName();
+    this.updateSelectedMonthName();
   }
 
   onFilterChange() {
     this.loadDashboard();
-     this.updateSelectedMonthName();
+    this.updateSelectedMonthName();
   }
 
   loadDashboard() {
@@ -91,20 +91,29 @@ export class AdminDashboardComponent implements OnInit {
 
     // ✅ Monthly Outstanding (YEARLY API → pick selected month)
     this.dashboardService.getMonthlyOutstanding(this.year)
-      .subscribe(res => {
-        this.monthlyOutstanding = res || [];
+  .subscribe(res => {
 
-        const currentMonth = this.monthlyOutstanding.find(
-          m => m.month === this.month
-        );
+    this.monthlyOutstanding = (res || []).map(m => ({
+      ...m,
+      outstandingAmount: Number(
+        (
+          m.outstandingAmount ??
+          ((m.totalBilled ?? 0) - (m.totalPaid ?? 0))
+        ).toFixed(2)
+      )
+    }));
 
-        this.monthlyOutstandingAmount =
-          currentMonth?.outstandingAmount ?? 0;
+    const currentMonth = this.monthlyOutstanding.find(
+      m => Number(m.month) === Number(this.month)
+    );
 
-        this.buildOutstandingChart();
-        this.cdr.detectChanges();
-      });
-  }
+    this.monthlyOutstandingAmount =
+      currentMonth?.outstandingAmount ?? 0;
+
+    this.buildOutstandingChart();
+    this.cdr.detectChanges();
+  });
+}
 
   buildConsumptionChart() {
     this.consumptionChartData = {
@@ -113,9 +122,9 @@ export class AdminDashboardComponent implements OnInit {
     };
   }
   updateSelectedMonthName() {
-  const found = this.months.find(m => m.value === this.month);
-  this.selectedMonthName = found ? found.name : '';
-}
+    const found = this.months.find(m => m.value === this.month);
+    this.selectedMonthName = found ? found.name : '';
+  }
 
   buildRevenueChart() {
     this.revenueChartData = {

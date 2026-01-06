@@ -6,11 +6,11 @@
 
   <!-- FILTER BAR -->
   <div class="filters">
-    <select [(ngModel)]="month" (change)="onFilterChange()">
-      <option *ngFor="let m of months" [value]="m.value">
-        {{ m.name }}
-      </option>
-    </select>
+    <select [(ngModel)]="month" (ngModelChange)="month = +$event; onFilterChange()">
+  <option *ngFor="let m of months" [ngValue]="m.value">
+    {{ m.name }}
+  </option>
+</select>
 
     <select [(ngModel)]="year" (change)="onFilterChange()">
       <option *ngFor="let y of years" [value]="y">
