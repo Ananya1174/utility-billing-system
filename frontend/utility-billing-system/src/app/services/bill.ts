@@ -68,7 +68,6 @@ export class BillService {
       `${this.baseUrl}/bills/${billId}`
     );
   }
-  // bill.ts
 getPaymentsByBillId(billId: string) {
   return this.http.get<any[]>(
     `${this.baseUrl}/payments/bill/${billId}`
@@ -89,21 +88,18 @@ getPaymentsByBillId(billId: string) {
     );
   }
 
-  // ✅ VIEW INVOICE (paymentId)
   getInvoice(paymentId: string): Observable<any> {
     return this.http.get<any>(
       `${this.baseUrl}/payments/invoice/${paymentId}`
     );
   }
 
-  // ✅ DOWNLOAD INVOICE (paymentId)
   downloadInvoice(paymentId: string): Observable<Blob> {
     return this.http.get(
       `${this.baseUrl}/payments/invoice/${paymentId}/download`,
       { responseType: 'blob' }
     );
   }
-  // ✅ GET ALL PAYMENTS (Accounts Officer)
 getAllPayments() {
   return this.http.get<any[]>(
     `${this.baseUrl}/payments`

@@ -22,15 +22,13 @@ export class PaymentHistoryComponent implements OnInit {
 
   summary: any = null;
   loading = true;
-
-  // ================= PAGINATION STATE =================
   pageSizeOptions = [10, 25, 50];
   pageSize = 10;
   currentPage = 1;
   totalPages = 0;
   paginatedPayments: any[] = [];
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   ngOnInit(): void {
     this.loadPayments();
@@ -63,7 +61,7 @@ export class PaymentHistoryComponent implements OnInit {
       return matchStatus && matchMode;
     });
 
-    this.currentPage = 1;   // ✅ reset page
+    this.currentPage = 1;
     this.updatePagination();
   }
 
@@ -72,9 +70,6 @@ export class PaymentHistoryComponent implements OnInit {
     if (status === 'FAILED') return 'status failed';
     return 'status initiated';
   }
-
-  // ================= PAGINATION LOGIC =================
-
   updatePagination(): void {
     this.totalPages = Math.ceil(this.filteredPayments.length / this.pageSize);
     this.paginate();
@@ -110,7 +105,6 @@ export class PaymentHistoryComponent implements OnInit {
     for (let i = start; i <= end; i++) {
       pages.push(i);
     }
-
     return pages;
   }
 }

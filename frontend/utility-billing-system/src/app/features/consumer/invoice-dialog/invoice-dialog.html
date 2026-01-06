@@ -1,8 +1,5 @@
-
-
 <div class="invoice-dialog">
 
-  <!-- HEADER -->
   <div class="dialog-header">
     <h2>Invoice</h2>
     <button class="close-btn" (click)="close()">✕</button>
@@ -13,8 +10,6 @@
   </div>
 
   <div *ngIf="!loading && invoice" class="dialog-body">
-
-    <!-- META -->
     <div class="meta-grid">
       <div>
         <label>Invoice Number</label>
@@ -41,11 +36,8 @@
         <p>{{ invoice.billingMonth }}/{{ invoice.billingYear }}</p>
       </div>
     </div>
-
-    <!-- DIVIDER -->
     <hr />
 
-    <!-- CHARGES -->
     <h3 class="section-title">Charges</h3>
 
     <table class="charges-table">
@@ -69,7 +61,6 @@
 
   </div>
 
-  <!-- FOOTER -->
   <div class="dialog-footer">
     <button class="secondary-btn" (click)="close()">Close</button>
   </div>

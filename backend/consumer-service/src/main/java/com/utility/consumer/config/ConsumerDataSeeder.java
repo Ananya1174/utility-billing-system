@@ -35,7 +35,6 @@ public class ConsumerDataSeeder {
             if (consumerRepo.count() > 0) {
                 return;
             }
-            // ---------------- CONSUMERS ----------------
             for (int i = 1; i <= 10; i++) {
 
                 Consumer consumer = new Consumer();
@@ -85,7 +84,6 @@ public class ConsumerDataSeeder {
 
     private void seedRequests(Consumer consumer) {
 
-        // PENDING
         requestRepo.save(buildRequest(
                 consumer.getId(),
                 UtilityType.ELECTRICITY,
@@ -93,7 +91,6 @@ public class ConsumerDataSeeder {
                 ConnectionRequestStatus.PENDING
         ));
 
-        // APPROVED
         ConnectionRequest approved = buildRequest(
                 consumer.getId(),
                 UtilityType.WATER,
@@ -104,7 +101,6 @@ public class ConsumerDataSeeder {
         approved.setReviewedBy("admin");
         requestRepo.save(approved);
 
-        // REJECTED
         ConnectionRequest rejected = buildRequest(
                 consumer.getId(),
                 UtilityType.INTERNET,

@@ -17,7 +17,6 @@ import { ForgotPasswordComponent } from './core/auth/forgot-password/forgot-pass
 import { ResetPasswordComponent } from './core/auth/reset-password/reset-password';
 import { MeterReadingsComponent } from './features/Billing/meter-readings/meter-readings';
 import { GenerateBillsComponent } from './features/Billing/generate-bills/generate-bills';
-// CONSUMER
 import { ConsumerDashboard } from './features/consumer/consumer-dashboard/consumer-dashboard';
 import { MyUtilitiesComponent } from './features/consumer/my-utilities/my-utilities';
 import { BillsComponent } from './features/consumer/bills/bills';
@@ -30,7 +29,6 @@ import { OfflinePaymentComponent } from './features/accounts/offline-payment/off
 import { PaymentHistoryComponent } from './features/accounts/payment-history/payment-history';
 export const routes: Routes = [
 
-  // ---------- PUBLIC ----------
   { path: '', component: LandingComponent },
   { path: 'login', component: LoginComponent },
   { path: 'create-account', component: CreateAccountComponent },
@@ -38,7 +36,6 @@ export const routes: Routes = [
   { path: 'reset-password', component: ResetPasswordComponent },
   { path: 'profile', component: ProfileComponent },
 
-  // ---------- AUTHENTICATED (NAVBAR INCLUDED) ----------
   {
     path: '',
     component: AuthLayoutComponent,
@@ -47,14 +44,12 @@ export const routes: Routes = [
 
       { path: 'change-password', component: ChangePasswordComponent },
 
-      // ---------- CONSUMER ----------
       { path: 'consumer/dashboard', component: ConsumerDashboard },
       { path: 'consumer/utilities', component: MyUtilitiesComponent },
       { path: 'consumer/bills', component: BillsComponent },
       { path: 'consumer/payments', component: PaymentsComponent },
       { path: 'consumer', redirectTo: 'consumer/dashboard', pathMatch: 'full' },
 
-      // ---------- ADMIN ----------
       { path: 'admin/dashboard', component: AdminDashboardComponent },
       { path: 'admin/reports', component: AdminReportsComponent },
       { path: 'admin/users', component: UserManagementComponent },
@@ -63,13 +58,11 @@ export const routes: Routes = [
       { path: 'admin/tariffs', component: TariffManagementComponent },
       { path: 'admin/billing', component: BillingPaymentsComponent },
 
-      //------------Billing Officer-----
       { path: 'billing/dashboard', component: BillingOfficerDashboardComponent },
       { path: 'billing/meter-readings', component: MeterReadingsComponent },
       { path: 'billing/generate-bills', component: GenerateBillsComponent },
       { path: 'billing/logs', component: BillingLogsComponent },
 
-      //----------Accounts Officer------
       { path: 'accounts/dashboard', component: AccountsDashboardComponent },
       { path: 'accounts/reports', component: AccountsReportsComponent },
       { path: 'accounts/offline', component: OfflinePaymentComponent },
@@ -77,6 +70,5 @@ export const routes: Routes = [
     ]
   },
 
-  // ---------- FALLBACK ----------
   { path: '**', redirectTo: '' }
 ];

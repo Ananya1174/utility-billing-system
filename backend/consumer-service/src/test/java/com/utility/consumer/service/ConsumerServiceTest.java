@@ -32,7 +32,6 @@ class ConsumerServiceTest {
     @InjectMocks
     private ConsumerService service;
 
-    // ---------- CREATE CONSUMER ----------
 
     @Test
     void createConsumer_success() {
@@ -90,7 +89,6 @@ class ConsumerServiceTest {
         assertEquals("Consumer not found", ex.getMessage());
     }
 
-    // ---------- UPDATE CONSUMER ----------
 
     @Test
     void updateConsumer_success() {
@@ -117,7 +115,6 @@ class ConsumerServiceTest {
         assertEquals("BLR", response.getAddress());
     }
 
-    // ---------- DEACTIVATE ----------
 
     @Test
     void deactivateConsumer_success() {
@@ -135,7 +132,6 @@ class ConsumerServiceTest {
         verify(consumerRepository).save(consumer);
     }
 
-    // ---------- GET CONSUMER ----------
 
     @Test
     void getConsumer_notFound() {
@@ -147,7 +143,6 @@ class ConsumerServiceTest {
                 () -> service.getConsumer("C1"));
     }
 
-    // ---------- GET ALL ----------
 
     @Test
     void getAllConsumers_success() {

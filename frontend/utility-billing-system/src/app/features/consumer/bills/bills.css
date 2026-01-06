@@ -1,15 +1,8 @@
-/* =========================
-   PAGE CONTAINER (ALIGNMENT FIX)
-========================= */
-
 .page-container {
   padding: 24px 32px;
   background: #f9fafb;
   min-height: 100vh;
 }
-/* =========================
-   PAGE BASICS
-========================= */
 
 h2 {
   margin: 20px 0 16px;
@@ -24,21 +17,12 @@ h2 {
   font-size: 0.95rem;
 }
 
-/* =========================
-   GRID LAYOUT
-========================= */
-
 .utilities-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 20px;
   margin-top: 20px;
 }
-
-/* =========================
-   BILL CARD
-========================= */
-
 .utility-card {
   background: #ffffff;
   border-radius: 14px;
@@ -57,10 +41,6 @@ h2 {
   color: #0f172a;
 }
 
-/* =========================
-   BILL DETAILS
-========================= */
-
 .utility-card p {
   margin: 0;
   font-size: 0.9rem;
@@ -72,10 +52,6 @@ h2 {
   font-weight: 600;
 }
 
-/* =========================
-   STATUS BADGE
-========================= */
-
 .status {
   align-self: flex-start;
   padding: 4px 10px;
@@ -86,7 +62,6 @@ h2 {
   text-transform: uppercase;
 }
 
-/* Status colors */
 .status.paid {
   background: #dcfce7;
   color: #166534;
@@ -102,10 +77,6 @@ h2 {
   color: #991b1b;
 }
 
-/* =========================
-   ACTION BUTTONS
-========================= */
-
 .actions {
   display: flex;
   flex-wrap: wrap;
@@ -113,7 +84,6 @@ h2 {
   margin-top: 12px;
 }
 
-/* Primary */
 .primary-btn {
   background: #2563eb;
   color: white;
@@ -129,7 +99,6 @@ h2 {
   background: #1d4ed8;
 }
 
-/* Secondary */
 .secondary-btn {
   background: #f1f5f9;
   color: #1e293b;
@@ -144,10 +113,6 @@ h2 {
 .secondary-btn:hover {
   background: #e2e8f0;
 }
-
-/* =========================
-   RESPONSIVE
-========================= */
 
 @media (max-width: 600px) {
   .utilities-grid {

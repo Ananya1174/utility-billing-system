@@ -50,7 +50,7 @@ private paymentsLoaded = false;
   this.activeTab = tab;
   this.pageIndex = 0;
 
-  this.loading = false; // ✅ IMPORTANT
+  this.loading = false; 
   this.updatePaging();
 }
 
@@ -173,15 +173,12 @@ private paymentsLoaded = false;
     });
   }
   private finishLoading() {
-  if (!this.loading) return; // 🔒 already finished
+  if (!this.loading) return; 
 
   if (this.billsLoaded && this.paymentsLoaded) {
     this.updatePaging();
-
-    // ✅ turn off loading exactly once
     this.loading = false;
 
-    // ✅ ensure UI updates
     setTimeout(() => {
       this.cdr.detectChanges();
     });

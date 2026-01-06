@@ -1,13 +1,9 @@
-
-
-/* GLOBAL FIX */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
 
-/* NAVBAR — SAME AS LANDING & SIGNUP */
 .navbar {
   background: #ffffff;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
@@ -58,7 +54,6 @@
   color: #2563eb;
 }
 
-/* PAGE */
 .login-page {
   min-height: calc(100vh - 72px);
   display: flex;
@@ -68,7 +63,6 @@
   padding: 40px;
 }
 
-/* CARD */
 .login-card {
   width: 100%;
   max-width: 1100px;
@@ -79,14 +73,12 @@
   box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
 }
 
-/* FORM LEFT */
 .login-form {
   flex: 1;
   padding: 64px;
   background: #ffffff;
 }
 
-/* IMAGE RIGHT */
 .login-image {
   flex: 1;
   display: flex;
@@ -102,7 +94,6 @@
   height: auto;
 }
 
-/* TEXT */
 .login-form h2 {
   font-size: 2.2rem;
   color: #1e3a8a;
@@ -115,7 +106,6 @@
   margin-bottom: 30px;
 }
 
-/* INPUTS */
 .login-form input {
   width: 100%;
   padding: 14px 18px;
@@ -133,7 +123,6 @@
   box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
 }
 
-/* BUTTON */
 .login-form button {
   width: 100%;
   margin-top: 12px;
@@ -156,7 +145,6 @@
   cursor: not-allowed;
 }
 
-/* FORGOT */
 .forgot-password {
   display: block;
   margin-top: 16px;
@@ -166,7 +154,6 @@
   cursor: pointer;
 }
 
-/* ERROR */
 .error {
   font-size: 0.85rem;
   color: #dc2626;
@@ -174,7 +161,6 @@
   text-align: center;
 }
 
-/* RESPONSIVE */
 @media (max-width: 900px) {
   .login-card {
     flex-direction: column;

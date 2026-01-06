@@ -5,7 +5,6 @@
 
 <div *ngIf="!loading" class="profile-card">
 
-  <!-- ACTION BAR -->
   <div class="profile-header">
     <button
       *ngIf="!editMode"
@@ -15,7 +14,6 @@
     </button>
   </div>
 
-  <!-- FORM -->
   <form (ngSubmit)="updateProfile()">
 
     <div class="form-grid">
@@ -59,7 +57,6 @@
 
     </div>
 
-    <!-- ACTIONS -->
     <div class="actions" *ngIf="editMode">
       <button
         type="submit"
@@ -76,9 +73,7 @@
       </button>
     </div>
 
-    <!-- STATUS -->
     <p class="success" *ngIf="successMsg">{{ successMsg }}</p>
     <p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>
-
   </form>
 </div>

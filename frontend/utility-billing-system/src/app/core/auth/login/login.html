@@ -1,10 +1,6 @@
-
-
-<!-- NAVBAR -->
 <nav class="navbar">
   <div class="nav-container">
     <button class="logo" (click)="goHome()">⚡ UtilityBilling</button>
-
     <div class="nav-actions">
       <button class="btn ghost" (click)="goToLogin()">Login</button>
       <button class="btn primary" (click)="goToCreateAccount()">Create Account</button>
@@ -12,12 +8,8 @@
   </div>
 </nav>
 
-<!-- PAGE -->
 <div class="login-page">
-
   <div class="login-card">
-
-    <!-- LEFT : FORM -->
     <div class="login-form">
       <h2>Welcome Back</h2>
       <p class="subtitle">
@@ -26,19 +18,9 @@
 
       <form [formGroup]="loginForm" (ngSubmit)="login()">
 
-        <input
-          type="text"
-          placeholder="Username"
-          formControlName="username"
-          autocomplete="username"
-        />
+        <input type="text" placeholder="Username" formControlName="username" autocomplete="username" />
 
-        <input
-          type="password"
-          placeholder="Password"
-          formControlName="password"
-          autocomplete="current-password"
-        />
+        <input type="password" placeholder="Password" formControlName="password" autocomplete="current-password" />
 
         <button type="submit" [disabled]="loginForm.invalid">
           Login
@@ -52,13 +34,8 @@
 
       </form>
     </div>
-
-    <!-- RIGHT : IMAGE -->
     <div class="login-image">
-      <img
-        src="/assets/login.svg"
-        alt="Login illustration"
-      />
+      <img src="/assets/login.svg" alt="Login illustration" />
     </div>
 
   </div>

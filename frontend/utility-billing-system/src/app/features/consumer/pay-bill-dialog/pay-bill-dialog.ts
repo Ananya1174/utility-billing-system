@@ -29,8 +29,6 @@ export class PayBillDialogComponent {
     private cdr: ChangeDetectorRef
   ) {}
 
-  /* ================= SEND OTP ================= */
-
   sendOtp(): void {
     const consumerId = this.authService.getUserId();
     if (!consumerId) {
@@ -55,7 +53,6 @@ export class PayBillDialogComponent {
       error: (err) => {
         const msg = err.error?.message || 'Failed to send OTP';
 
-        // backend says OTP already sent → still allow OTP entry
         if (msg.toLowerCase().includes('otp')) {
           this.step = 'OTP';
         } else {
@@ -68,7 +65,6 @@ export class PayBillDialogComponent {
     });
   }
 
-  /* ================= CONFIRM OTP ================= */
 
   confirmPayment(): void {
     if (!this.paymentId || this.otp.length !== 6) {

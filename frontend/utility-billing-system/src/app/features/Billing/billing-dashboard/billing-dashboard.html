@@ -4,8 +4,6 @@
 
 <div *ngIf="!loading && summary">
 
-  <!-- ================= DATE FILTER ================= -->
-
   <div class="filters">
     <select [(ngModel)]="month" (change)="onDateChange()">
       <option *ngFor="let m of months" [value]="m">
@@ -19,8 +17,6 @@
       </option>
     </select>
   </div>
-
-  <!-- ================= KPI CARDS ================= -->
 
   <div class="kpi-grid">
     <div class="kpi-card">
@@ -44,8 +40,6 @@
     </div>
   </div>
 
-  <!-- ================= CONSUMPTION CHART ================= -->
-
   <div class="card">
     <h3>Monthly Consumption ({{ month }}/{{ year }})</h3>
 
@@ -56,19 +50,15 @@
     </canvas>
   </div>
 
-  <!-- ================= ALERTS ================= -->
-
   <div class="alerts">
     <div class="alert warning" *ngIf="unpaidCount > 0">
-      ⚠️ {{ unpaidCount }} bills are pending payment
+       {{ unpaidCount }} bills are pending payment
     </div>
 
     <div class="alert danger" *ngIf="overdueCount > 0">
-      🔴 {{ overdueCount }} bills are overdue
+       {{ overdueCount }} bills are overdue
     </div>
   </div>
-
-  <!-- ================= QUICK ACTIONS ================= -->
 
   <div class="actions">
     <button class="primary-btn" (click)="goToMeterReadings()">

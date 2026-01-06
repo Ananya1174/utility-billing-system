@@ -37,7 +37,6 @@ export class InvoiceDialogComponent implements OnInit {
     });
   }
 
-  /** ✅ REQUIRED BY TEMPLATE */
   close(): void {
     this.dialogRef.close();
   }

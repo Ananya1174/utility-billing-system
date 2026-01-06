@@ -16,7 +16,6 @@ public class BillingOverdueScheduler {
 
     private final BillRepository billRepository;
 
-    // Runs every day at 12:05 AM
     @Scheduled(cron = "0 5 0 * * ?") //0 */1 * * * ? every minute for testing
     public void markOverdueBills() {
 

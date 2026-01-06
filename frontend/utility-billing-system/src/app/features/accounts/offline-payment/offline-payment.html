@@ -6,8 +6,6 @@
 <div class="card">
 
   <form [formGroup]="paymentForm" (ngSubmit)="submit()">
-
-    <!-- BILL ID -->
     <div class="form-group">
       <label>Bill ID</label>
       <input
@@ -18,8 +16,6 @@
         Bill ID is required
       </small>
     </div>
-
-    <!-- CONSUMER ID -->
     <div class="form-group">
       <label>Consumer ID</label>
       <input
@@ -31,7 +27,6 @@
       </small>
     </div>
 
-    <!-- REMARKS -->
     <div class="form-group">
       <label>Remarks</label>
       <textarea
@@ -40,7 +35,6 @@
         placeholder="Payment remarks"></textarea>
     </div>
 
-    <!-- ACTIONS -->
     <div class="actions">
       <button class="primary-btn" type="submit" [disabled]="loading">
         {{ loading ? 'Processing...' : 'Confirm Offline Payment' }}
@@ -50,8 +44,6 @@
   </form>
 
 </div>
-
-<!-- STATUS MESSAGES -->
 <div class="alert success" *ngIf="successMsg">
   {{ successMsg }}
 </div>

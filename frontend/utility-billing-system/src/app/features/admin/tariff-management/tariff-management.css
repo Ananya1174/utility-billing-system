@@ -1,4 +1,8 @@
-
+:host{
+  padding: 24px 32px;
+  background: #f9fafb;
+  min-height: 100vh;
+}
 body {
   background: #f9fafb;
 }

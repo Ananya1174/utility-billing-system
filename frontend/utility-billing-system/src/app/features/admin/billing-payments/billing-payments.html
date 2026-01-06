@@ -3,61 +3,56 @@
   View consumer bills, payments, outstanding balance and invoices
 </p>
 
-<!-- SEARCH -->
 <div class="filters">
   <input type="text" placeholder="Enter Consumer ID" [(ngModel)]="consumerId" />
   <button (click)="loadData()">Load</button>
 </div>
 
 <p *ngIf="error" class="danger">{{ error }}</p>
-<p *ngIf="loading && (!bills.length && !payments.length)"
-   class="loading">
+<p *ngIf="loading && (!bills.length && !payments.length)" class="loading">
   {{ consumerId ? 'Loading consumer data...' : 'Loading billing data...' }}
 </p>
 
-<!-- TABS -->
 <div class="tabs">
   <button [class.active]="activeTab==='BILLS'" (click)="switchTab('BILLS')">Bills</button>
   <button [class.active]="activeTab==='PAYMENTS'" (click)="switchTab('PAYMENTS')">Payments</button>
-  <button [disabled]="!selectedBill" [class.active]="activeTab==='OUTSTANDING'"
-    (click)="activeTab='OUTSTANDING'">Bill Status</button>
+  <button [disabled]="!selectedBill" [class.active]="activeTab==='OUTSTANDING'" (click)="activeTab='OUTSTANDING'">Bill
+    Status</button>
   <button [disabled]="!selectedInvoice" [class.active]="activeTab==='INVOICE'"
     (click)="activeTab='INVOICE'">Invoice</button>
 </div>
 
-<!-- ================= BILLS ================= -->
 <div *ngIf="activeTab==='BILLS'" class="card">
   <table>
-  <thead>
-    <tr>
-      <th class="sortable" (click)="sort('bills','id')">Bill ID</th>
-      <th>Consumer ID</th>
-      <th class="sortable" (click)="sort('bills','utilityType')">Utility</th>
-      <th>Period</th>
-      <th class="sortable" (click)="sort('bills','payableAmount')">Amount</th>
-      <th>Status</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
+    <thead>
+      <tr>
+        <th class="sortable" (click)="sort('bills','id')">Bill ID</th>
+        <th>Consumer ID</th>
+        <th class="sortable" (click)="sort('bills','utilityType')">Utility</th>
+        <th>Period</th>
+        <th class="sortable" (click)="sort('bills','payableAmount')">Amount</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
 
-  <tbody>
-    <tr *ngFor="let b of pagedBills">
-      <td class="mono">{{ b.id }}</td>
-      <td class="mono">{{ b.consumerId }}</td>
-      <td>{{ b.utilityType }}</td>
-      <td>{{ b.billingMonth }}/{{ b.billingYear }}</td>
-      <td>₹ {{ b.payableAmount }}</td>
-      <td>{{ b.status }}</td>
-      <td>
-        <button class="link" (click)="viewBill(b)">View</button>
-      </td>
-    </tr>
-  </tbody>
-</table>
+    <tbody>
+      <tr *ngFor="let b of pagedBills">
+        <td class="mono">{{ b.id }}</td>
+        <td class="mono">{{ b.consumerId }}</td>
+        <td>{{ b.utilityType }}</td>
+        <td>{{ b.billingMonth }}/{{ b.billingYear }}</td>
+        <td>₹ {{ b.payableAmount }}</td>
+        <td>{{ b.status }}</td>
+        <td>
+          <button class="link" (click)="viewBill(b)">View</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 
   <p *ngIf="!pagedBills.length" class="empty">No bills available</p>
 
-  <!-- PAGINATION -->
   <div class="pagination">
     <select [(ngModel)]="pageSize" (change)="updatePaging()">
       <option [value]="10">10</option>
@@ -77,7 +72,6 @@
   </div>
 </div>
 
-<!-- ================= PAYMENTS ================= -->
 <div *ngIf="activeTab==='PAYMENTS'" class="card">
   <table>
     <thead>
@@ -112,7 +106,6 @@
 
   <p *ngIf="!pagedPayments.length" class="empty">No payments available</p>
 
-  <!-- PAGINATION -->
   <div class="pagination-bar">
     <div class="page-size">
       Show
@@ -131,7 +124,6 @@
     </div>
   </div>
 </div>
-<!-- ================= OUTSTANDING ================= -->
 <div *ngIf="activeTab==='OUTSTANDING'" class="card">
   <h3>Bill Details</h3>
 
@@ -163,8 +155,6 @@
     <p class="empty">No bill selected</p>
   </ng-template>
 </div>
-<!-- ================= INVOICE ================= -->
-<!-- ================= INVOICE ================= -->
 <div *ngIf="activeTab==='INVOICE'" class="card">
   <h3>Invoice Details</h3>
 

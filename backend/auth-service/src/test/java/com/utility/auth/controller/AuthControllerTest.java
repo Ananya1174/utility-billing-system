@@ -43,7 +43,6 @@ class AuthControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    // ================= REGISTER =================
     @Test
     @WithMockUser(roles = "ADMIN")
     void registerUser_success() throws Exception {
@@ -71,7 +70,7 @@ class AuthControllerTest {
                         .value("User registered successfully"));
     }
 
-    // ================= LOGIN =================
+    
     @Test
     void login_success() throws Exception {
 
@@ -97,7 +96,7 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.accessToken").value("jwt-token"));
     }
 
-    // ================= FORGOT PASSWORD =================
+
     @Test
     void forgotPassword_success() throws Exception {
 
@@ -112,7 +111,6 @@ class AuthControllerTest {
                         .string("Password reset link sent to registered email"));
     }
 
-    // ================= RESET PASSWORD =================
     @Test
     void resetPassword_success() throws Exception {
 
@@ -128,7 +126,6 @@ class AuthControllerTest {
                         .string("Password reset successful"));
     }
 
-    // ================= CHANGE PASSWORD (UNAUTHORIZED) =================
     @Test
     void changePassword_unauthorized() throws Exception {
 
@@ -157,7 +154,6 @@ class AuthControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
-    // ================= VALIDATION =================
     @Test
     void registerUser_invalidRequest_returnsBadRequest() throws Exception {
 
@@ -172,7 +168,6 @@ class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest());
     }
- // ================= GET USER BY ID =================
     @Test
     @WithMockUser(roles = "ADMIN")
     void getUserById_success() throws Exception {
@@ -197,7 +192,6 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.status").value("ACTIVE"));
     }
 
-    // ================= GET USERS =================
     @Test
     @WithMockUser(roles = "ADMIN")
     void getAllUsers_success() throws Exception {
@@ -209,7 +203,6 @@ class AuthControllerTest {
                 .andExpect(status().isOk());
     }
 
-    // ================= DELETE USER =================
     @Test
     @WithMockUser(roles = "ADMIN")
     void deleteUser_success() throws Exception {

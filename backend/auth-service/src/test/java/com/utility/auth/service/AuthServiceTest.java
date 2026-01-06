@@ -42,7 +42,6 @@ class AuthServiceTest {
 
     @InjectMocks AuthService authService;
 
-    // ---------------- REGISTER ----------------
 
     @Test
     void registerUser_success() {
@@ -88,8 +87,6 @@ class AuthServiceTest {
                 () -> authService.registerUser(user));
     }
 
-    // ---------------- LOGIN ----------------
-
     @Test
     void login_success() {
         User user = User.builder()
@@ -118,8 +115,6 @@ class AuthServiceTest {
         assertThrows(BadCredentialsException.class,
                 () -> authService.login("x", "p"));
     }
-
-    // ---------------- FORGOT PASSWORD ----------------
 
     @Test
     void forgotPassword_existingUser_lambdaCovered() {
@@ -150,8 +145,6 @@ class AuthServiceTest {
 
         verifyNoInteractions(notificationPublisher);
     }
-
-    // ---------------- RESET PASSWORD ----------------
 
     @Test
     void resetPassword_success() {
@@ -207,8 +200,6 @@ class AuthServiceTest {
                 () -> authService.resetPassword("t", "ValidPass@123"));
     }
 
-    // ---------------- CHANGE PASSWORD ----------------
-
     @Test
     void changePassword_success() {
         User user = User.builder()
@@ -252,7 +243,6 @@ class AuthServiceTest {
                 () -> authService.changePassword("U1", "o", "n"));
     }
 
-    // ---------------- GET USER ----------------
 
     @Test
     void getUserById_success() {
@@ -281,8 +271,6 @@ class AuthServiceTest {
                 () -> authService.getUserById("U1"));
     }
 
-    // ---------------- GET ALL USERS ----------------
-
     @Test
     void getAllUsers_streamLambdaCovered() {
         User user = User.builder()
@@ -300,8 +288,6 @@ class AuthServiceTest {
 
         assertEquals("INACTIVE", users.get(0).getStatus());
     }
-
-    // ---------------- DELETE USER ----------------
 
     @Test
     void deleteUser_success() {

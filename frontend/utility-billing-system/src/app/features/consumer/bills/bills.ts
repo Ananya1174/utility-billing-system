@@ -42,7 +42,6 @@ export class BillsComponent implements OnInit {
             b.billingMonth - a.billingMonth
         );
 
-        // 🔑 Attach paymentId for ALREADY PAID bills
         this.bills.forEach(bill => {
           if (bill.status === 'PAID') {
             this.billService.getPaymentsByBillId(bill.id)
@@ -85,7 +84,7 @@ export class BillsComponent implements OnInit {
     dialogRef.afterClosed().subscribe(res => {
       if (res?.paid && res.paymentId) {
         bill.status = 'PAID';
-        bill.paymentId = res.paymentId; // ✅ CRITICAL
+        bill.paymentId = res.paymentId;
         this.cdr.detectChanges();
       }
     });

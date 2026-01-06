@@ -64,17 +64,12 @@ export class ForgotPasswordComponent {
       }
     });
   }
-
-  /* NAVBAR ACTIONS */
-
   goHome() {
     this.router.navigate(['/']);
   }
-
   goToLogin() {
     this.router.navigate(['/login']);
   }
-
   goToCreateAccount() {
     this.router.navigate(['/create-account']);
   }

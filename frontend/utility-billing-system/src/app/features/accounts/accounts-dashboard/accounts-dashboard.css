@@ -1,7 +1,3 @@
-
-
-/* ================= PAGE WRAPPER ================= */
-
 :host {
   display: block;
   padding: 24px 28px;
@@ -9,15 +5,11 @@
   min-height: 100vh;
 }
 
-/* ================= HEADER ================= */
-
 h2 {
   margin: 20px 0 16px;
   font-size: 1.8rem;
   color: #1e3a8a;
 }
-
-/* ================= FILTERS ================= */
 
 .filters {
   display: flex;
@@ -33,8 +25,6 @@ h2 {
   font-size: 14px;
   cursor: pointer;
 }
-
-/* ================= KPI GRID ================= */
 
 .kpi-grid {
   display: grid;
@@ -63,8 +53,6 @@ h2 {
   color: #111827;
 }
 
-/* KPI COLOR VARIANTS */
-
 .kpi-card.success {
   border-left: 4px solid #16a34a;
 }
@@ -73,15 +61,11 @@ h2 {
   border-left: 4px solid #dc2626;
 }
 
-/* ================= CHART GRID ================= */
-
 .charts-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 22px;
 }
-
-/* ================= CHART CARD ================= */
 
 .card {
   background: #ffffff;
@@ -96,15 +80,9 @@ h2 {
   font-weight: 600;
   color: #374151;
 }
-
-/* ================= CHART SIZE CONTROL ================= */
-
-/* IMPORTANT: Reduce chart height */
 .card canvas {
   max-height: 220px !important;
 }
-
-/* ================= RESPONSIVE ================= */
 
 @media (max-width: 768px) {
   :host {

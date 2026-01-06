@@ -1,5 +1,4 @@
 <div class="dialog-card">
-
   <div class="dialog-header">
     <h3>Pay Bill</h3>
     <button class="close-btn" (click)="cancel()">✕</button>
@@ -7,7 +6,6 @@
 
   <div class="dialog-body">
 
-    <!-- STEP: INIT -->
     <div *ngIf="step === 'INIT'" class="step">
       <p class="amount">
         Amount Payable
@@ -21,7 +19,6 @@
       </button>
     </div>
 
-    <!-- STEP: OTP -->
     <div *ngIf="step === 'OTP'" class="step">
 
       <label class="otp-label">Enter OTP</label>

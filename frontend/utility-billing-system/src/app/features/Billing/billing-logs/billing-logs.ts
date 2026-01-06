@@ -20,7 +20,6 @@ export class BillingLogsComponent implements OnInit {
   loading = false;
   error = '';
 
-  /* ================= FILTERS ================= */
 
   status: '' | 'DUE' | 'PAID' | 'OVERDUE' = '';
   month: number | null = null;
@@ -30,7 +29,6 @@ export class BillingLogsComponent implements OnInit {
   months = [1,2,3,4,5,6,7,8,9,10,11,12];
   years = [2023, 2024, 2025, 2026];
 
-  /* ================= PAGINATION ================= */
 
   pageSizeOptions = [10, 25, 50];
   pageSize = 10;
@@ -47,8 +45,6 @@ export class BillingLogsComponent implements OnInit {
   ngOnInit(): void {
     this.loadBills();
   }
-
-  /* ================= LOAD ================= */
 
   loadBills(): void {
     this.loading = true;
@@ -84,8 +80,6 @@ export class BillingLogsComponent implements OnInit {
     this.loadBills();
   }
 
-  /* ================= PAGING ================= */
-
   applyPaging(): void {
     this.totalPages = Math.ceil(this.bills.length / this.pageSize);
 
@@ -118,8 +112,6 @@ export class BillingLogsComponent implements OnInit {
     this.pageIndex = index;
     this.applyPaging();
   }
-
-  /* 🔑 ONLY 3 PAGE NUMBERS */
   visiblePages(): number[] {
     if (this.totalPages <= 3) {
       return Array.from({ length: this.totalPages }, (_, i) => i);
@@ -131,9 +123,6 @@ export class BillingLogsComponent implements OnInit {
 
     return [this.pageIndex - 1, this.pageIndex, this.pageIndex + 1];
   }
-
-  /* ================= HELPERS ================= */
-
   statusClass(status: string): string {
     if (status === 'PAID') return 'paid';
     if (status === 'OVERDUE') return 'overdue';

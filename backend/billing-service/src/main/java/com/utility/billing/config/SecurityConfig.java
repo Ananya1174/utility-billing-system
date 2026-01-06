@@ -98,17 +98,17 @@ public class SecurityConfig {
 
                         .requestMatchers(
                                 HttpMethod.GET,
-                                "/dashboard/bills-summary"
+                                "/dashboard/billing/bills-summary"
                         ).hasAnyRole(ADMIN, BILLING_OFFICER)
 
                         .requestMatchers(
                                 HttpMethod.GET,
-                                "/dashboard/consumption-summary"
+                                "/dashboard/billing/consumption-summary"
                         ).hasAnyRole(ADMIN, BILLING_OFFICER)
 
                         .requestMatchers(
                                 HttpMethod.GET,
-                                "/dashboard/consumption-average"
+                                "/dashboard/billing/consumption-average"
                         ).hasRole(ADMIN)
                         .requestMatchers(
                         	    HttpMethod.GET,
@@ -117,7 +117,7 @@ public class SecurityConfig {
 
                         .requestMatchers(
                                 HttpMethod.GET,
-                                "/dashboard/consumption/utility"
+                                "/dashboard/billing/consumption/utility"
                         ).hasAnyRole(ADMIN, BILLING_OFFICER)
                         .requestMatchers(
                         	    HttpMethod.GET,
@@ -136,6 +136,10 @@ public class SecurityConfig {
                                 HttpMethod.GET,
                                 "/dashboard/billing/total-billed-monthly"
                         ).hasRole(ADMIN)
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/dashboard/billing/total-billed"
+                        ).hasAnyRole(ADMIN,BILLING_OFFICER)
 
                         .requestMatchers(
                                 HttpMethod.GET,

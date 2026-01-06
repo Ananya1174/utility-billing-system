@@ -1,4 +1,4 @@
-/* CONTAINER */
+
 .invoice-dialog {
   width: 100%;
   max-width: 520px;
@@ -9,7 +9,6 @@
   font-family: inherit;
 }
 
-/* HEADER */
 .dialog-header {
   display: flex;
   justify-content: space-between;
@@ -36,12 +35,10 @@
   color: #dc2626;
 }
 
-/* BODY */
 .dialog-body {
   padding: 20px;
 }
 
-/* META GRID */
 .meta-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -66,14 +63,12 @@
   font-size: 0.85rem;
 }
 
-/* SECTION */
 .section-title {
   margin: 14px 0 10px;
   font-size: 1rem;
   color: #1e293b;
 }
 
-/* TABLE */
 .charges-table {
   width: 100%;
   border-collapse: collapse;
@@ -97,7 +92,6 @@
   border-bottom: none;
 }
 
-/* FOOTER */
 .dialog-footer {
   padding: 14px 20px;
   display: flex;
@@ -105,7 +99,6 @@
   border-top: 1px solid #e5e7eb;
 }
 
-/* BUTTONS */
 .secondary-btn {
   padding: 8px 16px;
   border-radius: 8px;
@@ -120,7 +113,6 @@
   background: #f1f5f9;
 }
 
-/* LOADING */
 .loading {
   padding: 30px;
   text-align: center;
@@ -128,7 +120,6 @@
   font-weight: 500;
 }
 
-/* RESPONSIVE */
 @media (max-width: 520px) {
   .meta-grid {
     grid-template-columns: 1fr;

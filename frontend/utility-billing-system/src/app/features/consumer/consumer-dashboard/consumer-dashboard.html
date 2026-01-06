@@ -4,7 +4,6 @@
 
 <div *ngIf="!loading && summary">
 
-  <!-- ================= KPI ================= -->
   <div class="kpi-grid">
     <div class="kpi-card highlight">
       <p>Total Due</p>
@@ -27,10 +26,8 @@
     </div>
   </div>
 
-  <!-- ================= CHARTS (2 × 2 GRID) ================= -->
   <div class="charts-grid">
 
-    <!-- 1️⃣ Consumption by Utility -->
     <div class="chart-card">
       <div class="chart-header">
         <h3>Consumption by Utility</h3>
@@ -51,7 +48,6 @@
       </canvas>
     </div>
 
-    <!-- 2️⃣ Monthly Consumption -->
     <div class="chart-card">
       <div class="chart-header">
         <h3>Monthly Consumption</h3>
@@ -72,7 +68,6 @@
       </canvas>
     </div>
 
-    <!-- 3️⃣ Paid vs Unpaid -->
     <div class="chart-card">
       <h3>Paid vs Unpaid</h3>
       <canvas
@@ -82,7 +77,6 @@
       </canvas>
     </div>
 
-    <!-- 4️⃣ Utility Cost Distribution -->
     <div class="chart-card">
       <div class="chart-header">
         <h3>Utility Cost Distribution (%)</h3>
@@ -106,7 +100,6 @@
 
   </div>
 
-  <!-- ================= ACTIONS ================= -->
   <div class="actions">
     <button class="primary-btn" (click)="goToBills()">View Bills</button>
     <button class="primary-btn"

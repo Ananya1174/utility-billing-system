@@ -34,21 +34,18 @@ export class AccountsDashboardComponent implements OnInit {
   { value: 12, name: 'December' }
 ];
 
-  /* ================= PIE ================= */
   pieType: ChartType = 'pie';
   paymentPieData: ChartData<'pie', number[], string> = {
     labels: ['Paid', 'Outstanding'],
     datasets: [{ data: [] }]
   };
 
-  /* ================= BAR ================= */
   barType: ChartType = 'bar';
   revenueBarData: ChartData<'bar', number[], string> = {
     labels: [],
     datasets: [{ label: 'Revenue', data: [] }]
   };
 
-  /* ================= LINE ================= */
   lineType: ChartType = 'line';
   outstandingLineData: ChartData<'line', number[], string> = {
     labels: [],

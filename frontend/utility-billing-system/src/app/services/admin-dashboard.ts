@@ -8,7 +8,6 @@ export class AdminDashboardService {
 
   constructor(private http: HttpClient) {}
 
-  /* ================= BILLING ================= */
 
   getBillsSummary(month: number, year: number) {
     return this.http.get<any>(
@@ -34,7 +33,6 @@ export class AdminDashboardService {
     );
   }
 
-  /* ================= PAYMENTS ================= */
 
   getRevenueSummary(month: number, year: number) {
     return this.http.get<any>(
@@ -59,8 +57,6 @@ export class AdminDashboardService {
       `${this.baseUrl}/dashboard/payments/consumer-summary?month=${month}&year=${year}`
     );
   }
-
-  /* ================= TRENDS ================= */
 
   getMonthlyOutstanding(year: number) {
     return this.http.get<any[]>(

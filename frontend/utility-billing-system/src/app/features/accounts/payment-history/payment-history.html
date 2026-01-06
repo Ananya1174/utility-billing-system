@@ -1,115 +1,105 @@
 <div class="fullpage">
-<h2>Payment History</h2>
-<p class="subtitle">Accounts Officer – All Transactions</p>
-
-<!-- FILTERS -->
-<div class="filters">
-  <select [(ngModel)]="selectedMonth" (change)="loadSummary()">
-    <option *ngFor="let m of [1,2,3,4,5,6,7,8,9,10,11,12]" [value]="m">
-      Month {{ m }}
-    </option>
-  </select>
-
-  <select [(ngModel)]="selectedYear" (change)="loadSummary()">
-    <option *ngFor="let y of [2024,2025,2026]" [value]="y">{{ y }}</option>
-  </select>
-
-  <select [(ngModel)]="selectedMode" (change)="applyFilters()">
-    <option value="ALL">All Modes</option>
-    <option value="ONLINE">Online</option>
-    <option value="OFFLINE">Offline</option>
-  </select>
-
-  <select [(ngModel)]="selectedStatus" (change)="applyFilters()">
-    <option value="ALL">All Status</option>
-    <option value="SUCCESS">Success</option>
-    <option value="FAILED">Failed</option>
-    <option value="INITIATED">Initiated</option>
-  </select>
-</div>
-
-<!-- SUMMARY -->
-<div class="summary" *ngIf="summary">
-  <div class="card success">
-    <p>Successful Payments</p>
-    <h3>{{ summary.successfulPayments }}</h3>
-  </div>
-
-  <div class="card failed">
-    <p>Failed Payments</p>
-    <h3>{{ summary.failedPayments }}</h3>
-  </div>
-
-  <div class="card total">
-    <p>Total Transactions</p>
-    <h3>{{ summary.successfulPayments + summary.failedPayments }}</h3>
-  </div>
-</div>
-
-<!-- TABLE -->
-<div *ngIf="loading">Loading payments...</div>
-
-<table *ngIf="!loading">
-  <thead>
-    <tr>
-      <th>Payment ID</th>
-      <th>Consumer ID</th>
-      <th>Bill ID</th>
-      <th>Amount (₹)</th>
-      <th>Mode</th>
-      <th>Status</th>
-      <th>Date</th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <tr *ngFor="let p of paginatedPayments">
-      <td>{{ p.paymentId }}</td>
-      <td>{{ p.consumerId }}</td>
-      <td>{{ p.billId }}</td>
-      <td>₹{{ p.amount }}</td>
-      <td>{{ p.mode }}</td>
-      <td>
-        <span [class]="getStatusClass(p.status)">
-          {{ p.status }}
-        </span>
-      </td>
-      <td>{{ p.createdAt | date:'short' }}</td>
-    </tr>
-  </tbody>
-</table>
-<!-- PAGINATION -->
-<div class="pagination" *ngIf="totalPages > 1">
-
-  <div class="page-size">
-    <label>Rows:</label>
-    <select [(ngModel)]="pageSize" (change)="changePageSize()">
-      <option *ngFor="let s of pageSizeOptions" [value]="s">
-        {{ s }}
+  <h2>Payment History</h2>
+  <p class="subtitle">Accounts Officer – All Transactions</p>
+  <div class="filters">
+    <select [(ngModel)]="selectedMonth" (change)="loadSummary()">
+      <option *ngFor="let m of [1,2,3,4,5,6,7,8,9,10,11,12]" [value]="m">
+        Month {{ m }}
       </option>
     </select>
+
+    <select [(ngModel)]="selectedYear" (change)="loadSummary()">
+      <option *ngFor="let y of [2024,2025,2026]" [value]="y">{{ y }}</option>
+    </select>
+
+    <select [(ngModel)]="selectedMode" (change)="applyFilters()">
+      <option value="ALL">All Modes</option>
+      <option value="ONLINE">Online</option>
+      <option value="OFFLINE">Offline</option>
+    </select>
+
+    <select [(ngModel)]="selectedStatus" (change)="applyFilters()">
+      <option value="ALL">All Status</option>
+      <option value="SUCCESS">Success</option>
+      <option value="FAILED">Failed</option>
+      <option value="INITIATED">Initiated</option>
+    </select>
+  </div>
+  <div class="summary" *ngIf="summary">
+    <div class="card success">
+      <p>Successful Payments</p>
+      <h3>{{ summary.successfulPayments }}</h3>
+    </div>
+
+    <div class="card failed">
+      <p>Failed Payments</p>
+      <h3>{{ summary.failedPayments }}</h3>
+    </div>
+
+    <div class="card total">
+      <p>Total Transactions</p>
+      <h3>{{ summary.successfulPayments + summary.failedPayments }}</h3>
+    </div>
   </div>
 
-  <div class="page-controls">
-    <button (click)="changePage(currentPage - 1)"
-            [disabled]="currentPage === 1">
-      Prev
-    </button>
+  <div *ngIf="loading">Loading payments...</div>
 
-    <button *ngFor="let p of getVisiblePages()"
-            (click)="changePage(p)"
-            [class.active]="p === currentPage">
-      {{ p }}
-    </button>
+  <table *ngIf="!loading">
+    <thead>
+      <tr>
+        <th>Payment ID</th>
+        <th>Consumer ID</th>
+        <th>Bill ID</th>
+        <th>Amount (₹)</th>
+        <th>Mode</th>
+        <th>Status</th>
+        <th>Date</th>
+      </tr>
+    </thead>
 
-    <button (click)="changePage(currentPage + 1)"
-            [disabled]="currentPage === totalPages">
-      Next
-    </button>
+    <tbody>
+      <tr *ngFor="let p of paginatedPayments">
+        <td>{{ p.paymentId }}</td>
+        <td>{{ p.consumerId }}</td>
+        <td>{{ p.billId }}</td>
+        <td>₹{{ p.amount }}</td>
+        <td>{{ p.mode }}</td>
+        <td>
+          <span [class]="getStatusClass(p.status)">
+            {{ p.status }}
+          </span>
+        </td>
+        <td>{{ p.createdAt | date:'short' }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="pagination" *ngIf="totalPages > 1">
+
+    <div class="page-size">
+      <label>Rows:</label>
+      <select [(ngModel)]="pageSize" (change)="changePageSize()">
+        <option *ngFor="let s of pageSizeOptions" [value]="s">
+          {{ s }}
+        </option>
+      </select>
+    </div>
+
+    <div class="page-controls">
+      <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">
+        Prev
+      </button>
+
+      <button *ngFor="let p of getVisiblePages()" (click)="changePage(p)" [class.active]="p === currentPage">
+        {{ p }}
+      </button>
+
+      <button (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages">
+        Next
+      </button>
+    </div>
   </div>
-</div>
 
-<div *ngIf="!loading && filteredPayments.length === 0" class="empty">
-  No payment records found.
-</div>
+  <div *ngIf="!loading && filteredPayments.length === 0" class="empty">
+    No payment records found.
+  </div>
 </div>

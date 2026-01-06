@@ -1,4 +1,3 @@
-/* CARD */
 .profile-card {
   background: #ffffff;
   padding: 28px;
@@ -7,14 +6,12 @@
   box-shadow: 0 10px 30px rgba(0,0,0,0.06);
 }
 
-/* HEADER */
 .profile-header {
   display: flex;
   justify-content: flex-end;
   margin-bottom: 16px;
 }
 
-/* GRID */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -30,7 +27,6 @@
   grid-column: span 2;
 }
 
-/* LABEL */
 label {
   font-size: 0.85rem;
   font-weight: 600;
@@ -38,7 +34,6 @@ label {
   margin-bottom: 6px;
 }
 
-/* INPUTS */
 input,
 textarea {
   padding: 10px 12px;
@@ -49,14 +44,12 @@ textarea {
   background: #f9fafb;
 }
 
-/* READONLY */
 input[readonly],
 textarea[readonly] {
   background: #f3f4f6;
   color: #6b7280;
 }
 
-/* EDITABLE FOCUS */
 input:not([readonly]):focus,
 textarea:not([readonly]):focus {
   outline: none;
@@ -65,14 +58,12 @@ textarea:not([readonly]):focus {
   box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
 }
 
-/* ACTIONS */
 .actions {
   display: flex;
   gap: 12px;
   margin-top: 20px;
 }
 
-/* STATUS */
 .success {
   margin-top: 12px;
   color: #059669;

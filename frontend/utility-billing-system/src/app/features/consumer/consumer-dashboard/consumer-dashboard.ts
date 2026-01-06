@@ -53,13 +53,11 @@ export class ConsumerDashboard implements OnInit {
     { value: 12, name: 'December' }
   ];
 
-  /* ================= CHART TYPES ================= */
   pieChartType: ChartType = 'pie';
   barChartType: ChartType = 'bar';
   doughnutChartType: ChartType = 'doughnut';
   utilityCostChartType: ChartType = 'doughnut';
 
-  /* ================= CHART OPTIONS ================= */
   utilityCostChartOptions: ChartOptions = {
   responsive: true,
   plugins: {
@@ -77,7 +75,6 @@ export class ConsumerDashboard implements OnInit {
     }
   }
 };
-  /* ================= CHART DATA ================= */
   pieChartData: ChartData<'pie', number[], string> = {
     labels: [],
     datasets: [{ data: [] }]
@@ -119,7 +116,6 @@ export class ConsumerDashboard implements OnInit {
     this.loadSummary();
   }
 
-  /* ================= SUMMARY ================= */
   loadSummary(): void {
     this.consumerService.getDashboardSummary().subscribe(res => {
       this.summary = res;
@@ -128,7 +124,6 @@ export class ConsumerDashboard implements OnInit {
     });
   }
 
-  /* ================= UTILITIES ================= */
   loadUtilities(): void {
     const consumerId = this.authService.getUserId();
     if (!consumerId) return;
@@ -146,7 +141,6 @@ export class ConsumerDashboard implements OnInit {
     });
   }
 
-  /* ================= PIE ================= */
   loadPieChart(): void {
     const consumerId = this.authService.getUserId();
     if (!consumerId) return;
@@ -165,7 +159,6 @@ export class ConsumerDashboard implements OnInit {
     });
   }
 
-  /* ================= BAR ================= */
   loadBarChart(): void {
     const consumerId = this.authService.getUserId();
     if (!consumerId) return;
@@ -190,7 +183,6 @@ export class ConsumerDashboard implements OnInit {
     });
   }
 
-  /* ================= PAID / UNPAID ================= */
   calculatePaidVsUnpaid(bills: any[]): void {
     const paid = bills.filter(b => b.status === 'PAID').length;
     const unpaid = bills.length - paid;
@@ -201,7 +193,6 @@ export class ConsumerDashboard implements OnInit {
     };
   }
 
-  /* ================= UTILITY COST ================= */
   loadUtilityCostDistribution(): void {
     const consumerId = this.authService.getUserId();
     if (!consumerId) return;
@@ -218,12 +209,10 @@ export class ConsumerDashboard implements OnInit {
     });
   }
 
-  /* ================= EVENTS ================= */
   onPieFilterChange() { this.loadPieChart(); }
   onBarFilterChange() { this.loadBarChart(); }
   onUtilityCostYearChange() { this.loadUtilityCostDistribution(); }
 
-  /* ================= NAV ================= */
   goToBills() { this.router.navigate(['/consumer/bills']); }
   goToUtilities() { this.router.navigate(['/consumer/utilities']); }
   payDueBill() { this.router.navigate(['/consumer/bills']); }

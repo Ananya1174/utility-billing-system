@@ -1,6 +1,3 @@
-
-
-<!-- NAVBAR -->
 <nav class="navbar">
   <div class="nav-container">
     <button class="logo" (click)="goHome()">⚡ UtilityBilling</button>
@@ -12,20 +9,14 @@
   </div>
 </nav>
 
-<!-- PAGE -->
 <div class="signup-page">
 
   <div class="signup-card">
 
-    <!-- LEFT : IMAGE -->
     <div class="signup-image">
-      <img
-        src="/assets/signup.svg"
-        alt="Create account illustration"
-      />
+      <img src="/assets/signup.svg" alt="Create account illustration" />
     </div>
 
-    <!-- RIGHT : FORM -->
     <div class="signup-form">
       <h2>Create Account</h2>
       <p class="subtitle">
@@ -34,37 +25,22 @@
 
       <form [formGroup]="accountForm" (ngSubmit)="submitRequest()">
 
-        <input
-          type="text"
-          placeholder="Full Name"
-          formControlName="name"
-        />
+        <input type="text" placeholder="Full Name" formControlName="name" />
         <small class="error" *ngIf="f['name'].touched && f['name'].invalid">
           Name is required
         </small>
 
-        <input
-          type="email"
-          placeholder="Email Address"
-          formControlName="email"
-        />
+        <input type="email" placeholder="Email Address" formControlName="email" />
         <small class="error" *ngIf="f['email'].touched && f['email'].invalid">
           Enter a valid email address
         </small>
 
-        <input
-          type="text"
-          placeholder="Phone Number"
-          maxlength="10"
-          formControlName="phone"
-        />
+        <input type="text" placeholder="Phone Number" maxlength="10" formControlName="phone" />
         <small class="error" *ngIf="f['phone'].touched && f['phone'].invalid">
           Phone number must be exactly 10 digits
         </small>
 
-        <textarea
-          placeholder="Address"
-          formControlName="address">
+        <textarea placeholder="Address" formControlName="address">
         </textarea>
         <small class="error" *ngIf="f['address'].touched && f['address'].invalid">
           Address is required

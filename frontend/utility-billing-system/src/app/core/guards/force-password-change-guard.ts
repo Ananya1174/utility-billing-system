@@ -9,7 +9,7 @@ import {
 @Injectable({ providedIn: 'root' })
 export class ForcePasswordChangeGuard implements CanActivateChild {
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) { }
 
   canActivateChild(
     route: ActivatedRouteSnapshot,
@@ -21,8 +21,6 @@ export class ForcePasswordChangeGuard implements CanActivateChild {
       localStorage.getItem('passwordChangeRequired') === 'true';
 
     const url = state.url;
-
-    // ✅ Always allow auth & password pages
     if (
       url.startsWith('/login') ||
       url.startsWith('/forgot-password') ||
@@ -30,16 +28,11 @@ export class ForcePasswordChangeGuard implements CanActivateChild {
     ) {
       return true;
     }
-
-    // 🔐 ONLY consumer restriction
     if (role === 'CONSUMER' && passwordChangeRequired) {
-
-      // allow ONLY change-password
       if (url.startsWith('/change-password')) {
         return true;
       }
 
-      // block everything else
       this.router.navigate(['/change-password'], {
         queryParams: { firstLogin: true }
       });

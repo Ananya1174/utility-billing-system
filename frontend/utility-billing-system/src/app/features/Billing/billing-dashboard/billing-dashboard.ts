@@ -17,15 +17,11 @@ export class BillingOfficerDashboardComponent implements OnInit {
 
   loading = true;
 
-  /* ================= KPI DATA ================= */
-
   summary: any = null;
   outstandingSummary: any = null;
 
   unpaidCount = 0;
   overdueCount = 0;
-
-  /* ================= CHART ================= */
 
   barChartType: ChartType = 'bar';
 
@@ -38,8 +34,6 @@ export class BillingOfficerDashboardComponent implements OnInit {
       }
     ]
   };
-
-  /* ================= DATE FILTER ================= */
 
   month = new Date().getMonth() + 1;
   year = new Date().getFullYear();
@@ -59,8 +53,6 @@ export class BillingOfficerDashboardComponent implements OnInit {
     this.loadDashboard();
   }
 
-  /* ================= LOAD DASHBOARD ================= */
-
   loadDashboard(): void {
     this.loading = true;
 
@@ -74,8 +66,6 @@ export class BillingOfficerDashboardComponent implements OnInit {
     this.loadConsumptionSummary();
     this.loadBillSummary();
   }
-
-  /* ================= KPI SUMMARY ================= */
 
   loadBillSummary(): void {
     this.http
@@ -94,8 +84,6 @@ export class BillingOfficerDashboardComponent implements OnInit {
       });
   }
 
-  /* ================= TOTAL BILLED ================= */
-
   loadOutstandingSummary(): void {
     this.http
       .get<any>(`${this.baseUrl}/dashboard/payments/outstanding-summary`)
@@ -105,31 +93,38 @@ export class BillingOfficerDashboardComponent implements OnInit {
       });
   }
 
-  /* ================= CONSUMPTION CHART ================= */
-
   loadConsumptionSummary(): void {
-    this.http
-      .get<any[]>(
-        `${this.baseUrl}/dashboard/billing/consumption-summary?month=${this.month}&year=${this.year}`
-      )
-      .subscribe(res => {
+  this.http
+    .get<any[]>(
+      `${this.baseUrl}/dashboard/billing/consumption-summary?month=${this.month}&year=${this.year}`
+    )
+    .subscribe(res => {
 
-        const labels: string[] = [];
-        const values: number[] = [];
+      const utilityOrder = ['ELECTRICITY', 'WATER', 'GAS', 'INTERNET'];
 
-        res.forEach(r => {
-          labels.push(r.utilityType);
-          values.push(r.totalUnits);
-        });
+      const labels: string[] = [];
+      const values: number[] = [];
 
-        this.barChartData.labels = labels;
-        this.barChartData.datasets[0].data = values;
-
-        this.cdr.detectChanges();
+      utilityOrder.forEach(type => {
+        const match = res.find(r => r.utilityType === type);
+        if (match) {
+          labels.push(match.utilityType);
+          values.push(match.totalUnits);
+        }
       });
-  }
+      this.barChartData = {
+        labels,
+        datasets: [
+          {
+            label: 'Consumption Units',
+            data: values
+          }
+        ]
+      };
 
-  /* ================= ALERT COUNTS ================= */
+      this.cdr.detectChanges();
+    });
+}
 
   loadAlerts(): void {
     this.http.get<any[]>(`${this.baseUrl}/bills?status=DUE`)
@@ -138,8 +133,6 @@ export class BillingOfficerDashboardComponent implements OnInit {
     this.http.get<any[]>(`${this.baseUrl}/bills?status=OVERDUE`)
       .subscribe(res => this.overdueCount = res.length);
   }
-
-  /* ================= NAVIGATION ================= */
 
   goToBillingLogs(): void {
     this.router.navigate(['/billing-officer/billing-logs']);

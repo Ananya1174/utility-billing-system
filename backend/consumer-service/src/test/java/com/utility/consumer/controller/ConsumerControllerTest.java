@@ -85,7 +85,7 @@ class ConsumerControllerTest {
 
         ConsumerRequestDTO dto = new ConsumerRequestDTO();
         dto.setFullName("Updated");
-        dto.setAddress("Bangalore"); // ✅ REQUIRED FIELD
+        dto.setAddress("Bangalore"); 
 
         Mockito.when(consumerService.updateConsumer(Mockito.eq("C1"), Mockito.any()))
                 .thenReturn(mockResponse());

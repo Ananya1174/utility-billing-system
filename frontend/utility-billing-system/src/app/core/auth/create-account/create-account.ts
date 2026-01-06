@@ -64,8 +64,6 @@ export class CreateAccountComponent {
       });
   }
 
-  /* ================= NAVBAR METHODS ================= */
-
   goHome(): void {
     this.router.navigate(['/']);
   }

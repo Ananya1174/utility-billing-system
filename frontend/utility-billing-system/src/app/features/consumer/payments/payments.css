@@ -1,19 +1,9 @@
-
-
-/* =========================
-   PAGE CONTAINER SPACING
-========================= */
-
 :host {
   display: block;
-  padding: 24px 32px;   /* ⬅️ THIS fixes left & right spacing */
+  padding: 24px 32px;   
   background: #f9fafb;
   min-height: 100vh;
 }
-
-/* =========================
-   PAGE LAYOUT
-========================= */
 
 h2 {
   margin: 20px 0 24px;
@@ -28,19 +18,11 @@ h2 {
   font-size: 0.95rem;
 }
 
-/* =========================
-   GRID
-========================= */
-
 .utilities-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 18px;
 }
-
-/* =========================
-   CARD
-========================= */
 
 .utility-card {
   background: #ffffff;
@@ -59,10 +41,6 @@ h2 {
   font-weight: 600;
 }
 
-/* =========================
-   TEXT
-========================= */
-
 .utility-card p {
   font-size: 0.9rem;
   color: #334155;
@@ -73,15 +51,10 @@ h2 {
   color: #0f172a;
 }
 
-/* TRANSACTION ID */
 .utility-card p br + span,
 .utility-card p br {
   word-break: break-all;
 }
-
-/* =========================
-   STATUS
-========================= */
 
 .status {
   display: inline-block;
@@ -108,10 +81,6 @@ h2 {
   color: #ca8a04;
 }
 
-/* =========================
-   ACTIONS
-========================= */
-
 .actions {
   display: flex;
   gap: 10px;
@@ -129,8 +98,6 @@ h2 {
   transition: background 0.2s ease, transform 0.15s ease;
   border: none;
 }
-
-/* SECONDARY (used here) */
 .secondary-btn {
   background: #e0e7ff;
   color: #1e3a8a;
@@ -140,10 +107,6 @@ h2 {
   background: #c7d2fe;
   transform: translateY(-1px);
 }
-
-/* =========================
-   RESPONSIVE
-========================= */
 
 @media (max-width: 600px) {
   .utilities-grid {

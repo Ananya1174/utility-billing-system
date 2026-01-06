@@ -8,8 +8,6 @@ h2 {
   margin-bottom: 18px;
   color: #1e3a8a;
 }
-
-/* FILTER BAR */
 .filters {
   display: flex;
   gap: 15px;
@@ -22,8 +20,6 @@ select {
   border: 1px solid #cbd5f5;
   font-size: 14px;
 }
-
-/* CARDS */
 .cards {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -58,10 +54,6 @@ select {
   color: #dc2626;
 }
 
-/* ===================== */
-/* CHART LAYOUT (KEY PART) */
-/* ===================== */
-
 .charts {
   display: grid;
   grid-template-columns: 1.2fr 1fr;
@@ -69,8 +61,6 @@ select {
   gap: 20px;
   align-items: stretch;
 }
-
-/* BASE CHART CARD */
 .chart {
   background: white;
   padding: 16px;
@@ -86,18 +76,15 @@ select {
   font-weight: 600;
 }
 
-/* PIE CHART — LEFT, FULL HEIGHT */
 .charts .chart:first-child {
   grid-row: span 2;
 }
 
-/* ENSURE CANVAS FILLS CARD */
 .chart canvas {
   flex: 1;
   max-height: 100%;
 }
 
-/* RESPONSIVE */
 @media (max-width: 1200px) {
   .cards {
     grid-template-columns: repeat(2, 1fr);

@@ -1,7 +1,5 @@
 
 <div class="page-container">
-
-  <!-- HEADER -->
   <div class="page-header">
     <h2>Meter Reading Entry</h2>
     <p class="subtitle">
@@ -10,12 +8,9 @@
     </p>
   </div>
 
-  <!-- FORM CARD -->
   <div class="card">
 
     <form (ngSubmit)="submitReading()" #readingForm="ngForm">
-
-      <!-- Consumer ID -->
       <div class="form-group">
         <label>Consumer ID</label>
         <input
@@ -26,7 +21,6 @@
           placeholder="Enter Consumer ID" />
       </div>
 
-      <!-- Connection ID -->
       <div class="form-group">
         <label>Connection ID</label>
         <input
@@ -37,7 +31,6 @@
           placeholder="Enter Connection ID" />
       </div>
 
-      <!-- Utility Type -->
       <div class="form-group">
         <label>Utility Type</label>
         <select
@@ -51,8 +44,6 @@
           <option value="INTERNET">Internet</option>
         </select>
       </div>
-
-      <!-- Meter Number -->
       <div class="form-group">
         <label>Meter Number</label>
         <input
@@ -62,8 +53,6 @@
           required
           placeholder="Enter Meter Number" />
       </div>
-
-      <!-- Current Reading -->
       <div class="form-group">
         <label>Current Reading</label>
         <input
@@ -75,7 +64,6 @@
           placeholder="Enter Current Reading" />
       </div>
 
-      <!-- MONTH / YEAR -->
       <div class="row">
         <div class="form-group">
           <label>Reading Month</label>
@@ -99,7 +87,6 @@
         </div>
       </div>
 
-      <!-- ACTION -->
       <div class="actions">
         <button
           type="submit"
@@ -108,9 +95,6 @@
           {{ submitting ? 'Submitting…' : 'Submit Reading' }}
         </button>
       </div>
-
     </form>
-
   </div>
-
 </div>

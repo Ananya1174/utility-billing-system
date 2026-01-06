@@ -18,97 +18,51 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private static final String ROLE_ADMIN = "ADMIN";
-    private static final String ROLE_ACCOUNTS = "ACCOUNTS_OFFICER";
-    private static final String ROLE_CONSUMER = "CONSUMER";
-    private static final String ROLE_BILLING = "BILLING_OFFICER";
+	private static final String ROLE_ADMIN = "ADMIN";
+	private static final String ROLE_ACCOUNTS = "ACCOUNTS_OFFICER";
+	private static final String ROLE_CONSUMER = "CONSUMER";
+	private static final String ROLE_BILLING = "BILLING_OFFICER";
 
-    private final JwtUtil jwtUtil;
+	private final JwtUtil jwtUtil;
 
-    @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(jwtUtil);
-    }
+	@Bean
+	public JwtAuthenticationFilter jwtAuthenticationFilter() {
+		return new JwtAuthenticationFilter(jwtUtil);
+	}
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+	@Bean
+	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        http
-            .csrf(csrf -> csrf.disable())
+		http.csrf(csrf -> csrf.disable())
 
-            .sessionManagement(session ->
-                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-            .authorizeHttpRequests(auth -> auth
-            		.requestMatchers(
-                            "/swagger-ui.html",
-                            "/swagger-ui/**",
-                            "/v3/api-docs",
-                            "/v3/api-docs/**"
-                    ).permitAll()
+				.authorizeHttpRequests(auth -> auth
+						.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs/**")
+						.permitAll()
 
-                /* ================= CONSUMER PAYMENTS ================= */
-                .requestMatchers(
-                        HttpMethod.POST,
-                        "/payments/online/initiate",
-                        "/payments/online/confirm"
-                ).hasRole(ROLE_CONSUMER)
+						.requestMatchers(HttpMethod.POST, "/payments/online/initiate", "/payments/online/confirm")
+						.hasRole(ROLE_CONSUMER)
 
-                /* ================= OFFLINE PAYMENTS ================= */
-                .requestMatchers(
-                        HttpMethod.POST,
-                        "/payments/offline"
-                ).hasRole(ROLE_ACCOUNTS)
+						.requestMatchers(HttpMethod.POST, "/payments/offline").hasRole(ROLE_ACCOUNTS)
 
-                /* ================= PAYMENT VIEW ================= */
-                .requestMatchers(
-                        HttpMethod.GET,
-                        "/payments",
-                        "/payments/bill/**",
-                        "/payments/consumer/**",
-                        "/payments/outstanding/**",
-                        "/payments/invoice/**"
-                ).hasAnyRole(
-                        ROLE_CONSUMER,
-                        ROLE_ACCOUNTS,
-                        ROLE_ADMIN,
-                        ROLE_BILLING
-                )
+						.requestMatchers(HttpMethod.GET, "/payments", "/payments/bill/**", "/payments/consumer/**",
+								"/payments/outstanding/**", "/payments/invoice/**")
+						.hasAnyRole(ROLE_CONSUMER, ROLE_ACCOUNTS, ROLE_ADMIN, ROLE_BILLING)
 
-                /* ================= PAYMENT DASHBOARD ================= */
-                .requestMatchers(
-                        HttpMethod.GET,
-                        "/dashboard/payments/revenue-summary",
-                        "/dashboard/payments/outstanding-summary",
-                        "/dashboard/payments/outstanding-monthly"
-                ).hasAnyRole(
-                        ROLE_ADMIN,
-                        ROLE_ACCOUNTS,
-                        ROLE_BILLING
-                )
+						.requestMatchers(HttpMethod.GET, "/dashboard/payments/revenue-summary",
+								"/dashboard/payments/outstanding-summary", "/dashboard/payments/outstanding-monthly")
+						.hasAnyRole(ROLE_ADMIN, ROLE_ACCOUNTS, ROLE_BILLING)
 
-                /* ================= PAYMENT REPORTS ================= */
-                .requestMatchers(
-                        HttpMethod.GET,
-                        "/dashboard/payments/failed-summary",
-                        "/dashboard/payments/revenue-by-mode",
-                        "/dashboard/payments/consumer-summary",
-                        "/dashboard/payments/revenue-yearly"
-                ).hasAnyRole(
-                        ROLE_ADMIN,
-                        ROLE_ACCOUNTS
-                )
+						.requestMatchers(HttpMethod.GET, "/dashboard/payments/failed-summary",
+								"/dashboard/payments/revenue-by-mode", "/dashboard/payments/consumer-summary",
+								"/dashboard/payments/revenue-yearly")
+						.hasAnyRole(ROLE_ADMIN, ROLE_ACCOUNTS)
 
-                /* ================= FALLBACK ================= */
-                .anyRequest().authenticated()
-            )
+						.anyRequest().authenticated())
 
-            .addFilterBefore(
-                jwtAuthenticationFilter(),
-                UsernamePasswordAuthenticationFilter.class
-            );
+				.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+		return http.build();
+	}
 }

@@ -9,7 +9,6 @@
 
     <form class="dialog-form">
 
-      <!-- UTILITY -->
       <div class="form-group">
         <label>Utility Type</label>
         <select
@@ -23,7 +22,6 @@
         </select>
       </div>
 
-      <!-- TARIFF -->
       <div class="form-group">
         <label>Tariff Plan</label>
         <select [(ngModel)]="tariffPlan" name="tariff">
@@ -34,12 +32,10 @@
         </select>
       </div>
 
-      <!-- ERROR -->
       <p class="error" *ngIf="errorMsg">
         {{ errorMsg }}
       </p>
 
-      <!-- ACTIONS -->
       <div class="dialog-actions">
         <button
           type="button"

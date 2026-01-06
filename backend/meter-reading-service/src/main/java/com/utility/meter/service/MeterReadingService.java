@@ -31,7 +31,6 @@ public class MeterReadingService {
             throw new ApiException("Connection not found", HttpStatus.BAD_REQUEST);
         }
 
-     // Consumer ownership check
         if (!connection.getConsumerId().equals(request.getConsumerId())) {
             throw new ApiException(
                 "Consumer does not own this connection",
@@ -39,7 +38,6 @@ public class MeterReadingService {
             );
         }
 
-        // Utility type validation
         if (connection.getUtilityType() != request.getUtilityType()) {
             throw new ApiException(
                 "Utility type does not match connection",
@@ -47,7 +45,6 @@ public class MeterReadingService {
             );
         }
 
-        // Meter number validation
         if (!connection.getMeterNumber().equals(request.getMeterNumber())) {
             throw new ApiException(
                 "Meter number does not match connection",

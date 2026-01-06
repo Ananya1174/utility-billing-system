@@ -5,15 +5,13 @@
 
   <ul class="navbar-links">
 
-    <!-- CONSUMER -->
-   <ng-container *ngIf="isConsumer()">
-  <li><a routerLink="/consumer/dashboard">Dashboard</a></li>
-  <li><a routerLink="/consumer/utilities">My Utilities</a></li>
-  <li><a routerLink="/consumer/bills">Bills</a></li>
-  <li><a routerLink="/consumer/payments">Payments</a></li>
-</ng-container>
+    <ng-container *ngIf="isConsumer()">
+      <li><a routerLink="/consumer/dashboard">Dashboard</a></li>
+      <li><a routerLink="/consumer/utilities">My Utilities</a></li>
+      <li><a routerLink="/consumer/bills">Bills</a></li>
+      <li><a routerLink="/consumer/payments">Payments</a></li>
+    </ng-container>
 
-    <!-- ADMIN -->
     <ng-container *ngIf="isAdmin()">
       <li><a routerLink="/admin/dashboard">Dashboard</a></li>
       <li><a routerLink="/admin/account-requests">Account Requests</a></li>
@@ -24,15 +22,13 @@
       <li><a routerLink="/admin/reports">Reports</a></li>
     </ng-container>
 
-    <!-- BILLING OFFICER -->
     <ng-container *ngIf="isBillingOfficer()">
       <li><a routerLink="/billing/dashboard">Dashboard</a></li>
       <li><a routerLink="/billing/meter-readings">Meter Readings</a></li>
-       <li><a routerLink="/billing/generate-bills">Generate Bills</a></li>
-        <li><a routerLink="/billing/logs">Billing Logs</a></li>
+      <li><a routerLink="/billing/generate-bills">Generate Bills</a></li>
+      <li><a routerLink="/billing/logs">Billing Logs</a></li>
     </ng-container>
 
-    <!-- ACCOUNTS OFFICER -->
     <ng-container *ngIf="isAccountsOfficer()">
       <li><a routerLink="/accounts/dashboard">Dashboard</a></li>
       <li><a routerLink="/accounts/offline">Offline Payments</a></li>
@@ -40,23 +36,14 @@
       <li><a routerLink="/accounts/reports">Reports</a></li>
     </ng-container>
 
-    <!-- PROFILE -->
     <li><a routerLink="/profile">Profile</a></li>
   </ul>
 
   <div class="navbar-right">
-    <!-- ✅ ONLY logout trigger -->
     <button class="logout-btn" (click)="confirmLogout()">Logout</button>
   </div>
 </nav>
 
-<!-- ✅ Reusable confirmation dialog -->
-<app-confirm-dialog
-  [visible]="logoutDialog"
-  title="Logout"
-  message="Are you sure you want to logout?"
-  confirmText="Logout"
-  cancelText="Stay"
-  (confirm)="logout()"
-  (cancel)="cancelLogout()">
+<app-confirm-dialog [visible]="logoutDialog" title="Logout" message="Are you sure you want to logout?"
+  confirmText="Logout" cancelText="Stay" (confirm)="logout()" (cancel)="cancelLogout()">
 </app-confirm-dialog>

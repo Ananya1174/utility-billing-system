@@ -43,19 +43,18 @@ export class OfflinePaymentComponent {
     this.http.post(`${this.baseUrl}/payments/offline`, this.paymentForm.value)
       .subscribe({
         next: () => {
-          this.successMsg = '✅ Offline payment recorded successfully';
+          this.successMsg = 'Offline payment recorded successfully';
           this.paymentForm.reset({
             remarks: 'Cash payment at counter'
           });
           this.loading = false;
         },
         error: err => {
-          this.errorMsg = err?.error?.message || '❌ Failed to record payment';
+          this.errorMsg = err?.error?.message || 'Failed to record payment';
           this.loading = false;
         }
       });
   }
-
   get f() {
     return this.paymentForm.controls;
   }

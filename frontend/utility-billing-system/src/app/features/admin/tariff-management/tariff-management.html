@@ -1,7 +1,6 @@
 <h2>Tariff Management</h2>
 <p class="subtitle">Configure tariff plans and slabs for utilities</p>
 
-<!-- FILTERS -->
 <div class="filters">
   <select [(ngModel)]="utilityFilter" (change)="onFilterChange()">
     <option value="ALL">All Utilities</option>
@@ -23,7 +22,6 @@
   </button>
 </div>
 
-<!-- PLANS TABLE -->
 <div class="card">
   <table>
     <thead>
@@ -71,12 +69,10 @@
   </table>
 </div>
 
-<!-- BACKDROP -->
 <div
   class="overlay"
   *ngIf="(selectedPlan || showAddPlan) && !confirmPlanVisible && !confirmSlabVisible">
 </div>
-<!-- ADD PLAN MODAL -->
 <div class="modal" *ngIf="showAddPlan">
   <h3>Add Tariff Plan</h3>
 
@@ -98,7 +94,6 @@
   </div>
 </div>
 
-<!-- MANAGE SLABS MODAL -->
 <div class="modal wide" *ngIf="selectedPlan">
   <h3>Manage Slabs — {{ selectedPlan.planCode }}</h3>
 
@@ -131,7 +126,6 @@
     </tbody>
   </table>
 
-  <!-- ADD SLAB -->
   <div class="add-slab">
     <input type="number"
            placeholder="Min Units"
@@ -155,10 +149,6 @@
   </div>
 </div>
 
-<!-- ================= CONFIRM DIALOGS (ROOT LEVEL) ================= -->
-
-<!-- DEACTIVATE PLAN CONFIRM -->
-<!-- DEACTIVATE PLAN CONFIRM DIALOG -->
 <app-confirm-dialog
   [visible]="confirmPlanVisible"
   title="Deactivate Tariff Plan"
@@ -169,7 +159,6 @@
   (cancel)="cancelDeactivate()">
 </app-confirm-dialog>
 
-<!-- DELETE SLAB CONFIRM -->
 <app-confirm-dialog
   [visible]="confirmSlabVisible"
   title="Delete Tariff Slab"

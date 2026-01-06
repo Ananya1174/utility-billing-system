@@ -25,296 +25,249 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class BillingServiceTest {
 
-    @Mock
-    private BillRepository billRepository;
+	@Mock
+	private BillRepository billRepository;
 
-    @Mock
-    private MeterReadingClient meterClient;
+	@Mock
+	private MeterReadingClient meterClient;
 
-    @Mock
-    private TariffSlabRepository slabRepository;
+	@Mock
+	private TariffSlabRepository slabRepository;
 
-    @Mock
-    private BillEventPublisher publisher;
+	@Mock
+	private BillEventPublisher publisher;
 
-    @Mock
-    private ConnectionClient connectionClient;
+	@Mock
+	private ConnectionClient connectionClient;
 
-    @Mock
-    private ConsumerClient consumerClient;
+	@Mock
+	private ConsumerClient consumerClient;
 
-    @InjectMocks
-    private BillingService service;
+	@InjectMocks
+	private BillingService service;
 
-    // ------------------ helpers ------------------
+	private GenerateBillRequest request() {
+		GenerateBillRequest r = new GenerateBillRequest();
+		r.setConsumerId("C1");
+		r.setConnectionId("CON1");
+		return r;
+	}
 
-    private GenerateBillRequest request() {
-        GenerateBillRequest r = new GenerateBillRequest();
-        r.setConsumerId("C1");
-        r.setConnectionId("CON1");
-        return r;
-    }
+	private void mockGenerateBillDependencies() {
 
-    /**
-     * ⭐ Centralized mock setup for generateBill
-     * Used by MULTIPLE tests
-     */
-    private void mockGenerateBillDependencies() {
+		MeterReadingResponse reading = new MeterReadingResponse();
+		reading.setReadingMonth(LocalDate.now().getMonthValue());
+		reading.setReadingYear(LocalDate.now().getYear());
+		reading.setConsumptionUnits(100);
+		reading.setUtilityType(UtilityType.ELECTRICITY);
 
-        // Meter reading
-        MeterReadingResponse reading = new MeterReadingResponse();
-        reading.setReadingMonth(LocalDate.now().getMonthValue());
-        reading.setReadingYear(LocalDate.now().getYear());
-        reading.setConsumptionUnits(100);
-        reading.setUtilityType(UtilityType.ELECTRICITY);
+		when(meterClient.getLatest("CON1")).thenReturn(reading);
 
-        when(meterClient.getLatest("CON1"))
-                .thenReturn(reading);
+		when(billRepository.findTopByConnectionIdOrderByBillingYearDescBillingMonthDesc("CON1"))
+				.thenReturn(Optional.empty());
+		ConsumerConnectionResponse conn = new ConsumerConnectionResponse();
+		conn.setActive(true);
+		conn.setUtilityType(UtilityType.ELECTRICITY);
+		conn.setTariffPlan("DOMESTIC");
 
-        when(billRepository
-                .findTopByConnectionIdOrderByBillingYearDescBillingMonthDesc("CON1"))
-                .thenReturn(Optional.empty());
+		when(connectionClient.getConnectionById("CON1")).thenReturn(conn);
+		ConsumerResponse consumer = new ConsumerResponse();
+		consumer.setId("C1");
+		consumer.setEmail("a@gmail.com");
 
-        // Connection
-        ConsumerConnectionResponse conn = new ConsumerConnectionResponse();
-        conn.setActive(true);
-        conn.setUtilityType(UtilityType.ELECTRICITY);
-        conn.setTariffPlan("DOMESTIC");
+		when(consumerClient.getConsumerById("C1")).thenReturn(consumer);
+		TariffSlab slab = new TariffSlab();
+		slab.setMinUnits(0);
+		slab.setMaxUnits(200);
+		slab.setRate(5);
 
-        when(connectionClient.getConnectionById("CON1"))
-                .thenReturn(conn);
+		when(slabRepository.findByUtilityTypeAndPlanCodeOrderByMinUnitsAsc(UtilityType.ELECTRICITY, "DOMESTIC"))
+				.thenReturn(List.of(slab));
 
-        // Consumer
-        ConsumerResponse consumer = new ConsumerResponse();
-        consumer.setId("C1");
-        consumer.setEmail("a@gmail.com");
+		when(billRepository.save(any(Bill.class))).thenAnswer(inv -> inv.getArgument(0));
+	}
 
-        when(consumerClient.getConsumerById("C1"))
-                .thenReturn(consumer);
+	@Test
+	void generateBill_success() {
 
-        // Tariff slab
-        TariffSlab slab = new TariffSlab();
-        slab.setMinUnits(0);
-        slab.setMaxUnits(200);
-        slab.setRate(5);
+		mockGenerateBillDependencies();
 
-        when(slabRepository
-                .findByUtilityTypeAndPlanCodeOrderByMinUnitsAsc(
-                        UtilityType.ELECTRICITY, "DOMESTIC"))
-                .thenReturn(List.of(slab));
+		BillResponse response = service.generateBill(request());
 
-        when(billRepository.save(any(Bill.class)))
-                .thenAnswer(inv -> inv.getArgument(0));
-    }
+		assertNotNull(response);
+		assertTrue(response.getTotalAmount() > 0);
 
-    // ------------------ tests ------------------
+		verify(publisher, times(1)).publish(any());
+	}
 
-    @Test
-    void generateBill_success() {
+	@Test
+	void markBillAsPaid_notFound_lambdaCovered() {
 
-        mockGenerateBillDependencies();
+		when(billRepository.findById("B99")).thenReturn(Optional.empty());
 
-        BillResponse response = service.generateBill(request());
+		assertThrows(ApiException.class, () -> service.markBillAsPaid("B99"));
+	}
 
-        assertNotNull(response);
-        assertTrue(response.getTotalAmount() > 0);
+	@Test
+	void generateBill_multipleSlabs_lambdaCovered() {
 
-        verify(publisher, times(1))
-                .publish(any());
-    }
-    @Test
-    void markBillAsPaid_notFound_lambdaCovered() {
+		mockGenerateBillDependencies();
 
-        when(billRepository.findById("B99"))
-                .thenReturn(Optional.empty());
+		TariffSlab slab1 = new TariffSlab();
+		slab1.setMinUnits(0);
+		slab1.setMaxUnits(50);
+		slab1.setRate(3);
 
-        assertThrows(ApiException.class,
-                () -> service.markBillAsPaid("B99"));
-    }
-    @Test
-    void generateBill_multipleSlabs_lambdaCovered() {
+		TariffSlab slab2 = new TariffSlab();
+		slab2.setMinUnits(51);
+		slab2.setMaxUnits(200);
+		slab2.setRate(5);
 
-        mockGenerateBillDependencies();
+		when(slabRepository.findByUtilityTypeAndPlanCodeOrderByMinUnitsAsc(UtilityType.ELECTRICITY, "DOMESTIC"))
+				.thenReturn(List.of(slab1, slab2));
 
-        TariffSlab slab1 = new TariffSlab();
-        slab1.setMinUnits(0);
-        slab1.setMaxUnits(50);
-        slab1.setRate(3);
+		BillResponse response = service.generateBill(request());
 
-        TariffSlab slab2 = new TariffSlab();
-        slab2.setMinUnits(51);
-        slab2.setMaxUnits(200);
-        slab2.setRate(5);
+		assertTrue(response.getEnergyCharge() > 0);
+	}
 
-        when(slabRepository.findByUtilityTypeAndPlanCodeOrderByMinUnitsAsc(
-                UtilityType.ELECTRICITY, "DOMESTIC"))
-                .thenReturn(List.of(slab1, slab2));
+	@Test
+	void getAllBills_byMonthYear() {
 
-        BillResponse response = service.generateBill(request());
+		when(billRepository.findByBillingMonthAndBillingYear(1, 2025)).thenReturn(List.of(new Bill()));
 
-        assertTrue(response.getEnergyCharge() > 0);
-    }
-    @Test
-    void getAllBills_byMonthYear() {
+		assertEquals(1, service.getAllBills(null, 1, 2025, null).size());
+	}
 
-        when(billRepository.findByBillingMonthAndBillingYear(1, 2025))
-                .thenReturn(List.of(new Bill()));
+	@Test
+	void getAllBills_byConsumerId() {
 
-        assertEquals(1,
-                service.getAllBills(null, 1, 2025, null).size());
-    }
+		when(billRepository.findByConsumerId("C1")).thenReturn(List.of(new Bill()));
 
-    @Test
-    void getAllBills_byConsumerId() {
+		assertEquals(1, service.getAllBills(null, null, null, "C1").size());
+	}
 
-        when(billRepository.findByConsumerId("C1"))
-                .thenReturn(List.of(new Bill()));
+	@Test
+	void getAllBills_all() {
 
-        assertEquals(1,
-                service.getAllBills(null, null, null, "C1").size());
-    }
+		when(billRepository.findAll()).thenReturn(List.of(new Bill()));
 
-    @Test
-    void getAllBills_all() {
+		assertEquals(1, service.getAllBills(null, null, null, null).size());
+	}
 
-        when(billRepository.findAll())
-                .thenReturn(List.of(new Bill()));
+	@Test
+	void getBillsByConsumer_success() {
 
-        assertEquals(1,
-                service.getAllBills(null, null, null, null).size());
-    }
-    @Test
-    void getBillsByConsumer_success() {
+		when(billRepository.findByConsumerId("C1")).thenReturn(List.of(new Bill()));
 
-        when(billRepository.findByConsumerId("C1"))
-                .thenReturn(List.of(new Bill()));
+		assertEquals(1, service.getBillsByConsumer("C1").size());
+	}
 
-        assertEquals(1,
-                service.getBillsByConsumer("C1").size());
-    }
+	@Test
+	void generateBill_lambdaCovered() {
 
-    @Test
-    void generateBill_lambdaCovered() {
+		mockGenerateBillDependencies();
 
-        mockGenerateBillDependencies(); // ⭐ REQUIRED
+		BillResponse response = service.generateBill(request());
+		assertTrue(response.getTotalAmount() > 0);
+	}
 
-        BillResponse response = service.generateBill(request());
+	@Test
+	void markBillAsPaid_success() {
 
-        // ⭐ forces lambda execution for JaCoCo
-        assertTrue(response.getTotalAmount() > 0);
-    }
+		Bill bill = new Bill();
+		bill.setStatus(BillStatus.DUE);
+		bill.setEnergyCharge(100);
+		bill.setFixedCharge(50);
+		bill.setTax(10);
+		bill.setPenalty(0);
 
-    @Test
-    void markBillAsPaid_success() {
+		when(billRepository.findById("B1")).thenReturn(Optional.of(bill));
 
-        Bill bill = new Bill();
-        bill.setStatus(BillStatus.DUE);
-        bill.setEnergyCharge(100);
-        bill.setFixedCharge(50);
-        bill.setTax(10);
-        bill.setPenalty(0);
+		service.markBillAsPaid("B1");
 
-        when(billRepository.findById("B1"))
-                .thenReturn(Optional.of(bill));
+		assertEquals(BillStatus.PAID, bill.getStatus());
+		assertEquals(160, bill.getTotalAmount());
+	}
 
-        service.markBillAsPaid("B1");
+	@Test
+	void markBillAsPaid_withPenalty() {
 
-        assertEquals(BillStatus.PAID, bill.getStatus());
-        assertEquals(160, bill.getTotalAmount());
-    }
+		Bill bill = new Bill();
+		bill.setStatus(BillStatus.DUE);
+		bill.setPenalty(50);
 
-    @Test
-    void markBillAsPaid_withPenalty() {
+		when(billRepository.findById("B1")).thenReturn(Optional.of(bill));
 
-        Bill bill = new Bill();
-        bill.setStatus(BillStatus.DUE);
-        bill.setPenalty(50);
+		service.markBillAsPaid("B1");
 
-        when(billRepository.findById("B1"))
-                .thenReturn(Optional.of(bill));
+		assertEquals(BillStatus.PAID, bill.getStatus());
+	}
 
-        service.markBillAsPaid("B1");
+	@Test
+	void getBillById_notFound() {
 
-        assertEquals(BillStatus.PAID, bill.getStatus());
-    }
+		when(billRepository.findById("B1")).thenReturn(Optional.empty());
 
-    @Test
-    void getBillById_notFound() {
+		assertThrows(ApiException.class, () -> service.getBillById("B1"));
+	}
 
-        when(billRepository.findById("B1"))
-                .thenReturn(Optional.empty());
+	@Test
+	void getBillsByConsumer_notFound() {
 
-        assertThrows(ApiException.class,
-                () -> service.getBillById("B1"));
-    }
+		when(billRepository.findByConsumerId("C1")).thenReturn(List.of());
 
-    @Test
-    void getBillsByConsumer_notFound() {
+		assertThrows(ApiException.class, () -> service.getBillsByConsumer("C1"));
+	}
 
-        when(billRepository.findByConsumerId("C1"))
-                .thenReturn(List.of());
+	@Test
+	void getAllBills_withStatus() {
 
-        assertThrows(ApiException.class,
-                () -> service.getBillsByConsumer("C1"));
-    }
+		when(billRepository.findByStatus(BillStatus.PAID)).thenReturn(List.of(new Bill()));
 
-    @Test
-    void getAllBills_withStatus() {
+		assertEquals(1, service.getAllBills(BillStatus.PAID, null, null, null).size());
+	}
 
-        when(billRepository.findByStatus(BillStatus.PAID))
-                .thenReturn(List.of(new Bill()));
+	@Test
+	void getTotalBilledAmount_success() {
 
-        assertEquals(
-                1,
-                service.getAllBills(BillStatus.PAID, null, null, null).size()
-        );
-    }
+		Bill b = new Bill();
+		b.setTotalAmount(500);
 
-    @Test
-    void getTotalBilledAmount_success() {
+		when(billRepository.findAll()).thenReturn(List.of(b));
 
-        Bill b = new Bill();
-        b.setTotalAmount(500);
+		assertEquals(500, service.getTotalBilledAmount());
+	}
 
-        when(billRepository.findAll())
-                .thenReturn(List.of(b));
+	@Test
+	void getOverdueBills_success() {
 
-        assertEquals(500, service.getTotalBilledAmount());
-    }
+		when(billRepository.findByStatus(BillStatus.OVERDUE)).thenReturn(List.of(new Bill()));
 
-    @Test
-    void getOverdueBills_success() {
+		assertEquals(1, service.getOverdueBills().size());
+	}
 
-        when(billRepository.findByStatus(BillStatus.OVERDUE))
-                .thenReturn(List.of(new Bill()));
+	@Test
+	void map_billCovered() {
 
-        assertEquals(1, service.getOverdueBills().size());
-    }
+		Bill bill = new Bill();
+		bill.setId("B1");
+		bill.setConsumerId("C1");
+		bill.setTotalAmount(500);
 
-    @Test
-    void map_billCovered() {
+		when(billRepository.findAll()).thenReturn(List.of(bill));
 
-        Bill bill = new Bill();
-        bill.setId("B1");
-        bill.setConsumerId("C1");
-        bill.setTotalAmount(500);
+		List<BillResponse> result = service.getAllBills(null, null, null, null);
 
-        when(billRepository.findAll())
-                .thenReturn(List.of(bill));
+		assertEquals(1, result.size());
+		assertEquals("B1", result.get(0).getId());
+	}
 
-        List<BillResponse> result =
-                service.getAllBills(null, null, null, null);
+	@Test
+	void meterFallback_called() {
 
-        assertEquals(1, result.size());
-        assertEquals("B1", result.get(0).getId());
-    }
+		MeterReadingResponse response = service.meterFallback("CON1", new RuntimeException());
 
-    @Test
-    void meterFallback_called() {
-
-        MeterReadingResponse response =
-                service.meterFallback("CON1", new RuntimeException());
-
-        assertNull(response);
-    }
+		assertNull(response);
+	}
 }

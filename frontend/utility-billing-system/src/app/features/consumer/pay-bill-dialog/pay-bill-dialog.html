@@ -5,7 +5,6 @@
     <button class="close-btn" (click)="close()">✕</button>
   </div>
 
-  <!-- SEND OTP -->
   <div *ngIf="step === 'SEND'" class="dialog-body">
     <p class="amount">
       Amount Payable: <strong>₹{{ bill.payableAmount }}</strong>
@@ -18,7 +17,6 @@
     </button>
   </div>
 
-  <!-- ENTER OTP -->
   <div *ngIf="step === 'OTP'" class="dialog-body">
 
     <label class="otp-label">Enter OTP</label>

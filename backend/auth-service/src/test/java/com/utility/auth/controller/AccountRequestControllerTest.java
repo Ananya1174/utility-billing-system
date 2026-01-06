@@ -37,7 +37,6 @@ class AccountRequestControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    // ================= CREATE REQUEST =================
     @Test
     void createAccountRequest_success() throws Exception {
 
@@ -66,7 +65,6 @@ class AccountRequestControllerTest {
                 .andExpect(jsonPath("$.name").value("Ananya"));
     }
 
-    // ================= GET PENDING =================
     @Test
     @WithMockUser(roles = "ADMIN")
     void getPendingRequests_success() throws Exception {
@@ -99,14 +97,13 @@ class AccountRequestControllerTest {
                 .andExpect(jsonPath("$[0].requestId").value("R1"));
     }
 
-    // ================= REVIEW REQUEST =================
     @Test
     @WithMockUser(roles = "ADMIN")
     void reviewRequest_success() throws Exception {
 
         AccountRequestReviewDto dto = new AccountRequestReviewDto();
         dto.setRequestId("R1");
-        dto.setDecision("APPROVE"); // 👈 STRING, not boolean
+        dto.setDecision("APPROVE"); 
 
         mockMvc.perform(post("/auth/account-requests/review")
                 .contentType(MediaType.APPLICATION_JSON)

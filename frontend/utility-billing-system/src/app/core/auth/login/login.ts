@@ -1,5 +1,3 @@
-
-
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -64,7 +62,6 @@ export class LoginComponent {
             String(res.passwordChangeRequired)
           );
 
-          // FORCE PASSWORD CHANGE (CONSUMER ONLY)
           if (res.role === 'CONSUMER' && res.passwordChangeRequired) {
             this.router.navigate(['/change-password'], {
               queryParams: { firstLogin: true }
@@ -72,7 +69,6 @@ export class LoginComponent {
             return;
           }
 
-          // ROLE BASED REDIRECT
           if (res.role === 'ADMIN') {
             this.router.navigate(['/admin/dashboard']);
           } else if(res.role=='CONSUMER'){

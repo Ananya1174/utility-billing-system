@@ -30,7 +30,6 @@ export class ChangePasswordComponent {
     private authService: AuthService,
     private snackBar: MatSnackBar
   ) {
-    // ✅ SAFE INITIALIZATION
     this.form = this.fb.group({
       oldPassword: ['', Validators.required],
       newPassword: ['', [Validators.required, Validators.minLength(12)]],

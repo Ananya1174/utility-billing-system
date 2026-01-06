@@ -37,256 +37,214 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentService {
 
-	private static final SecureRandom RANDOM = new SecureRandom(); // ✅ reused Random
+	private static final SecureRandom RANDOM = new SecureRandom();
 
-    private final PaymentRepository repository;
-    private final BillingClient billingClient;
-    private final InvoiceRepository invoiceRepository;
-    private final ConsumerClient consumerClient;
-    private final RabbitTemplate rabbitTemplate;
+	private final PaymentRepository repository;
+	private final BillingClient billingClient;
+	private final InvoiceRepository invoiceRepository;
+	private final ConsumerClient consumerClient;
+	private final RabbitTemplate rabbitTemplate;
 
-    public PaymentResponse initiateOnline(InitiateOnlinePaymentRequest request) {
+	public PaymentResponse initiateOnline(InitiateOnlinePaymentRequest request) {
 
-        BillResponse bill = billingClient.getBill(request.billId());
+		BillResponse bill = billingClient.getBill(request.billId());
 
-        if (bill.getStatus() == BillStatus.PAID) {
-            throw new ApiException("Bill already paid", HttpStatus.BAD_REQUEST);
-        }
+		if (bill.getStatus() == BillStatus.PAID) {
+			throw new ApiException("Bill already paid", HttpStatus.BAD_REQUEST);
+		}
 
-        double totalPaid = repository.findByBillId(request.billId()).stream()
-                .filter(p -> p.getStatus() == PaymentStatus.SUCCESS)
-                .mapToDouble(Payment::getAmount)
-                .sum();
+		double totalPaid = repository.findByBillId(request.billId()).stream()
+				.filter(p -> p.getStatus() == PaymentStatus.SUCCESS).mapToDouble(Payment::getAmount).sum();
 
-        double outstanding = bill.getTotalAmount() - totalPaid;
+		double outstanding = bill.getTotalAmount() - totalPaid;
 
-        if (outstanding <= 0) {
-            throw new ApiException("No outstanding amount", HttpStatus.BAD_REQUEST);
-        }
+		if (outstanding <= 0) {
+			throw new ApiException("No outstanding amount", HttpStatus.BAD_REQUEST);
+		}
 
-        Payment payment = repository
-                .findByBillIdAndStatus(request.billId(), PaymentStatus.INITIATED)
-                .orElseGet(() -> {
-                    Payment p = new Payment();
-                    p.setBillId(request.billId());
-                    p.setConsumerId(request.consumerId());
-                    p.setAmount(outstanding);
-                    p.setMode(PaymentMode.ONLINE);
-                    p.setStatus(PaymentStatus.INITIATED);
-                    p.setTransactionId(UUID.randomUUID().toString());
-                    p.setBillingMonth(bill.getBillingMonth());
-                    p.setBillingYear(bill.getBillingYear());
-                    p.setCreatedAt(LocalDateTime.now());
-                    return p;
-                });
+		Payment payment = repository.findByBillIdAndStatus(request.billId(), PaymentStatus.INITIATED).orElseGet(() -> {
+			Payment p = new Payment();
+			p.setBillId(request.billId());
+			p.setConsumerId(request.consumerId());
+			p.setAmount(outstanding);
+			p.setMode(PaymentMode.ONLINE);
+			p.setStatus(PaymentStatus.INITIATED);
+			p.setTransactionId(UUID.randomUUID().toString());
+			p.setBillingMonth(bill.getBillingMonth());
+			p.setBillingYear(bill.getBillingYear());
+			p.setCreatedAt(LocalDateTime.now());
+			return p;
+		});
 
-        // ✅ reuse Random
-        String otp = String.valueOf(100000 + RANDOM.nextInt(900000));
-        payment.setOtp(otp);
-        payment.setOtpExpiry(Instant.now().plusSeconds(300));
+		String otp = String.valueOf(100000 + RANDOM.nextInt(900000));
+		payment.setOtp(otp);
+		payment.setOtpExpiry(Instant.now().plusSeconds(300));
 
-        repository.save(payment);
+		repository.save(payment);
 
-        ConsumerResponse consumer =
-                consumerClient.getConsumerById(payment.getConsumerId());
+		ConsumerResponse consumer = consumerClient.getConsumerById(payment.getConsumerId());
 
-        PaymentOtpEvent event = new PaymentOtpEvent();
-        event.setEmail(consumer.getEmail());
-        event.setOtp(otp);
-        event.setValidMinutes(5);
+		PaymentOtpEvent event = new PaymentOtpEvent();
+		event.setEmail(consumer.getEmail());
+		event.setOtp(otp);
+		event.setValidMinutes(5);
 
-        rabbitTemplate.convertAndSend(
-                RabbitMQConfig.EXCHANGE,
-                RabbitMQConfig.PAYMENT_OTP_KEY,
-                event
-        );
+		rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE, RabbitMQConfig.PAYMENT_OTP_KEY, event);
 
-        return PaymentResponse.from(payment, bill, null);
-    }
+		return PaymentResponse.from(payment, bill, null);
+	}
 
-    public List<PaymentResponse> getAllPayments() {
+	public List<PaymentResponse> getAllPayments() {
 
-        List<Payment> payments = repository.findAllByOrderByCreatedAtDesc();
+		List<Payment> payments = repository.findAllByOrderByCreatedAtDesc();
 
-        if (payments.isEmpty()) {
-            throw new ApiException("No payments found", HttpStatus.NOT_FOUND);
-        }
+		if (payments.isEmpty()) {
+			throw new ApiException("No payments found", HttpStatus.NOT_FOUND);
+		}
 
-        return payments.stream().map(payment -> {
-            BillResponse bill = billingClient.getBill(payment.getBillId());
-            Invoice invoice = invoiceRepository
-                    .findByPaymentId(payment.getId())
-                    .orElse(null);
+		return payments.stream().map(payment -> {
+			BillResponse bill = billingClient.getBill(payment.getBillId());
+			Invoice invoice = invoiceRepository.findByPaymentId(payment.getId()).orElse(null);
 
-            return PaymentResponse.from(
-                    payment,
-                    bill,
-                    invoice != null ? invoice.getId() : null
-            );
-        }).toList();
-    }
+			return PaymentResponse.from(payment, bill, invoice != null ? invoice.getId() : null);
+		}).toList();
+	}
 
-    public PaymentResponse confirmOtp(ConfirmOtpRequest request) {
+	public PaymentResponse confirmOtp(ConfirmOtpRequest request) {
 
-        Payment payment = repository.findById(request.paymentId())
-                .orElseThrow(() ->
-                        new ApiException("Payment not found", HttpStatus.NOT_FOUND));
+		Payment payment = repository.findById(request.paymentId())
+				.orElseThrow(() -> new ApiException("Payment not found", HttpStatus.NOT_FOUND));
 
-        if (payment.getStatus() == PaymentStatus.SUCCESS) {
-            throw new ApiException("Payment already completed", HttpStatus.BAD_REQUEST);
-        }
+		if (payment.getStatus() == PaymentStatus.SUCCESS) {
+			throw new ApiException("Payment already completed", HttpStatus.BAD_REQUEST);
+		}
 
-        if (payment.getOtpExpiry().isBefore(Instant.now())) {
-            payment.setStatus(PaymentStatus.FAILED);
-            repository.save(payment);
-            throw new ApiException("OTP expired", HttpStatus.BAD_REQUEST);
-        }
+		if (payment.getOtpExpiry().isBefore(Instant.now())) {
+			payment.setStatus(PaymentStatus.FAILED);
+			repository.save(payment);
+			throw new ApiException("OTP expired", HttpStatus.BAD_REQUEST);
+		}
 
-        if (!payment.getOtp().equals(request.otp())) {
-            throw new ApiException("Invalid OTP", HttpStatus.BAD_REQUEST);
-        }
+		if (!payment.getOtp().equals(request.otp())) {
+			throw new ApiException("Invalid OTP", HttpStatus.BAD_REQUEST);
+		}
 
-        payment.setStatus(PaymentStatus.SUCCESS);
-        payment.setConfirmedAt(LocalDateTime.now());
-        payment.setOtp(null);
-        payment.setOtpExpiry(null);
+		payment.setStatus(PaymentStatus.SUCCESS);
+		payment.setConfirmedAt(LocalDateTime.now());
+		payment.setOtp(null);
+		payment.setOtpExpiry(null);
 
-        repository.save(payment);
+		repository.save(payment);
 
-        billingClient.markPaid(payment.getBillId());
+		billingClient.markPaid(payment.getBillId());
 
-        Invoice invoice = generateInvoice(payment);
-        BillResponse bill = billingClient.getBill(payment.getBillId());
+		Invoice invoice = generateInvoice(payment);
+		BillResponse bill = billingClient.getBill(payment.getBillId());
 
-        return PaymentResponse.from(payment, bill, invoice.getId());
-    }
+		return PaymentResponse.from(payment, bill, invoice.getId());
+	}
 
-    public PaymentResponse offlinePayment(OfflinePaymentRequest request) {
+	public PaymentResponse offlinePayment(OfflinePaymentRequest request) {
 
-        BillResponse bill = billingClient.getBill(request.billId());
+		BillResponse bill = billingClient.getBill(request.billId());
 
-        if (bill.getStatus() == BillStatus.PAID) {
-            throw new ApiException("Bill already paid", HttpStatus.BAD_REQUEST);
-        }
+		if (bill.getStatus() == BillStatus.PAID) {
+			throw new ApiException("Bill already paid", HttpStatus.BAD_REQUEST);
+		}
 
-        double totalPaid = repository.findByBillId(request.billId()).stream()
-                .filter(p -> p.getStatus() == PaymentStatus.SUCCESS)
-                .mapToDouble(Payment::getAmount)
-                .sum();
+		double totalPaid = repository.findByBillId(request.billId()).stream()
+				.filter(p -> p.getStatus() == PaymentStatus.SUCCESS).mapToDouble(Payment::getAmount).sum();
 
-        double outstanding = bill.getTotalAmount() - totalPaid;
+		double outstanding = bill.getTotalAmount() - totalPaid;
 
-        if (outstanding <= 0) {
-            throw new ApiException("No outstanding amount", HttpStatus.BAD_REQUEST);
-        }
+		if (outstanding <= 0) {
+			throw new ApiException("No outstanding amount", HttpStatus.BAD_REQUEST);
+		}
 
-        billingClient.markPaid(request.billId());
+		billingClient.markPaid(request.billId());
 
-        Payment payment = new Payment();
-        payment.setBillId(request.billId());
-        payment.setConsumerId(request.consumerId());
-        payment.setAmount(outstanding);
-        payment.setMode(PaymentMode.OFFLINE);
-        payment.setStatus(PaymentStatus.SUCCESS);
-        payment.setRemarks(request.remarks());
-        payment.setTransactionId(UUID.randomUUID().toString());
-        payment.setBillingMonth(bill.getBillingMonth());
-        payment.setBillingYear(bill.getBillingYear());
-        payment.setCreatedAt(LocalDateTime.now());
-        payment.setConfirmedAt(LocalDateTime.now());
+		Payment payment = new Payment();
+		payment.setBillId(request.billId());
+		payment.setConsumerId(request.consumerId());
+		payment.setAmount(outstanding);
+		payment.setMode(PaymentMode.OFFLINE);
+		payment.setStatus(PaymentStatus.SUCCESS);
+		payment.setRemarks(request.remarks());
+		payment.setTransactionId(UUID.randomUUID().toString());
+		payment.setBillingMonth(bill.getBillingMonth());
+		payment.setBillingYear(bill.getBillingYear());
+		payment.setCreatedAt(LocalDateTime.now());
+		payment.setConfirmedAt(LocalDateTime.now());
 
-        repository.save(payment);
+		repository.save(payment);
 
-        Invoice invoice = generateInvoice(payment);
+		Invoice invoice = generateInvoice(payment);
 
-        return PaymentResponse.from(payment, bill, invoice.getId());
-    }
+		return PaymentResponse.from(payment, bill, invoice.getId());
+	}
 
-    public OutstandingResponse getOutstanding(String billId) {
+	public OutstandingResponse getOutstanding(String billId) {
 
-        BillResponse bill = billingClient.getBill(billId);
+		BillResponse bill = billingClient.getBill(billId);
 
-        double totalPaid = repository.findByBillId(billId).stream()
-                .filter(p -> p.getStatus() == PaymentStatus.SUCCESS)
-                .mapToDouble(Payment::getAmount)
-                .sum();
+		double totalPaid = repository.findByBillId(billId).stream().filter(p -> p.getStatus() == PaymentStatus.SUCCESS)
+				.mapToDouble(Payment::getAmount).sum();
 
-        return new OutstandingResponse(
-                billId,
-                bill.getTotalAmount(),
-                totalPaid,
-                Math.max(bill.getTotalAmount() - totalPaid, 0)
-        );
-    }
+		return new OutstandingResponse(billId, bill.getTotalAmount(), totalPaid,
+				Math.max(bill.getTotalAmount() - totalPaid, 0));
+	}
 
-    public List<PaymentResponse> getPaymentsByConsumer(String consumerId) {
+	public List<PaymentResponse> getPaymentsByConsumer(String consumerId) {
 
-        List<Payment> payments =
-                repository.findByConsumerIdOrderByCreatedAtDesc(consumerId);
+		List<Payment> payments = repository.findByConsumerIdOrderByCreatedAtDesc(consumerId);
 
-        if (payments.isEmpty()) {
-            throw new ApiException(
-                    "No payments found for consumerId: " + consumerId,
-                    HttpStatus.NOT_FOUND
-            );
-        }
+		if (payments.isEmpty()) {
+			throw new ApiException("No payments found for consumerId: " + consumerId, HttpStatus.NOT_FOUND);
+		}
 
-        return payments.stream().map(p -> {
-            BillResponse bill = billingClient.getBill(p.getBillId());
-            Invoice invoice =
-                    invoiceRepository.findByPaymentId(p.getId()).orElse(null);
+		return payments.stream().map(p -> {
+			BillResponse bill = billingClient.getBill(p.getBillId());
+			Invoice invoice = invoiceRepository.findByPaymentId(p.getId()).orElse(null);
 
-            return PaymentResponse.from(
-                    p,
-                    bill,
-                    invoice != null ? invoice.getId() : null
-            );
-        }).toList();
-    }
+			return PaymentResponse.from(p, bill, invoice != null ? invoice.getId() : null);
+		}).toList();
+	}
 
-    public List<PaymentResponse> getPaymentsByBill(String billId) {
+	public List<PaymentResponse> getPaymentsByBill(String billId) {
 
-        List<Payment> payments = repository.findByBillId(billId);
+		List<Payment> payments = repository.findByBillId(billId);
 
-        if (payments.isEmpty()) {
-            throw new ApiException(
-                    "No payments found for billId: " + billId,
-                    HttpStatus.NOT_FOUND
-            );
-        }
+		if (payments.isEmpty()) {
+			throw new ApiException("No payments found for billId: " + billId, HttpStatus.NOT_FOUND);
+		}
 
-        BillResponse bill = billingClient.getBill(billId);
+		BillResponse bill = billingClient.getBill(billId);
 
-        return payments.stream().map(p -> {
-            Invoice invoice =
-                    invoiceRepository.findByPaymentId(p.getId()).orElse(null);
+		return payments.stream().map(p -> {
+			Invoice invoice = invoiceRepository.findByPaymentId(p.getId()).orElse(null);
 
-            return PaymentResponse.from(
-                    p,
-                    bill,
-                    invoice != null ? invoice.getId() : null
-            );
-        }).toList();
-    }
+			return PaymentResponse.from(p, bill, invoice != null ? invoice.getId() : null);
+		}).toList();
+	}
 
-    private Invoice generateInvoice(Payment payment) {
+	private Invoice generateInvoice(Payment payment) {
 
-        BillResponse bill = billingClient.getBill(payment.getBillId());
+		BillResponse bill = billingClient.getBill(payment.getBillId());
 
-        Invoice invoice = new Invoice();
-        invoice.setInvoiceNumber("INV-" + System.currentTimeMillis());
-        invoice.setBillId(payment.getBillId());
-        invoice.setPaymentId(payment.getId());
-        invoice.setConsumerId(payment.getConsumerId());
-        invoice.setBillingMonth(bill.getBillingMonth());
-        invoice.setBillingYear(bill.getBillingYear());
-        invoice.setEnergyCharge(bill.getEnergyCharge());
-        invoice.setAmountPaid(payment.getAmount());
-        invoice.setTax(bill.getTax());
-        invoice.setPenalty(bill.getPenalty());
-        invoice.setTotalAmount(payment.getAmount());
-        invoice.setInvoiceDate(LocalDateTime.now());
+		Invoice invoice = new Invoice();
+		invoice.setInvoiceNumber("INV-" + System.currentTimeMillis());
+		invoice.setBillId(payment.getBillId());
+		invoice.setPaymentId(payment.getId());
+		invoice.setConsumerId(payment.getConsumerId());
+		invoice.setBillingMonth(bill.getBillingMonth());
+		invoice.setBillingYear(bill.getBillingYear());
+		invoice.setEnergyCharge(bill.getEnergyCharge());
+		invoice.setAmountPaid(payment.getAmount());
+		invoice.setTax(bill.getTax());
+		invoice.setPenalty(bill.getPenalty());
+		invoice.setTotalAmount(payment.getAmount());
+		invoice.setInvoiceDate(LocalDateTime.now());
 
-        return invoiceRepository.save(invoice);
-    }
+		return invoiceRepository.save(invoice);
+	}
 }

@@ -8,8 +8,6 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  // ================= AUTH APIs =================
-
   login(payload: { username: string; password: string }) {
     return this.http.post<any>(`${this.baseUrl}/login`, payload);
   }
@@ -41,8 +39,6 @@ export class AuthService {
     );
   }
 
-  // ================= TOKEN STORAGE =================
-
   saveToken(token: string) {
     localStorage.setItem('token', token);
   }
@@ -59,8 +55,6 @@ export class AuthService {
     return !!this.getToken();
   }
 
-  // ================= JWT DECODING =================
-
   private decodeToken(): any | null {
     const token = this.getToken();
     if (!token) return null;
@@ -71,28 +65,20 @@ export class AuthService {
       return null;
     }
   }
-
-  // ================= JWT DATA ACCESS =================
-
-  /** ✅ Comes from claim("userId", userId) */
   getUserId(): string | null {
     const payload = this.decodeToken();
     return payload?.userId || null;
   }
 
-  /** ✅ Comes from claim("role", role) */
   getRole(): string | null {
     const payload = this.decodeToken();
     return payload?.role || null;
   }
 
-  /** ✅ Comes from setSubject(username) */
   getUsername(): string | null {
     const payload = this.decodeToken();
     return payload?.sub || null;
   }
-
-  // ================= ROLE HELPERS =================
 
   isConsumer(): boolean {
     return this.getRole() === 'CONSUMER';

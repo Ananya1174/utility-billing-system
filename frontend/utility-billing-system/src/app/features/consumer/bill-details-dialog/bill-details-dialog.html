@@ -1,11 +1,9 @@
 <div class="dialog-container">
 
-  <!-- HEADER -->
   <div class="dialog-header">
     <h2>Bill Details</h2>
   </div>
 
-  <!-- CONTENT -->
   <div class="dialog-content" *ngIf="!loading && bill">
 
     <div class="row">
@@ -42,14 +40,10 @@
 
   </div>
 
-  <!-- LOADING -->
   <div class="loading" *ngIf="loading">
     Loading bill details...
   </div>
-
-  <!-- ACTIONS -->
   <div class="dialog-actions">
     <button class="secondary-btn" (click)="close()">Close</button>
   </div>
-
 </div>

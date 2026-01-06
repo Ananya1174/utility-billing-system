@@ -32,7 +32,7 @@ public class BillReminderScheduler {
     public void sendDueReminders() {
 
         LocalDate start = LocalDate.now().plusDays(2);
-        LocalDate end   = start.plusDays(1); // handles timezone safely
+        LocalDate end   = start.plusDays(1); 
 
         List<Bill> bills =
             billRepository.findByStatusAndDueDateBetween(

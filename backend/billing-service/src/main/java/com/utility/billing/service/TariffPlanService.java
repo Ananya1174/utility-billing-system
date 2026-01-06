@@ -18,103 +18,65 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TariffPlanService {
 
-    private final TariffPlanRepository repository;
+	private final TariffPlanRepository repository;
 
-    /* ================= CREATE ================= */
+	public TariffPlanResponse createTariffPlan(TariffPlanDto dto) {
 
-    public TariffPlanResponse createTariffPlan(TariffPlanDto dto) {
+		TariffPlan plan = toEntity(dto);
 
-        TariffPlan plan = toEntity(dto);
+		boolean exists = repository.existsByUtilityTypeAndPlanCode(plan.getUtilityType(), plan.getPlanCode());
 
-        boolean exists =
-                repository.existsByUtilityTypeAndPlanCode(
-                        plan.getUtilityType(),
-                        plan.getPlanCode()
-                );
+		if (exists) {
+			throw new ApiException("Tariff plan already exists", HttpStatus.CONFLICT);
+		}
 
-        if (exists) {
-            throw new ApiException(
-                    "Tariff plan already exists",
-                    HttpStatus.CONFLICT
-            );
-        }
+		plan.setActive(true);
+		TariffPlan saved = repository.save(plan);
 
-        plan.setActive(true);
-        TariffPlan saved = repository.save(plan);
+		return TariffPlanResponse.from(saved);
+	}
 
-        return TariffPlanResponse.from(saved);
-    }
+	public Map<String, String> deactivateTariffPlan(String id) {
 
-    /* ================= DEACTIVATE ================= */
+		TariffPlan plan = repository.findById(id)
+				.orElseThrow(() -> new ApiException("Tariff plan not found", HttpStatus.NOT_FOUND));
 
-    public Map<String, String> deactivateTariffPlan(String id) {
+		if (!plan.isActive()) {
+			return Map.of("message", "Tariff plan already inactive");
+		}
 
-        TariffPlan plan =
-                repository.findById(id)
-                        .orElseThrow(() ->
-                                new ApiException(
-                                        "Tariff plan not found",
-                                        HttpStatus.NOT_FOUND
-                                )
-                        );
+		plan.setActive(false);
+		repository.save(plan);
 
-        if (!plan.isActive()) {
-            return Map.of(
-                    "message",
-                    "Tariff plan already inactive"
-            );
-        }
+		return Map.of("message", "Tariff plan " + plan.getPlanCode() + " deactivated successfully");
+	}
 
-        plan.setActive(false);
-        repository.save(plan);
+	public List<TariffPlanResponse> getActivePlans() {
 
-        return Map.of(
-                "message",
-                "Tariff plan " + plan.getPlanCode() + " deactivated successfully"
-        );
-    }
+		return repository.findByActiveTrue().stream().map(TariffPlanResponse::from).toList();
+	}
 
-    /* ================= GET ACTIVE (FIXED) ================= */
+	public List<TariffPlanResponse> getPlans(Boolean active) {
 
-    public List<TariffPlanResponse> getActivePlans() {
+		List<TariffPlan> plans;
 
-        return repository.findByActiveTrue()
-                .stream()
-                .map(TariffPlanResponse::from)
-                .toList();
-    }
+		if (active == null) {
+			plans = repository.findAll();
+		} else if (active) {
+			plans = repository.findByActiveTrue();
+		} else {
+			plans = repository.findAll().stream().filter(plan -> !plan.isActive()).toList();
+		}
 
-    /* ================= GET ALL / FILTERED (FIXED) ================= */
+		return plans.stream().map(TariffPlanResponse::from).toList();
+	}
 
-    public List<TariffPlanResponse> getPlans(Boolean active) {
+	private TariffPlan toEntity(TariffPlanDto dto) {
 
-        List<TariffPlan> plans;
+		TariffPlan plan = new TariffPlan();
+		plan.setUtilityType(dto.getUtilityType());
+		plan.setPlanCode(dto.getPlanCode());
+		return plan;
+	}
 
-        if (active == null) {
-            plans = repository.findAll();
-        } else if (active) {
-            plans = repository.findByActiveTrue();
-        } else {
-            plans = repository.findAll()
-                    .stream()
-                    .filter(plan -> !plan.isActive())
-                    .toList();
-        }
-
-        return plans.stream()
-                .map(TariffPlanResponse::from)
-                .toList();
-    }
-
-    /* ================= PRIVATE MAPPERS ================= */
-
-    private TariffPlan toEntity(TariffPlanDto dto) {
-
-        TariffPlan plan = new TariffPlan();
-        plan.setUtilityType(dto.getUtilityType());
-        plan.setPlanCode(dto.getPlanCode());
-        return plan;
-    }
-
-    
 }

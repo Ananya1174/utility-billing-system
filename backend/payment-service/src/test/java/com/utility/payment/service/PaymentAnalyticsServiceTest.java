@@ -31,7 +31,6 @@ class PaymentAnalyticsServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    /* ================= MONTHLY REVENUE ================= */
 
     @Test
     void getMonthlyRevenue_success() {
@@ -49,7 +48,6 @@ class PaymentAnalyticsServiceTest {
         assertEquals(1, dto.successfulPayments());
     }
 
-    /* ================= OUTSTANDING SUMMARY ================= */
 
     @Test
     void getOutstandingSummary_success() {
@@ -70,7 +68,6 @@ class PaymentAnalyticsServiceTest {
         assertEquals(700.0, dto.outstandingAmount());
     }
 
-    /* ================= PAYMENTS SUMMARY ================= */
 
     @Test
     void getPaymentsSummary_success() {
@@ -90,7 +87,6 @@ class PaymentAnalyticsServiceTest {
         assertEquals(1, dto.failedPayments());
     }
 
-    /* ================= FAILED PAYMENTS SUMMARY ================= */
 
     @Test
     void getFailedPaymentsSummary_success() {
@@ -109,7 +105,6 @@ class PaymentAnalyticsServiceTest {
         assertEquals(400, dto.failedAmount());
     }
 
-    /* ================= MONTHLY OUTSTANDING (12 MONTH LOOP) ================= */
 
     @Test
     void getMonthlyOutstanding_success() {
@@ -132,7 +127,6 @@ class PaymentAnalyticsServiceTest {
         assertEquals(500, result.get(0).outstandingAmount());
     }
 
-    /* ================= REVENUE BY MODE ================= */
 
     @Test
     void getRevenueByMode_success() {
@@ -152,7 +146,6 @@ class PaymentAnalyticsServiceTest {
         assertEquals(600, result.get(0).amount());
     }
 
-    /* ================= CONSUMER PAYMENT SUMMARY ================= */
 
     @Test
     void getConsumerPaymentSummary_success() {
@@ -173,7 +166,6 @@ class PaymentAnalyticsServiceTest {
         assertEquals(700, result.get(0).totalPaid());
     }
 
-    /* ================= YEARLY REVENUE ================= */
 
     @Test
     void getYearlyRevenue_success() {

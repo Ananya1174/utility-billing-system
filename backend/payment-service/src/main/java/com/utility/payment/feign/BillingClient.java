@@ -21,7 +21,7 @@ public interface BillingClient {
     @GetMapping("/bills/{billId}")
     BillResponse getBill(@PathVariable("billId") String billId);
 
-    // ✅ ADD THIS (matches controller exactly)
+   
     @GetMapping("/bills")
     List<BillResponse> getAllBills(
         @RequestParam(value = "status", required = false) BillStatus status,

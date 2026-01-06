@@ -1,6 +1,4 @@
 <div class="page-container">
-
-  <!-- HEADER -->
   <div class="page-header">
     <h2>My Utilities</h2>
 
@@ -12,12 +10,10 @@
     </button>
   </div>
 
-  <!-- LOADING -->
   <div class="loading" *ngIf="loading">
     Loading utilities...
   </div>
 
-  <!-- EMPTY -->
   <div class="empty-state" *ngIf="!loading && !hasUtilities">
     <p>You don’t have any utilities yet.</p>
     <button class="primary-btn" (click)="openRequestDialog()">
@@ -25,12 +21,10 @@
     </button>
   </div>
 
-  <!-- GRID -->
   <div class="utilities-grid" *ngIf="!loading && hasUtilities">
 
     <div class="utility-card" *ngFor="let u of utilities">
 
-      <!-- HEADER -->
       <div class="utility-header">
         <h3>{{ u.utilityType }}</h3>
 
@@ -41,7 +35,6 @@
         </span>
       </div>
 
-      <!-- DETAILS -->
       <div class="details">
 
         <p>
@@ -58,21 +51,14 @@
           <strong>Activated On:</strong>
           {{ u.activatedAt | date:'mediumDate' }}
         </p>
-
         <p *ngIf="!u.activatedAt && u.requestedAt">
           <strong>Requested On:</strong>
           {{ u.requestedAt | date:'mediumDate' }}
         </p>
-
       </div>
-
-      <!-- PENDING INFO -->
       <p class="hint" *ngIf="(u.status || u.connectionStatus) === 'PENDING'">
         Waiting for admin approval
       </p>
-
     </div>
-
   </div>
-
 </div>

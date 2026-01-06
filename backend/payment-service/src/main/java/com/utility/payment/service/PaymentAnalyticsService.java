@@ -25,194 +25,97 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PaymentAnalyticsService {
 
-    private final PaymentRepository paymentRepository;
-    private final BillingClient billingClient;
+	private final PaymentRepository paymentRepository;
+	private final BillingClient billingClient;
 
-    /* ================= DASHBOARD ================= */
+	public RevenueSummaryDto getMonthlyRevenue(int month, int year) {
 
-    public RevenueSummaryDto getMonthlyRevenue(int month, int year) {
+		List<Payment> payments = paymentRepository.findByBillingMonthAndBillingYear(month, year).stream()
+				.filter(p -> p.getStatus() == PaymentStatus.SUCCESS).toList();
 
-        List<Payment> payments =
-                paymentRepository.findByBillingMonthAndBillingYear(month, year)
-                        .stream()
-                        .filter(p -> p.getStatus() == PaymentStatus.SUCCESS)
-                        .toList();
+		double revenue = payments.stream().mapToDouble(Payment::getAmount).sum();
 
-        double revenue = payments.stream()
-                .mapToDouble(Payment::getAmount)
-                .sum();
+		return new RevenueSummaryDto(month, year, revenue, payments.size());
+	}
 
-        return new RevenueSummaryDto(
-                month,
-                year,
-                revenue,
-                payments.size()
-        );
-    }
+	public OutstandingSummaryDto getOutstandingSummary() {
 
-    public OutstandingSummaryDto getOutstandingSummary() {
+		double totalPaid = paymentRepository.findByStatus(PaymentStatus.SUCCESS).stream()
+				.mapToDouble(Payment::getAmount).sum();
 
-        double totalPaid = paymentRepository
-                .findByStatus(PaymentStatus.SUCCESS)
-                .stream()
-                .mapToDouble(Payment::getAmount)
-                .sum();
+		double totalBilled = billingClient.getTotalBilled();
 
-        double totalBilled = billingClient.getTotalBilled();
+		double outstanding = Math.max(totalBilled - totalPaid, 0);
 
-        double outstanding = Math.max(totalBilled - totalPaid, 0);
+		return new OutstandingSummaryDto(totalBilled, totalPaid, outstanding);
+	}
 
-        // Billing service owns total billed
-        return new OutstandingSummaryDto(
-        		totalBilled,
-                totalPaid,
-                outstanding
-        );
-    }
+	public PaymentsSummaryDto getPaymentsSummary(int month, int year) {
 
-    /* ================= PAYMENTS SUMMARY ================= */
+		List<Payment> payments = paymentRepository.findByBillingMonthAndBillingYear(month, year);
 
-    public PaymentsSummaryDto getPaymentsSummary(int month, int year) {
+		long success = payments.stream().filter(p -> p.getStatus() == PaymentStatus.SUCCESS).count();
 
-        List<Payment> payments =
-                paymentRepository.findByBillingMonthAndBillingYear(month, year);
+		long failed = payments.stream().filter(p -> p.getStatus() == PaymentStatus.FAILED).count();
 
-        long success = payments.stream()
-                .filter(p -> p.getStatus() == PaymentStatus.SUCCESS)
-                .count();
+		return new PaymentsSummaryDto(month, year, success, failed);
+	}
 
-        long failed = payments.stream()
-                .filter(p -> p.getStatus() == PaymentStatus.FAILED)
-                .count();
+	public FailedPaymentSummaryDto getFailedPaymentsSummary(int month, int year) {
 
-        return new PaymentsSummaryDto(
-                month,
-                year,
-                success,
-                failed
-        );
-    }
+		List<Payment> failed = paymentRepository.findByBillingMonthAndBillingYear(month, year).stream()
+				.filter(p -> p.getStatus() == PaymentStatus.FAILED).toList();
 
-    public FailedPaymentSummaryDto getFailedPaymentsSummary(int month, int year) {
+		double amount = failed.stream().mapToDouble(Payment::getAmount).sum();
 
-        List<Payment> failed =
-                paymentRepository.findByBillingMonthAndBillingYear(month, year)
-                        .stream()
-                        .filter(p -> p.getStatus() == PaymentStatus.FAILED)
-                        .toList();
+		return new FailedPaymentSummaryDto(failed.size(), amount);
+	}
 
-        double amount = failed.stream()
-                .mapToDouble(Payment::getAmount)
-                .sum();
+	public List<MonthlyOutstandingDto> getMonthlyOutstanding(int year) {
 
-        return new FailedPaymentSummaryDto(
-                failed.size(),
-                amount
-        );
-    }
-    public List<MonthlyOutstandingDto> getMonthlyOutstanding(int year) {
+		List<MonthlyOutstandingDto> result = new ArrayList<>();
 
-        List<MonthlyOutstandingDto> result = new ArrayList<>();
+		for (int month = 1; month <= 12; month++) {
 
-        for (int month = 1; month <= 12; month++) {
+			double totalPaid = paymentRepository
+					.findByBillingMonthAndBillingYearAndStatus(month, year, PaymentStatus.SUCCESS).stream()
+					.mapToDouble(Payment::getAmount).sum();
 
-            // 🔹 Total Paid (SUCCESS payments only)
-            double totalPaid =
-                    paymentRepository
-                            .findByBillingMonthAndBillingYearAndStatus(
-                                    month,
-                                    year,
-                                    PaymentStatus.SUCCESS
-                            )
-                            .stream()
-                            .mapToDouble(Payment::getAmount)
-                            .sum();
+			double totalBilled = billingClient.getTotalBilledForMonth(month, year);
 
-            // 🔹 Total Billed (from Billing Service)
-            double totalBilled =
-                    billingClient.getTotalBilledForMonth(month, year);
+			double outstanding = Math.max(0, totalBilled - totalPaid);
 
-            double outstanding =
-                    Math.max(0, totalBilled - totalPaid);
+			result.add(new MonthlyOutstandingDto(month, Month.of(month).name(), totalBilled, totalPaid, outstanding));
+		}
 
-            result.add(
-                    new MonthlyOutstandingDto(
-                            month,
-                            Month.of(month).name(),
-                            totalBilled,
-                            totalPaid,
-                            outstanding
-                    )
-            );
-        }
+		return result;
+	}
 
-        return result;
-    }
+	public List<PaymentModeSummaryDto> getRevenueByMode(int month, int year) {
 
-    /* ================= REPORTS ================= */
+		return paymentRepository.findByBillingMonthAndBillingYear(month, year).stream()
+				.filter(p -> p.getStatus() == PaymentStatus.SUCCESS)
+				.collect(Collectors.groupingBy(Payment::getMode, Collectors.summingDouble(Payment::getAmount)))
+				.entrySet().stream().map(e -> new PaymentModeSummaryDto(e.getKey(), e.getValue())).toList();
+	}
 
-    public List<PaymentModeSummaryDto> getRevenueByMode(int month, int year) {
+	public List<ConsumerPaymentSummaryDto> getConsumerPaymentSummary(int month, int year) {
 
-        return paymentRepository
-                .findByBillingMonthAndBillingYear(month, year)
-                .stream()
-                .filter(p -> p.getStatus() == PaymentStatus.SUCCESS)
-                .collect(Collectors.groupingBy(
-                        Payment::getMode,
-                        Collectors.summingDouble(Payment::getAmount)
-                ))
-                .entrySet()
-                .stream()
-                .map(e -> new PaymentModeSummaryDto(e.getKey(), e.getValue()))
-                .toList();
-    }
+		return paymentRepository.findByBillingMonthAndBillingYear(month, year).stream()
+				.filter(p -> p.getStatus() == PaymentStatus.SUCCESS)
+				.collect(Collectors.groupingBy(Payment::getConsumerId)).entrySet().stream()
+				.map(e -> new ConsumerPaymentSummaryDto(e.getKey(), e.getValue().size(),
+						e.getValue().stream().mapToDouble(Payment::getAmount).sum()))
+				.toList();
+	}
 
-    public List<ConsumerPaymentSummaryDto> getConsumerPaymentSummary(
-            int month,
-            int year) {
+	public List<RevenueSummaryDto> getYearlyRevenue(int year) {
+		return paymentRepository.findByBillingYear(year).stream().filter(p -> p.getStatus() == PaymentStatus.SUCCESS)
+				.collect(Collectors.groupingBy(Payment::getBillingMonth, Collectors.toList())).entrySet().stream()
+				.map(e -> {
+					double revenue = e.getValue().stream().mapToDouble(Payment::getAmount).sum();
 
-        return paymentRepository
-                .findByBillingMonthAndBillingYear(month, year)
-                .stream()
-                .filter(p -> p.getStatus() == PaymentStatus.SUCCESS)
-                .collect(Collectors.groupingBy(Payment::getConsumerId))
-                .entrySet()
-                .stream()
-                .map(e -> new ConsumerPaymentSummaryDto(
-                        e.getKey(),
-                        e.getValue().size(),
-                        e.getValue()
-                                .stream()
-                                .mapToDouble(Payment::getAmount)
-                                .sum()
-                ))
-                .toList();
-    }
-
-    public List<RevenueSummaryDto> getYearlyRevenue(int year) {
-
-        return paymentRepository.findByBillingYear(year)
-                .stream()
-                .filter(p -> p.getStatus() == PaymentStatus.SUCCESS)
-                .collect(Collectors.groupingBy(
-                        Payment::getBillingMonth,
-                        Collectors.toList()
-                ))
-                .entrySet()
-                .stream()
-                .map(e -> {
-                    double revenue = e.getValue()
-                            .stream()
-                            .mapToDouble(Payment::getAmount)
-                            .sum();
-
-                    return new RevenueSummaryDto(
-                            e.getKey(),
-                            year,
-                            revenue,
-                            e.getValue().size()
-                    );
-                })
-                .toList();
-    }
+					return new RevenueSummaryDto(e.getKey(), year, revenue, e.getValue().size());
+				}).toList();
+	}
 }

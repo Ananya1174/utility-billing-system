@@ -22,14 +22,12 @@
       <td>{{ r.requestedAt | date:'medium' }}</td>
 
       <td>
-        <!-- APPROVE -->
         <button
           *ngIf="approvingRequestId !== r.id"
           (click)="startApprove(r.id)">
           Approve
         </button>
 
-        <!-- APPROVE FORM -->
         <div *ngIf="approvingRequestId === r.id" class="approve-form">
           <input
             type="text"
@@ -41,7 +39,6 @@
           </button>
         </div>
 
-        <!-- REJECT -->
         <button class="reject-btn" (click)="reject(r.id)">
           Reject
         </button>

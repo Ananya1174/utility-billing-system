@@ -34,7 +34,6 @@ export class BillDetailsDialogComponent implements OnInit {
       }
     });
   }
-
   close(): void {
     this.dialogRef.close();
   }

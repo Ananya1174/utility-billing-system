@@ -9,7 +9,6 @@ export class ConsumerService {
 
   constructor(private http: HttpClient) {}
 
-  // ✅ DASHBOARD SUMMARY
   getDashboardSummary(): Observable<any> {
     return this.http.get<any>(
       `${this.baseUrl}/dashboard/summary`

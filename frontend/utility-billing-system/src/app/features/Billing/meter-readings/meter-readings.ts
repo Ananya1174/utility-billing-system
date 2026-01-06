@@ -80,7 +80,6 @@ export class MeterReadingsComponent {
             panelClass: ['snackbar-error']
           }
         );
-
         this.cdr.detectChanges();
       }
     });

@@ -51,7 +51,7 @@ public class PaymentDataSeeder {
                     null
             );
         } catch (FeignException ex) {
-            return; // billing not ready yet → retry later
+            return; 
         }
 
         if (paidBills.isEmpty()) {

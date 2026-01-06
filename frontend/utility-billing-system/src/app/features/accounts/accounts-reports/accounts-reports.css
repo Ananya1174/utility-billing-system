@@ -1,7 +1,3 @@
-
-
-/* ================= PAGE WRAPPER ================= */
-
 :host {
   display: block;
   padding: 24px 28px;
@@ -9,15 +5,11 @@
   min-height: 100vh;
 }
 
-/* ================= HEADER ================= */
-
 h2 {
   margin: 20px 0 16px;
   font-size: 1.8rem;
   color: #1e3a8a;
 }
-
-/* ================= FILTERS ================= */
 
 .filters {
   display: flex;
@@ -34,16 +26,12 @@ h2 {
   cursor: pointer;
 }
 
-/* ================= CHART GRID ================= */
-
 .charts-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 22px;
   margin-bottom: 26px;
 }
-
-/* ================= CARD ================= */
 
 .card {
   background: #ffffff;
@@ -56,8 +44,6 @@ h2 {
   padding: 16px 18px;
 }
 
-/* ================= CARD TITLE ================= */
-
 .card h3 {
   margin: 0 0 14px;
   font-size: 15px;
@@ -65,13 +51,9 @@ h2 {
   color: #374151;
 }
 
-/* ================= CHART SIZE CONTROL ================= */
-
 .card canvas {
   max-height: 220px !important;
 }
-
-/* ================= TABLE ================= */
 
 table {
   width: 100%;
@@ -103,8 +85,6 @@ tbody tr:hover {
   background: #f9fafb;
 }
 
-/* ================= RESPONSIVE ================= */
-
 @media (max-width: 768px) {
   :host {
     padding: 18px;
@@ -114,7 +94,6 @@ tbody tr:hover {
     flex-direction: column;
     align-items: flex-start;
   }
-
   .card canvas {
     max-height: 200px !important;
   }

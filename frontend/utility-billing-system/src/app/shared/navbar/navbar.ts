@@ -19,7 +19,6 @@ export class Navbar {
     this.role = localStorage.getItem('role');
   }
 
-  /* ===== ROLE HELPERS ===== */
   isAdmin() {
     return this.role === 'ADMIN';
   }
@@ -36,7 +35,6 @@ export class Navbar {
     return this.role === 'ACCOUNTS_OFFICER';
   }
 
-  /* ===== LOGOUT FLOW ===== */
   confirmLogout() {
     this.logoutDialog = true;
   }
@@ -51,7 +49,6 @@ export class Navbar {
   localStorage.clear();
   sessionStorage.clear();
 
-  // Redirect to landing
   this.router.navigate(['/']);
 }
 }

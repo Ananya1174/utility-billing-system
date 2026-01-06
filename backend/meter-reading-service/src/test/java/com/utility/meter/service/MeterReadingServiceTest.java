@@ -24,142 +24,127 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class MeterReadingServiceTest {
 
-    @Mock
-    private MeterReadingRepository repository;
+	@Mock
+	private MeterReadingRepository repository;
 
-    @Mock
-    private ConsumerConnectionClient consumerConnectionClient;
+	@Mock
+	private ConsumerConnectionClient consumerConnectionClient;
 
-    @InjectMocks
-    private MeterReadingService service;
+	@InjectMocks
+	private MeterReadingService service;
 
-    private CreateMeterReadingRequest request() {
-        CreateMeterReadingRequest r = new CreateMeterReadingRequest();
-        r.setConsumerId("C1");
-        r.setConnectionId("CON1");
-        r.setUtilityType(UtilityType.ELECTRICITY);
-        r.setMeterNumber("MTR1");
-        r.setCurrentReading(100);
-        r.setReadingMonth(1);
-        r.setReadingYear(2025);
-        return r;
-    }
+	private CreateMeterReadingRequest request() {
+		CreateMeterReadingRequest r = new CreateMeterReadingRequest();
+		r.setConsumerId("C1");
+		r.setConnectionId("CON1");
+		r.setUtilityType(UtilityType.ELECTRICITY);
+		r.setMeterNumber("MTR1");
+		r.setCurrentReading(100);
+		r.setReadingMonth(1);
+		r.setReadingYear(2025);
+		return r;
+	}
 
-    private ConnectionDto connection() {
-        ConnectionDto c = new ConnectionDto();
-        c.setConsumerId("C1");
-        c.setUtilityType(UtilityType.ELECTRICITY);
-        c.setMeterNumber("MTR1");
-        return c;
-    }
+	private ConnectionDto connection() {
+		ConnectionDto c = new ConnectionDto();
+		c.setConsumerId("C1");
+		c.setUtilityType(UtilityType.ELECTRICITY);
+		c.setMeterNumber("MTR1");
+		return c;
+	}
 
-    @Test
-    void addReading_success() {
+	@Test
+	void addReading_success() {
 
-        when(consumerConnectionClient.getConnectionById("CON1"))
-                .thenReturn(connection());
+		when(consumerConnectionClient.getConnectionById("CON1")).thenReturn(connection());
 
-        when(repository.existsByConnectionIdAndReadingMonthAndReadingYear(
-                "CON1", 1, 2025))
-                .thenReturn(false);
+		when(repository.existsByConnectionIdAndReadingMonthAndReadingYear("CON1", 1, 2025)).thenReturn(false);
 
-        when(repository.findTopByConnectionIdOrderByReadingYearDescReadingMonthDesc("CON1"))
-                .thenReturn(Optional.empty());
+		when(repository.findTopByConnectionIdOrderByReadingYearDescReadingMonthDesc("CON1"))
+				.thenReturn(Optional.empty());
 
-        MeterReadingResponse response =
-                service.addReading(request());
+		MeterReadingResponse response = service.addReading(request());
 
-        assertNotNull(response);
-    }
+		assertNotNull(response);
+	}
 
-    @Test
-    void addReading_duplicateMonth() {
+	@Test
+	void addReading_duplicateMonth() {
 
-        when(consumerConnectionClient.getConnectionById("CON1"))
-                .thenReturn(connection());
+		when(consumerConnectionClient.getConnectionById("CON1")).thenReturn(connection());
 
-        when(repository.existsByConnectionIdAndReadingMonthAndReadingYear(
-                "CON1", 1, 2025))
-                .thenReturn(true);
+		when(repository.existsByConnectionIdAndReadingMonthAndReadingYear("CON1", 1, 2025)).thenReturn(true);
 
-        CreateMeterReadingRequest req = request(); // ✅ correct type
+		CreateMeterReadingRequest req = request();
 
-        assertThrows(ApiException.class,
-                () -> service.addReading(req));
-    }
+		assertThrows(ApiException.class, () -> service.addReading(req));
+	}
 
-    @Test
-    void getLatest_success() {
+	@Test
+	void getLatest_success() {
 
-        MeterReading r = new MeterReading();
-        r.setConnectionId("CON1");
+		MeterReading r = new MeterReading();
+		r.setConnectionId("CON1");
 
-        when(repository.findTopByConnectionIdOrderByReadingYearDescReadingMonthDesc("CON1"))
-                .thenReturn(Optional.of(r));
+		when(repository.findTopByConnectionIdOrderByReadingYearDescReadingMonthDesc("CON1")).thenReturn(Optional.of(r));
 
-        assertNotNull(service.getLatest("CON1"));
-    }
+		assertNotNull(service.getLatest("CON1"));
+	}
 
-    @Test
-    void getLatest_notFound() {
+	@Test
+	void getLatest_notFound() {
 
-        when(repository.findTopByConnectionIdOrderByReadingYearDescReadingMonthDesc("CON1"))
-                .thenReturn(Optional.empty());
+		when(repository.findTopByConnectionIdOrderByReadingYearDescReadingMonthDesc("CON1"))
+				.thenReturn(Optional.empty());
 
-        assertThrows(ApiException.class,
-                () -> service.getLatest("CON1"));
-    }
+		assertThrows(ApiException.class, () -> service.getLatest("CON1"));
+	}
 
-    @Test
-    void getByConnection_success() {
+	@Test
+	void getByConnection_success() {
 
-        when(repository.findByConnectionId("CON1"))
-                .thenReturn(List.of(new MeterReading()));
+		when(repository.findByConnectionId("CON1")).thenReturn(List.of(new MeterReading()));
 
-        assertEquals(1, service.getByConnection("CON1").size());
-    }
-    @Test
-    void getByConsumer_withData() {
+		assertEquals(1, service.getByConnection("CON1").size());
+	}
 
-        MeterReading reading = new MeterReading();
-        reading.setConsumerId("C1");
-        reading.setConnectionId("CON1");
-        reading.setUtilityType(UtilityType.ELECTRICITY);
-        reading.setMeterNumber("MTR1");
+	@Test
+	void getByConsumer_withData() {
 
-        when(repository.findByConsumerId("C1"))
-                .thenReturn(List.of(reading));
+		MeterReading reading = new MeterReading();
+		reading.setConsumerId("C1");
+		reading.setConnectionId("CON1");
+		reading.setUtilityType(UtilityType.ELECTRICITY);
+		reading.setMeterNumber("MTR1");
 
-        List<MeterReadingResponse> result =
-                service.getByConsumer("C1");
+		when(repository.findByConsumerId("C1")).thenReturn(List.of(reading));
 
-        assertEquals(1, result.size());   // 🔑 forces map() execution
-    }
-    @Test
-    void getByMonth_withData() {
+		List<MeterReadingResponse> result = service.getByConsumer("C1");
 
-        MeterReading reading = new MeterReading();
-        reading.setReadingMonth(1);
-        reading.setReadingYear(2025);
-        reading.setUtilityType(UtilityType.ELECTRICITY);
-        reading.setMeterNumber("MTR1");
+		assertEquals(1, result.size());
+	}
 
-        when(repository.findByReadingMonthAndReadingYear(1, 2025))
-                .thenReturn(List.of(reading));
+	@Test
+	void getByMonth_withData() {
 
-        List<MeterReadingResponse> result =
-                service.getByMonth(1, 2025);
+		MeterReading reading = new MeterReading();
+		reading.setReadingMonth(1);
+		reading.setReadingYear(2025);
+		reading.setUtilityType(UtilityType.ELECTRICITY);
+		reading.setMeterNumber("MTR1");
 
-        assertEquals(1, result.size());   // 🔑 forces map() execution
-    }
+		when(repository.findByReadingMonthAndReadingYear(1, 2025)).thenReturn(List.of(reading));
 
-    @Test
-    void getByConnection_notFound() {
+		List<MeterReadingResponse> result = service.getByMonth(1, 2025);
 
-        when(repository.findByConnectionId("CON1"))
-                .thenReturn(List.of());
+		assertEquals(1, result.size());
+	}
 
-        assertThrows(ApiException.class,
-                () -> service.getByConnection("CON1"));
-    }
+	@Test
+	void getByConnection_notFound() {
+
+		when(repository.findByConnectionId("CON1")).thenReturn(List.of());
+
+		assertThrows(ApiException.class, () -> service.getByConnection("CON1"));
+	}
 }

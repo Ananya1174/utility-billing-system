@@ -4,8 +4,6 @@
 
   <h2>Billing Logs</h2>
   <p class="subtitle">All generated bills with status and details</p>
-
-  <!-- FILTERS -->
   <div class="filters">
 
     <select [(ngModel)]="status">
@@ -35,11 +33,9 @@
 
   </div>
 
-  <!-- LOADING / ERROR -->
   <div *ngIf="loading">Loading bills...</div>
   <div *ngIf="error" class="error">{{ error }}</div>
 
-  <!-- TABLE -->
   <div class="card" *ngIf="!loading && pagedBills.length">
 
     <table>
@@ -80,7 +76,6 @@
     No billing records found
   </div>
 
-  <!-- PAGINATION -->
   <div class="pagination" *ngIf="totalPages > 1">
 
     <div class="page-size">
@@ -108,9 +103,6 @@
         [disabled]="pageIndex === totalPages - 1">
         ›
       </button>
-
     </div>
-
   </div>
-
 </div>

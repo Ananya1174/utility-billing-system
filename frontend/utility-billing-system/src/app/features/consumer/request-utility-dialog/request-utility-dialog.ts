@@ -44,7 +44,7 @@ export class RequestUtilityDialogComponent {
     this.utilityService.getTariffs(this.utilityType).subscribe({
       next: (res) => {
         this.tariffPlans = res.plans.map((p: any) => p.planCode);
-        this.cdr.detectChanges(); // ✅ update dropdown
+        this.cdr.detectChanges(); 
       }
     });
   }

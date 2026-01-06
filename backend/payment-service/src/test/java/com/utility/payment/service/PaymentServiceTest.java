@@ -24,236 +24,207 @@ import static org.mockito.Mockito.*;
 
 class PaymentServiceTest {
 
-    @Mock private PaymentRepository paymentRepository;
-    @Mock private BillingClient billingClient;
-    @Mock private InvoiceRepository invoiceRepository;
-    @Mock private ConsumerClient consumerClient;
-    @Mock private RabbitTemplate rabbitTemplate;
+	@Mock
+	private PaymentRepository paymentRepository;
+	@Mock
+	private BillingClient billingClient;
+	@Mock
+	private InvoiceRepository invoiceRepository;
+	@Mock
+	private ConsumerClient consumerClient;
+	@Mock
+	private RabbitTemplate rabbitTemplate;
 
-    @InjectMocks
-    private PaymentService service;
+	@InjectMocks
+	private PaymentService service;
 
-    @BeforeEach
-    void setup() {
-        MockitoAnnotations.openMocks(this);
-    }
+	@BeforeEach
+	void setup() {
+		MockitoAnnotations.openMocks(this);
+	}
 
-    /* ================= INITIATE ONLINE ================= */
+	@Test
+	void initiateOnline_success() {
 
-    @Test
-    void initiateOnline_success() {
+		InitiateOnlinePaymentRequest req = new InitiateOnlinePaymentRequest("B1", "C1");
 
-        InitiateOnlinePaymentRequest req =
-                new InitiateOnlinePaymentRequest("B1", "C1");
+		BillResponse bill = new BillResponse();
+		bill.setStatus(BillStatus.GENERATED);
+		bill.setTotalAmount(1000);
+		bill.setBillingMonth(1);
+		bill.setBillingYear(2025);
 
-        BillResponse bill = new BillResponse();
-        bill.setStatus(BillStatus.GENERATED); // ✅ FIX
-        bill.setTotalAmount(1000);
-        bill.setBillingMonth(1);
-        bill.setBillingYear(2025);
+		ConsumerResponse consumer = new ConsumerResponse();
+		consumer.setEmail("test@example.com");
 
-        ConsumerResponse consumer = new ConsumerResponse();
-        consumer.setEmail("test@example.com");
+		when(billingClient.getBill("B1")).thenReturn(bill);
+		when(paymentRepository.findByBillId("B1")).thenReturn(List.of());
+		when(paymentRepository.findByBillIdAndStatus("B1", PaymentStatus.INITIATED)).thenReturn(Optional.empty());
+		when(consumerClient.getConsumerById("C1")).thenReturn(consumer);
+		when(paymentRepository.save(any())).thenAnswer(i -> i.getArgument(0));
 
-        when(billingClient.getBill("B1")).thenReturn(bill);
-        when(paymentRepository.findByBillId("B1")).thenReturn(List.of());
-        when(paymentRepository.findByBillIdAndStatus("B1", PaymentStatus.INITIATED))
-                .thenReturn(Optional.empty());
-        when(consumerClient.getConsumerById("C1")).thenReturn(consumer);
-        when(paymentRepository.save(any())).thenAnswer(i -> i.getArgument(0));
+		PaymentResponse response = service.initiateOnline(req);
 
-        PaymentResponse response = service.initiateOnline(req);
+		assertEquals(PaymentStatus.INITIATED, response.status());
 
-        assertEquals(PaymentStatus.INITIATED, response.status());
+		verify(rabbitTemplate).convertAndSend(eq(RabbitMQConfig.EXCHANGE), eq(RabbitMQConfig.PAYMENT_OTP_KEY),
+				any(Object.class));
+	}
 
-        verify(rabbitTemplate).convertAndSend(
-                eq(RabbitMQConfig.EXCHANGE),
-                eq(RabbitMQConfig.PAYMENT_OTP_KEY),
-                any(Object.class)
-        );
-    }
+	@Test
+	void initiateOnline_billAlreadyPaid() {
 
-    @Test
-    void initiateOnline_billAlreadyPaid() {
+		BillResponse bill = new BillResponse();
+		bill.setStatus(BillStatus.PAID);
 
-        BillResponse bill = new BillResponse();
-        bill.setStatus(BillStatus.PAID);
+		when(billingClient.getBill("B1")).thenReturn(bill);
 
-        when(billingClient.getBill("B1")).thenReturn(bill);
+		InitiateOnlinePaymentRequest request = new InitiateOnlinePaymentRequest("B1", "C1");
 
-        InitiateOnlinePaymentRequest request =
-                new InitiateOnlinePaymentRequest("B1", "C1");
+		ApiException ex = assertThrows(ApiException.class, () -> service.initiateOnline(request));
 
-        ApiException ex = assertThrows(
-                ApiException.class,
-                () -> service.initiateOnline(request)
-        );
+		assertEquals(HttpStatus.BAD_REQUEST, ex.getStatus());
+	}
 
-        assertEquals(HttpStatus.BAD_REQUEST, ex.getStatus());
-    }
+	@Test
+	void confirmOtp_success() {
 
-    /* ================= CONFIRM OTP ================= */
+		Payment payment = new Payment();
+		payment.setId("P1");
+		payment.setBillId("B1");
+		payment.setOtp("123456");
+		payment.setOtpExpiry(Instant.now().plusSeconds(60));
+		payment.setStatus(PaymentStatus.INITIATED);
+		payment.setAmount(500);
+		payment.setCreatedAt(LocalDateTime.now());
 
-    @Test
-    void confirmOtp_success() {
+		BillResponse bill = new BillResponse();
+		bill.setBillingMonth(1);
+		bill.setBillingYear(2025);
+		bill.setEnergyCharge(400);
+		bill.setTax(50);
+		bill.setPenalty(50);
 
-        Payment payment = new Payment();
-        payment.setId("P1");
-        payment.setBillId("B1");
-        payment.setOtp("123456");
-        payment.setOtpExpiry(Instant.now().plusSeconds(60));
-        payment.setStatus(PaymentStatus.INITIATED);
-        payment.setAmount(500);
-        payment.setCreatedAt(LocalDateTime.now());
+		when(paymentRepository.findById("P1")).thenReturn(Optional.of(payment));
+		when(billingClient.getBill("B1")).thenReturn(bill);
+		doNothing().when(billingClient).markPaid("B1");
+		when(invoiceRepository.save(any())).thenAnswer(i -> i.getArgument(0));
 
-        BillResponse bill = new BillResponse();
-        bill.setBillingMonth(1);
-        bill.setBillingYear(2025);
-        bill.setEnergyCharge(400);
-        bill.setTax(50);
-        bill.setPenalty(50);
+		PaymentResponse response = service.confirmOtp(new ConfirmOtpRequest("P1", "123456"));
 
-        when(paymentRepository.findById("P1")).thenReturn(Optional.of(payment));
-        when(billingClient.getBill("B1")).thenReturn(bill);
-        doNothing().when(billingClient).markPaid("B1");
-        when(invoiceRepository.save(any())).thenAnswer(i -> i.getArgument(0));
+		assertEquals(PaymentStatus.SUCCESS, response.status());
+	}
 
-        PaymentResponse response =
-                service.confirmOtp(new ConfirmOtpRequest("P1", "123456"));
+	@Test
+	void confirmOtp_invalidOtp() {
 
-        assertEquals(PaymentStatus.SUCCESS, response.status());
-    }
+		Payment payment = new Payment();
+		payment.setOtp("123456");
+		payment.setOtpExpiry(Instant.now().plusSeconds(60));
+		payment.setStatus(PaymentStatus.INITIATED);
 
-    @Test
-    void confirmOtp_invalidOtp() {
+		when(paymentRepository.findById("P1")).thenReturn(Optional.of(payment));
 
-        Payment payment = new Payment();
-        payment.setOtp("123456");
-        payment.setOtpExpiry(Instant.now().plusSeconds(60));
-        payment.setStatus(PaymentStatus.INITIATED);
+		ConfirmOtpRequest request = new ConfirmOtpRequest("P1", "999999");
 
-        when(paymentRepository.findById("P1"))
-                .thenReturn(Optional.of(payment));
+		assertThrows(ApiException.class, () -> service.confirmOtp(request));
+	}
 
-        ConfirmOtpRequest request =
-                new ConfirmOtpRequest("P1", "999999");
+	@Test
+	void offlinePayment_success() {
 
-        assertThrows(
-                ApiException.class,
-                () -> service.confirmOtp(request)
-        );
-    }
+		OfflinePaymentRequest req = new OfflinePaymentRequest("B1", "C1", "cash");
 
-    /* ================= OFFLINE PAYMENT ================= */
+		BillResponse bill = new BillResponse();
+		bill.setStatus(BillStatus.GENERATED);
+		bill.setTotalAmount(500);
+		bill.setBillingMonth(1);
+		bill.setBillingYear(2025);
+		bill.setEnergyCharge(400);
+		bill.setTax(50);
+		bill.setPenalty(50);
 
-    @Test
-    void offlinePayment_success() {
+		when(billingClient.getBill("B1")).thenReturn(bill);
+		doNothing().when(billingClient).markPaid("B1");
+		when(paymentRepository.findByBillId("B1")).thenReturn(List.of());
+		when(paymentRepository.save(any())).thenAnswer(i -> i.getArgument(0));
+		when(invoiceRepository.save(any())).thenAnswer(i -> i.getArgument(0));
 
-        OfflinePaymentRequest req =
-                new OfflinePaymentRequest("B1", "C1", "cash");
+		PaymentResponse response = service.offlinePayment(req);
 
-        BillResponse bill = new BillResponse();
-        bill.setStatus(BillStatus.GENERATED);
-        bill.setTotalAmount(500);
-        bill.setBillingMonth(1);
-        bill.setBillingYear(2025);
-        bill.setEnergyCharge(400);
-        bill.setTax(50);
-        bill.setPenalty(50);
+		assertEquals(PaymentStatus.SUCCESS, response.status());
+	}
 
-        when(billingClient.getBill("B1")).thenReturn(bill);
-        doNothing().when(billingClient).markPaid("B1");
-        when(paymentRepository.findByBillId("B1")).thenReturn(List.of());
-        when(paymentRepository.save(any())).thenAnswer(i -> i.getArgument(0));
-        when(invoiceRepository.save(any())).thenAnswer(i -> i.getArgument(0));
+	@Test
+	void getPaymentsByBill_success() {
 
-        PaymentResponse response = service.offlinePayment(req);
+		Payment p = new Payment();
+		p.setBillId("B1");
 
-        assertEquals(PaymentStatus.SUCCESS, response.status());
-    }
+		BillResponse bill = new BillResponse();
+		bill.setBillingMonth(1);
+		bill.setBillingYear(2025);
 
-    /* ================= GET PAYMENTS ================= */
+		when(paymentRepository.findByBillId("B1")).thenReturn(List.of(p));
+		when(billingClient.getBill("B1")).thenReturn(bill);
 
-    @Test
-    void getPaymentsByBill_success() {
+		List<PaymentResponse> list = service.getPaymentsByBill("B1");
 
-        Payment p = new Payment();
-        p.setBillId("B1");
+		assertEquals(1, list.size());
+	}
 
-        BillResponse bill = new BillResponse();
-        bill.setBillingMonth(1);
-        bill.setBillingYear(2025);
+	@Test
+	void getPaymentsByConsumer_success() {
 
-        when(paymentRepository.findByBillId("B1"))
-                .thenReturn(List.of(p));
-        when(billingClient.getBill("B1")).thenReturn(bill);
+		Payment p = new Payment();
+		p.setConsumerId("C1");
+		p.setBillId("B1");
 
-        List<PaymentResponse> list =
-                service.getPaymentsByBill("B1");
+		BillResponse bill = new BillResponse();
+		bill.setBillingMonth(1);
+		bill.setBillingYear(2025);
 
-        assertEquals(1, list.size());
-    }
+		when(paymentRepository.findByConsumerIdOrderByCreatedAtDesc("C1")).thenReturn(List.of(p));
+		when(billingClient.getBill(anyString())).thenReturn(bill);
 
-    @Test
-    void getPaymentsByConsumer_success() {
+		List<PaymentResponse> list = service.getPaymentsByConsumer("C1");
 
-        Payment p = new Payment();
-        p.setConsumerId("C1");
-        p.setBillId("B1");
+		assertEquals(1, list.size());
+	}
 
-        BillResponse bill = new BillResponse();
-        bill.setBillingMonth(1);
-        bill.setBillingYear(2025);
+	@Test
+	void getAllPayments_success() {
 
-        when(paymentRepository.findByConsumerIdOrderByCreatedAtDesc("C1"))
-                .thenReturn(List.of(p));
-        when(billingClient.getBill(anyString()))
-                .thenReturn(bill);
+		Payment p = new Payment();
+		p.setBillId("B1");
 
-        List<PaymentResponse> list =
-                service.getPaymentsByConsumer("C1");
+		BillResponse bill = new BillResponse();
+		bill.setBillingMonth(1);
+		bill.setBillingYear(2025);
 
-        assertEquals(1, list.size());
-    }
+		when(paymentRepository.findAllByOrderByCreatedAtDesc()).thenReturn(List.of(p));
+		when(billingClient.getBill("B1")).thenReturn(bill);
 
-    @Test
-    void getAllPayments_success() {
+		List<PaymentResponse> list = service.getAllPayments();
 
-        Payment p = new Payment();
-        p.setBillId("B1");
+		assertEquals(1, list.size());
+	}
 
-        BillResponse bill = new BillResponse();
-        bill.setBillingMonth(1);
-        bill.setBillingYear(2025);
+	@Test
+	void getOutstanding_success() {
 
-        when(paymentRepository.findAllByOrderByCreatedAtDesc())
-                .thenReturn(List.of(p));
-        when(billingClient.getBill("B1"))
-                .thenReturn(bill);
+		BillResponse bill = new BillResponse();
+		bill.setTotalAmount(1000);
 
-        List<PaymentResponse> list = service.getAllPayments();
+		Payment p = new Payment();
+		p.setAmount(400);
+		p.setStatus(PaymentStatus.SUCCESS);
 
-        assertEquals(1, list.size());
-    }
+		when(billingClient.getBill("B1")).thenReturn(bill);
+		when(paymentRepository.findByBillId("B1")).thenReturn(List.of(p));
 
-    /* ================= OUTSTANDING ================= */
+		OutstandingResponse response = service.getOutstanding("B1");
 
-    @Test
-    void getOutstanding_success() {
-
-        BillResponse bill = new BillResponse();
-        bill.setTotalAmount(1000);
-
-        Payment p = new Payment();
-        p.setAmount(400);
-        p.setStatus(PaymentStatus.SUCCESS);
-
-        when(billingClient.getBill("B1")).thenReturn(bill);
-        when(paymentRepository.findByBillId("B1"))
-                .thenReturn(List.of(p));
-
-        OutstandingResponse response = service.getOutstanding("B1");
-
-        assertEquals(600, response.getOutstandingAmount());
-    }
+		assertEquals(600, response.getOutstandingAmount());
+	}
 }

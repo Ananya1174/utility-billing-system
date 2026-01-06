@@ -1,11 +1,9 @@
-/* FULL PAGE LAYOUT */
 .profile-layout {
   display: flex;
-  min-height: calc(100vh - 64px); /* subtract navbar height */
+  min-height: calc(100vh - 64px); 
   background: #f8fafc;
 }
 
-/* SIDEBAR */
 .sidebar {
   width: 260px;
   background: linear-gradient(180deg, #1e3a8a, #1e40af);
@@ -15,14 +13,12 @@
   flex-direction: column;
 }
 
-/* SIDEBAR TITLE */
 .sidebar h3 {
   margin-bottom: 20px;
   font-size: 1.2rem;
   font-weight: 600;
 }
 
-/* SIDEBAR BUTTONS */
 .sidebar button {
   background: transparent;
   border: none;
@@ -45,7 +41,6 @@
   font-weight: 600;
 }
 
-/* CONTENT */
 .content {
   flex: 1;
   padding: 32px;

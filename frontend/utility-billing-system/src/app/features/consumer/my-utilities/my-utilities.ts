@@ -33,7 +33,7 @@ export class MyUtilitiesComponent implements OnInit {
       next: (res) => {
         this.utilities = this.normalizeConnections(res);
         this.loading = false;
-        this.cdr.detectChanges(); // ✅ force UI refresh
+        this.cdr.detectChanges();
       },
       error: () => {
         this.loading = false;
@@ -62,7 +62,7 @@ export class MyUtilitiesComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((refresh) => {
       if (refresh) {
-        this.loadConnections(); // reload
+        this.loadConnections(); 
       }
     });
   }
@@ -79,13 +79,11 @@ export class MyUtilitiesComponent implements OnInit {
         continue;
       }
 
-      // Prefer connection with meter number
       if (!existing.meterNumber && conn.meterNumber) {
         map.set(key, conn);
         continue;
       }
 
-      // If both have meter numbers → keep latest activated
       if (
         existing.meterNumber &&
         conn.meterNumber &&

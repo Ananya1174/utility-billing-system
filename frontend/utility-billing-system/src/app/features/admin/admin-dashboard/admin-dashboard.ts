@@ -33,7 +33,6 @@ export class AdminDashboardComponent implements OnInit {
   billsSummary: any;
   revenueSummary: any;
 
-  /** ✅ MONTHLY outstanding only */
   monthlyOutstandingAmount = 0;
 
   consumptionData: any[] = [];
@@ -61,35 +60,29 @@ export class AdminDashboardComponent implements OnInit {
 
   loadDashboard() {
 
-    // Bills summary (paid / unpaid)
     this.dashboardService.getBillsSummary(this.month, this.year)
       .subscribe(res => {
         this.billsSummary = res;
         this.cdr.detectChanges();
       });
 
-    // Monthly revenue
     this.dashboardService.getRevenueSummary(this.month, this.year)
       .subscribe(res => {
         this.revenueSummary = res;
         this.cdr.detectChanges();
       });
 
-    // Consumption
     this.dashboardService.getConsumptionSummary(this.month, this.year)
       .subscribe(res => {
         this.consumptionData = res || [];
         this.buildConsumptionChart();
       });
 
-    // Revenue by mode
     this.dashboardService.getRevenueByMode(this.month, this.year)
       .subscribe(res => {
         this.revenueByMode = res || [];
         this.buildRevenueChart();
       });
-
-    // ✅ Monthly Outstanding (YEARLY API → pick selected month)
     this.dashboardService.getMonthlyOutstanding(this.year)
   .subscribe(res => {
 

@@ -61,7 +61,6 @@ export class AccountsReportsComponent implements OnInit {
     this.loadConsumerSummary();
   }
 
-  /** ✅ FIX */
   onFilterChange(): void {
     this.loadReports();
   }
@@ -85,9 +84,6 @@ export class AccountsReportsComponent implements OnInit {
     }
   ]
 };
-
-
-
 loadYearlyRevenue(): void {
   this.http.get<any[]>(
     `${this.baseUrl}/dashboard/payments/revenue-yearly?year=${this.year}`

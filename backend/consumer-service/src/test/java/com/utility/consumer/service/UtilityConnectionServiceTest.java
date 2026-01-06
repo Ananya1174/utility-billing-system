@@ -88,7 +88,7 @@ class UtilityConnectionServiceTest {
         List<ConnectionResponseDto> result =
                 service.getConnectionsByUserId("C1");
 
-        assertEquals(2, result.size()); // 👈 KEY
+        assertEquals(2, result.size()); 
     }
     @Test
     void getAllConnections_onlyActive() {

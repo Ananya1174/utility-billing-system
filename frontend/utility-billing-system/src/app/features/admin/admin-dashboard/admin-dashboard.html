@@ -1,16 +1,13 @@
-
-
 <div class="dashboard-container">
 
   <h2>Admin Dashboard</h2>
 
-  <!-- FILTER BAR -->
   <div class="filters">
     <select [(ngModel)]="month" (ngModelChange)="month = +$event; onFilterChange()">
-  <option *ngFor="let m of months" [ngValue]="m.value">
-    {{ m.name }}
-  </option>
-</select>
+      <option *ngFor="let m of months" [ngValue]="m.value">
+        {{ m.name }}
+      </option>
+    </select>
 
     <select [(ngModel)]="year" (change)="onFilterChange()">
       <option *ngFor="let y of years" [value]="y">
@@ -19,7 +16,6 @@
     </select>
   </div>
 
-  <!-- SUMMARY CARDS -->
   <div class="cards">
     <div class="card">
       <h4>Monthly Revenue</h4>
@@ -27,9 +23,9 @@
     </div>
 
     <div class="card">
-  <h4>Outstanding ({{ selectedMonthName }} {{ year }})</h4>
-  <p>₹ {{ monthlyOutstandingAmount }}</p>
-</div>
+      <h4>Outstanding ({{ selectedMonthName }} {{ year }})</h4>
+      <p>₹ {{ monthlyOutstandingAmount }}</p>
+    </div>
 
     <div class="card">
       <h4>Paid Bills</h4>
@@ -42,39 +38,22 @@
     </div>
   </div>
 
-  <!-- CHARTS -->
   <div class="charts">
 
-    <!-- CONSUMPTION -->
     <div class="chart">
       <h4>Consumption by Utility</h4>
-      <canvas
-        *ngIf="consumptionChartData"
-        baseChart
-        [data]="consumptionChartData"
-        [type]="'pie'">
+      <canvas *ngIf="consumptionChartData" baseChart [data]="consumptionChartData" [type]="'pie'">
       </canvas>
     </div>
-
-    <!-- REVENUE BY MODE -->
     <div class="chart">
       <h4>Revenue by Payment Mode</h4>
-      <canvas
-        *ngIf="revenueChartData"
-        baseChart
-        [data]="revenueChartData"
-        [type]="'bar'">
+      <canvas *ngIf="revenueChartData" baseChart [data]="revenueChartData" [type]="'bar'">
       </canvas>
     </div>
 
-    <!-- MONTHLY OUTSTANDING -->
     <div class="chart wide">
       <h4>Monthly Outstanding Trend</h4>
-      <canvas
-        *ngIf="outstandingChartData"
-        baseChart
-        [data]="outstandingChartData"
-        [type]="'line'">
+      <canvas *ngIf="outstandingChartData" baseChart [data]="outstandingChartData" [type]="'line'">
       </canvas>
     </div>
 
