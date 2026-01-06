@@ -49,9 +49,12 @@
           </span>
         </td>
         <td class="center">
-          <button class="ghost-btn" (click)="openSlabs(p)">
-            Manage Slabs
-          </button>
+          <button
+  *ngIf="p.active"
+  class="ghost-btn"
+  (click)="openSlabs(p)">
+  Manage Slabs
+</button>
 
           <button *ngIf="p.active"
                   class="danger-btn"

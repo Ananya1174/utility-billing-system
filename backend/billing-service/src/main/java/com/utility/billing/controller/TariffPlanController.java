@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import com.utility.billing.dto.TariffPlanDto;
+import com.utility.billing.dto.TariffPlanResponse;
 import com.utility.billing.service.TariffPlanService;
 
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ public class TariffPlanController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public TariffPlanDto create(@RequestBody TariffPlanDto dto) {
+    public TariffPlanResponse create(@RequestBody TariffPlanDto dto) {
         return service.createTariffPlan(dto);
     }
 
@@ -28,15 +29,14 @@ public class TariffPlanController {
     public Map<String, String> deactivate(@PathVariable("id") String id) {
         return service.deactivateTariffPlan(id);
     }
-
-    @GetMapping
-    public List<TariffPlanDto> getPlans(
-            @RequestParam(name = "active",required = false) Boolean active) {
-        return service.getPlans(active);
+    @GetMapping("/plans/active")
+    public List<TariffPlanResponse> getActivePlans() {
+        return service.getActivePlans();
     }
 
-    @GetMapping("/active")
-    public List<TariffPlanDto> activePlans() {
-        return service.getActivePlans();
+    @GetMapping("/plans")
+    public List<TariffPlanResponse> getPlans(
+            @RequestParam(required = false) Boolean active) {
+        return service.getPlans(active);
     }
 }

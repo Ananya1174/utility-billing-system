@@ -3,15 +3,18 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { ConfirmDialogComponent } from "../../../shared/confirm-dialog/confirm-dialog";
 
 @Component({
   selector: 'app-user-management',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ConfirmDialogComponent],
   templateUrl: './user-management.html',
   styleUrl: './user-management.css'
 })
 export class UserManagementComponent implements OnInit {
+  confirmVisible = false;
+userToDelete: string | null = null;
 
   users: any[] = [];
   filteredUsers: any[] = [];
@@ -91,12 +94,26 @@ export class UserManagementComponent implements OnInit {
     }
   }
 
-  deleteUser(userId: string) {
-    if (!confirm('Are you sure you want to delete this user?')) return;
+  openDeleteDialog(userId: string) {
+  this.userToDelete = userId;
+  this.confirmVisible = true;
+}
 
-    this.http.delete(`${this.baseUrl}/${userId}`)
-      .subscribe(() => {
-        this.loadUsers();
-      });
-  }
+confirmDelete() {
+  if (!this.userToDelete) return;
+
+  this.http
+    .delete(`${this.baseUrl}/${this.userToDelete}`)
+    .subscribe(() => {
+      this.confirmVisible = false;
+      this.userToDelete = null;
+      this.loadUsers();
+      this.cdr.detectChanges();
+    });
+}
+
+cancelDelete() {
+  this.confirmVisible = false;
+  this.userToDelete = null;
+}
 }

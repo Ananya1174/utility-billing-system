@@ -36,6 +36,12 @@ public class SecurityConfig {
                         )
                 )
                 .authorizeHttpRequests(auth -> auth
+                		.requestMatchers(
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs",
+                                "/v3/api-docs/**"
+                        ).permitAll()
 
                         .requestMatchers(
                                 HttpMethod.POST,
@@ -51,11 +57,19 @@ public class SecurityConfig {
                                 HttpMethod.POST,
                                 "/tariffs/slabs"
                         ).hasRole(ADMIN)
+                        .requestMatchers(
+                        	    HttpMethod.GET,
+                        	    "/tariffs/slabs"
+                        	).hasAnyRole(ADMIN, BILLING_OFFICER)
 
                         .requestMatchers(
                                 HttpMethod.GET,
-                                "/tariffs/plans/active"
+                                "/tariffs/plans/plans/active"
                         ).hasAnyRole(ADMIN, BILLING_OFFICER)
+                        .requestMatchers(
+                        	    HttpMethod.GET,
+                        	    "/tariffs/plans/plans"
+                        	).hasAnyRole(ADMIN, BILLING_OFFICER)
 
                         .requestMatchers(
                                 HttpMethod.GET,
@@ -105,6 +119,10 @@ public class SecurityConfig {
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/dashboard/billing/consumer-summary"
+                        ).hasRole(ADMIN)
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/dashboard/billing/total-billed-monthly"
                         ).hasRole(ADMIN)
 
                         .requestMatchers(

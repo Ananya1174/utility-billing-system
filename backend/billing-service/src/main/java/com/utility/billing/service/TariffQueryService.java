@@ -36,10 +36,10 @@ public class TariffQueryService {
 					plan.getPlanCode());
 
 			List<TariffSlabDto> slabDtos = slabs.stream()
-					.map(slab -> new TariffSlabDto(slab.getMinUnits(), slab.getMaxUnits(), slab.getRate()))
+					.map(slab -> new TariffSlabDto(slab.getUtilityType(),slab.getPlanCode(),slab.getMinUnits(), slab.getMaxUnits(), slab.getRate()))
 					.toList();
 
-			return new TariffPlanDto(plan.getPlanCode(), slabDtos);
+			return new TariffPlanDto(plan.getUtilityType(),plan.getPlanCode());
 		}).toList();
 
 		return new TariffResponseDto(utilityType.name(), planDtos);

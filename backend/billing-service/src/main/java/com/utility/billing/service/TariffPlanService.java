@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.utility.billing.dto.TariffPlanDto;
+import com.utility.billing.dto.TariffPlanResponse;
 import com.utility.billing.exception.ApiException;
 import com.utility.billing.model.TariffPlan;
 import com.utility.billing.repository.TariffPlanRepository;
@@ -19,7 +20,9 @@ public class TariffPlanService {
 
     private final TariffPlanRepository repository;
 
-    public TariffPlanDto createTariffPlan(TariffPlanDto dto) {
+    /* ================= CREATE ================= */
+
+    public TariffPlanResponse createTariffPlan(TariffPlanDto dto) {
 
         TariffPlan plan = toEntity(dto);
 
@@ -38,8 +41,11 @@ public class TariffPlanService {
 
         plan.setActive(true);
         TariffPlan saved = repository.save(plan);
-        return toDto(saved);
+
+        return TariffPlanResponse.from(saved);
     }
+
+    /* ================= DEACTIVATE ================= */
 
     public Map<String, String> deactivateTariffPlan(String id) {
 
@@ -64,21 +70,23 @@ public class TariffPlanService {
 
         return Map.of(
                 "message",
-                "Tariff plan "
-                        + plan.getPlanCode()
-                        + " deactivated successfully"
+                "Tariff plan " + plan.getPlanCode() + " deactivated successfully"
         );
     }
 
-    public List<TariffPlanDto> getActivePlans() {
+    /* ================= GET ACTIVE (FIXED) ================= */
+
+    public List<TariffPlanResponse> getActivePlans() {
 
         return repository.findByActiveTrue()
                 .stream()
-                .map(this::toDto)
+                .map(TariffPlanResponse::from)
                 .toList();
     }
 
-    public List<TariffPlanDto> getPlans(Boolean active) {
+    /* ================= GET ALL / FILTERED (FIXED) ================= */
+
+    public List<TariffPlanResponse> getPlans(Boolean active) {
 
         List<TariffPlan> plans;
 
@@ -94,22 +102,19 @@ public class TariffPlanService {
         }
 
         return plans.stream()
-                .map(this::toDto)
+                .map(TariffPlanResponse::from)
                 .toList();
     }
+
+    /* ================= PRIVATE MAPPERS ================= */
 
     private TariffPlan toEntity(TariffPlanDto dto) {
 
         TariffPlan plan = new TariffPlan();
+        plan.setUtilityType(dto.getUtilityType());
         plan.setPlanCode(dto.getPlanCode());
         return plan;
     }
 
-    private TariffPlanDto toDto(TariffPlan plan) {
-
-        return new TariffPlanDto(
-                plan.getPlanCode(),
-                List.of()
-        );
-    }
+    
 }

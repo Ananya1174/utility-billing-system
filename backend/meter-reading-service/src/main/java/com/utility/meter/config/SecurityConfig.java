@@ -15,24 +15,26 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfig {
 
+ 
     @Bean
-    public SecurityFilterChain filterChain(
-            HttpSecurity http,
-            JwtUtil jwtUtil
-    ) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, JwtUtil jwtUtil) throws Exception {
 
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers(
+                    "/swagger-ui.html",
+                    "/swagger-ui/**",
+                    "/v3/api-docs",
+                    "/v3/api-docs/**"
+                ).permitAll()
 
-                // ✅ OPEN ONLY for billing internal usage
                 .requestMatchers(
                     HttpMethod.GET,
                     "/meter-readings/connection/**"
                 ).permitAll()
 
-                // 🔒 EVERYTHING ELSE → ONLY BILLING_OFFICER
-                .anyRequest().authenticated()
+                .anyRequest().hasRole("BILLING_OFFICER")
             )
             .addFilterBefore(
                 new JwtAuthenticationFilter(jwtUtil),

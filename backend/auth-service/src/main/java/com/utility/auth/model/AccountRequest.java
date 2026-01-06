@@ -25,7 +25,7 @@ public class AccountRequest {
     private String phone;
     private String address;
 
-    private AccountRequestStatus status;
+    private AccountRequestStatus status; 
 
     private LocalDateTime createdAt;
     private LocalDateTime reviewedAt;

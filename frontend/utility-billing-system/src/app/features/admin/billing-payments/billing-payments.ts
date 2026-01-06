@@ -13,6 +13,8 @@ import { HttpClient } from '@angular/common/http';
   styleUrl: './billing-payments.css'
 })
 export class BillingPaymentsComponent {
+  private billsLoaded = false;
+private paymentsLoaded = false;
 
   consumerId = '';
   activeTab: 'BILLS' | 'PAYMENTS' | 'OUTSTANDING' | 'INVOICE' = 'BILLS';
@@ -45,37 +47,54 @@ export class BillingPaymentsComponent {
   }
 
   switchTab(tab: any) {
-    this.activeTab = tab;
-    this.pageIndex = 0;
-    this.updatePaging();
-  }
+  this.activeTab = tab;
+  this.pageIndex = 0;
+
+  this.loading = false; // ✅ IMPORTANT
+  this.updatePaging();
+}
 
   loadData() {
-    this.loading = true;
-    this.error = '';
+  this.loading = true;
+  this.error = '';
 
-    const billsUrl = this.consumerId
-      ? `${this.baseUrl}/bills/consumer/${this.consumerId}`
-      : `${this.baseUrl}/bills`;
+  this.billsLoaded = false;
+  this.paymentsLoaded = false;
 
-    this.http.get<any[]>(billsUrl).subscribe(res => {
+  const billsUrl = this.consumerId
+    ? `${this.baseUrl}/bills/consumer/${this.consumerId}`
+    : `${this.baseUrl}/bills`;
+
+  this.http.get<any[]>(billsUrl).subscribe({
+    next: res => {
       this.bills = res || [];
-      this.updatePaging();
-      this.loading = false;
-    });
+      this.billsLoaded = true;
+      this.finishLoading();
+    },
+    error: () => {
+      this.bills = [];
+      this.billsLoaded = true;
+      this.finishLoading();
+    }
+  });
 
-    const paymentsUrl = this.consumerId
-      ? `${this.baseUrl}/payments/consumer/${this.consumerId}`
-      : `${this.baseUrl}/payments`;
+  const paymentsUrl = this.consumerId
+    ? `${this.baseUrl}/payments/consumer/${this.consumerId}`
+    : `${this.baseUrl}/payments`;
 
-    this.http.get<any[]>(paymentsUrl).subscribe({
-      next: res => {
-        this.payments = res || [];
-        this.updatePaging();
-      },
-      error: () => this.payments = []   // 403 safe fallback
-    });
-  }
+  this.http.get<any[]>(paymentsUrl).subscribe({
+    next: res => {
+      this.payments = res || [];
+      this.paymentsLoaded = true;
+      this.finishLoading();
+    },
+    error: () => {
+      this.payments = [];
+      this.paymentsLoaded = true;
+      this.finishLoading();
+    }
+  });
+}
 
   updatePaging() {
     const data = this.activeTab === 'PAYMENTS' ? this.payments : this.bills;
@@ -153,4 +172,19 @@ export class BillingPaymentsComponent {
       a.click();
     });
   }
+  private finishLoading() {
+  if (!this.loading) return; // 🔒 already finished
+
+  if (this.billsLoaded && this.paymentsLoaded) {
+    this.updatePaging();
+
+    // ✅ turn off loading exactly once
+    this.loading = false;
+
+    // ✅ ensure UI updates
+    setTimeout(() => {
+      this.cdr.detectChanges();
+    });
+  }
+}
 }

@@ -6,8 +6,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.utility.billing.dto.TariffSlabDto;
+import com.utility.billing.dto.TariffSlabResponse;
 import com.utility.billing.exception.ApiException;
 import com.utility.billing.model.TariffSlab;
+import com.utility.billing.model.UtilityType;
 import com.utility.billing.repository.TariffSlabRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -63,10 +65,25 @@ public class TariffSlabService {
         repository.delete(slab);
         return toDto(slab);
     }
+    public List<TariffSlabResponse> getSlabs(
+            UtilityType utilityType,
+            String planCode
+    ) {
+        return repository
+                .findByUtilityTypeAndPlanCodeOrderByMinUnitsAsc(
+                        utilityType,
+                        planCode
+                )
+                .stream()
+                .map(TariffSlabResponse::from)
+                .toList();
+    }
 
     private TariffSlab toEntity(TariffSlabDto dto) {
 
         TariffSlab slab = new TariffSlab();
+        slab.setUtilityType(dto.getUtilityType());
+        slab.setPlanCode(dto.getPlanCode());
         slab.setMinUnits(dto.getMinUnits());
         slab.setMaxUnits(dto.getMaxUnits());
         slab.setRate(dto.getRate());
@@ -75,13 +92,15 @@ public class TariffSlabService {
 
     private TariffSlabDto toDto(TariffSlab slab) {
 
-        return new TariffSlabDto(
-                slab.getMinUnits(),
-                slab.getMaxUnits(),
-                slab.getRate()
-        );
-    }
+        TariffSlabDto dto = new TariffSlabDto();
+        dto.setUtilityType(slab.getUtilityType());
+        dto.setPlanCode(slab.getPlanCode());
+        dto.setMinUnits(slab.getMinUnits());
+        dto.setMaxUnits(slab.getMaxUnits());
+        dto.setRate(slab.getRate());
 
+        return dto;
+    }
     private boolean rangesOverlap(
             long min1,
             long max1,
