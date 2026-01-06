@@ -38,7 +38,6 @@ import lombok.RequiredArgsConstructor;
 public class AuthController {
 
     private final AuthService authService;
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/register")
     public ResponseEntity<RegisterResponseDto> registerUser(
             @Valid @RequestBody RegisterRequestDto request) {

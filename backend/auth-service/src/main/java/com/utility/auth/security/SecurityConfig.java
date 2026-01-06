@@ -66,6 +66,7 @@ public class SecurityConfig {
 
 	        .authorizeHttpRequests(auth -> auth
 	            .requestMatchers(
+	            	"/auth/register",
 	                "/auth/login",
 	                "/auth/forgot-password",
 	                "/auth/reset-password",
