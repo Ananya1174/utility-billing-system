@@ -43,10 +43,16 @@ utility-billing-system/
 ├── frontend/                 # Angular Application
 │
 ├── backend/
-│   ├── eureka-server/        # Service Registry
-│   ├── consumer-service/     # Consumer Management
-│   ├── billing-service/      # Bill Generation
-│   ├── payment-service/      # Payments
+│   ├── service-registry/     
+│   ├── config-service/           
+│   ├── auth-service/    
+│   ├── notification-service/      
+│   ├── consumer-service/      
+│   ├── meter-reading-service/
+│   ├── billing-service/
+│   ├── paymnet-service/
+│   ├── api-gateway/
+│   
 │
 └── README.md
 
