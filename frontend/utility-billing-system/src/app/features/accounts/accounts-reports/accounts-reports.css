@@ -28,7 +28,7 @@ h2 {
 
 .charts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: 1fr 1fr;
   gap: 22px;
   margin-bottom: 26px;
 }
@@ -38,6 +38,7 @@ h2 {
   border-radius: 14px;
   padding: 18px 20px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  margin-bottom: 26px;
 }
 
 .card.small {
@@ -51,14 +52,9 @@ h2 {
   color: #374151;
 }
 
-.card canvas {
-  max-height: 220px !important;
-}
-
 table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 6px;
 }
 
 thead {
@@ -90,11 +86,12 @@ tbody tr:hover {
     padding: 18px;
   }
 
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+
   .filters {
     flex-direction: column;
     align-items: flex-start;
-  }
-  .card canvas {
-    max-height: 200px !important;
   }
 }

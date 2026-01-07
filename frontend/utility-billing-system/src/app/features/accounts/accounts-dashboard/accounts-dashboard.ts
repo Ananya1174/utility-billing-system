@@ -46,11 +46,47 @@ export class AccountsDashboardComponent implements OnInit {
     datasets: [{ label: 'Revenue', data: [] }]
   };
 
-  lineType: ChartType = 'line';
-  outstandingLineData: ChartData<'line', number[], string> = {
-    labels: [],
-    datasets: [{ label: 'Outstanding', data: [] }]
-  };
+  stackedBarType: ChartType = 'bar';
+
+outstandingStackedBarData: ChartData<'bar', number[], string> = {
+  labels: [],
+  datasets: [
+    { label: 'Total Billed', data: [] },
+    { label: 'Total Paid', data: [] },
+    { label: 'Outstanding', data: [] }
+  ]
+};
+
+stackedBarOptions = {
+  responsive: true,
+  scales: {
+    x: { stacked: true },
+    y: { stacked: true }
+  }
+};
+yearlyRevenueLineData: ChartData<'line', number[], string> = {
+  labels: [],
+  datasets: [
+    {
+      label: 'Revenue',
+      data: [],
+      fill: false,
+      tension: 0.3
+    }
+  ]
+};
+
+yearlyRevenueLineType: ChartType = 'line';
+paymentModeDonutData: ChartData<'doughnut', number[], string> = {
+  labels: [],
+  datasets: [
+    {
+      data: []
+    }
+  ]
+};
+
+paymentModeDonutType: ChartType = 'doughnut';
 
   baseUrl = 'http://localhost:8031';
 
@@ -67,6 +103,8 @@ export class AccountsDashboardComponent implements OnInit {
     this.loadOutstanding();
     this.loadPaymentStatus();
     this.loadOutstandingTrend();
+    this.loadYearlyRevenue();
+  this.loadRevenueByMode();
   }
 
   loadOutstanding() {
@@ -80,28 +118,92 @@ export class AccountsDashboardComponent implements OnInit {
   }
 
   loadPaymentStatus() {
-    this.http.get<any>(
-      `${this.baseUrl}/dashboard/payments/payments-summary?month=${this.month}&year=${this.year}`
-    ).subscribe(res => {
-      this.paymentPieData.datasets[0].data = [
-        res.success,
-        res.failed
-      ];
-      this.cdr.detectChanges();
-    });
-  }
+  this.http.get<any>(
+    `${this.baseUrl}/dashboard/payments/payments-summary?month=${this.month}&year=${this.year}`
+  ).subscribe(res => {
+
+    this.paymentPieData = {
+      labels: ['Successful', 'Failed'],
+      datasets: [{
+        data: [
+          res.successfulPayments,
+          res.failedPayments
+        ]
+      }]
+    };
+
+    this.cdr.detectChanges();
+  });
+}
+loadYearlyRevenue() {
+  const monthNames = [
+    'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
+    'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'
+  ];
+
+  this.http.get<any[]>(
+    `${this.baseUrl}/dashboard/payments/revenue-yearly?year=${this.year}`
+  ).subscribe(res => {
+
+    this.yearlyRevenueLineData = {
+      labels: res.map(r => monthNames[r.month - 1]),
+      datasets: [
+        {
+          label: 'Revenue',
+          data: res.map(r => r.totalRevenue),
+          fill: false,
+          tension: 0.3
+        }
+      ]
+    };
+
+    this.cdr.detectChanges();
+  });
+}
 
   loadOutstandingTrend() {
-    this.http.get<any[]>(
-      `${this.baseUrl}/dashboard/payments/outstanding-monthly?year=${this.year}`
-    ).subscribe(res => {
-      this.outstandingLineData.labels = res.map(r => r.monthName);
-      this.outstandingLineData.datasets[0].data =
-        res.map(r => r.outstanding);
-      this.cdr.detectChanges();
-    });
-  }
+  this.http.get<any[]>(
+    `${this.baseUrl}/dashboard/payments/outstanding-monthly?year=${this.year}`
+  ).subscribe(res => {
 
+    this.outstandingStackedBarData = {
+      labels: res.map(r => r.monthName),
+      datasets: [
+        {
+          label: 'Total Billed',
+          data: res.map(r => r.totalBilled)
+        },
+        {
+          label: 'Total Paid',
+          data: res.map(r => r.totalPaid)
+        },
+        {
+          label: 'Outstanding',
+          data: res.map(r => r.outstandingAmount)
+        }
+      ]
+    };
+
+    this.cdr.detectChanges();
+  });
+}
+loadRevenueByMode() {
+  this.http.get<any[]>(
+    `${this.baseUrl}/dashboard/payments/revenue-by-mode?month=${this.month}&year=${this.year}`
+  ).subscribe(res => {
+
+    this.paymentModeDonutData = {
+      labels: res.map(r => r.mode),
+      datasets: [
+        {
+          data: res.map(r => r.amount)
+        }
+      ]
+    };
+
+    this.cdr.detectChanges();
+  });
+}
   onFilterChange() {
     this.loadDashboard();
   }

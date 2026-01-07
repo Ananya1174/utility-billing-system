@@ -42,9 +42,26 @@
 
   <div class="card">
     <h3>Outstanding Trend (Year)</h3>
+    <canvas
+  baseChart
+  [type]="stackedBarType"
+  [data]="outstandingStackedBarData"
+  [options]="stackedBarOptions">
+</canvas>
+  </div>
+  <div class="card">
+    <h3>Revenue by Payment Mode</h3>
     <canvas baseChart
-      [type]="lineType"
-      [data]="outstandingLineData">
+      [type]="paymentModeDonutType"
+      [data]="paymentModeDonutData">
+    </canvas>
+  </div>
+
+  <div class="card">
+    <h3>Yearly Revenue Trend</h3>
+    <canvas baseChart
+      [type]="yearlyRevenueLineType"
+      [data]="yearlyRevenueLineData">
     </canvas>
   </div>
 </div>

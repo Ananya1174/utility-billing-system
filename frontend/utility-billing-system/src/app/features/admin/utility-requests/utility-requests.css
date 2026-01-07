@@ -1,38 +1,158 @@
+:host {
+  display: block;
+  padding: 24px 28px;
+  background: #f6f8fb;
+  min-height: 100vh;
+}
+
+h2 {
+  margin: 20px 0 6px;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #1e3a8a;
+}
+
+p {
+  margin: 0 0 22px;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.filters {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.filters select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 18px 20px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  margin-bottom: 26px;
+}
+
 .requests-table {
   width: 100%;
   border-collapse: collapse;
+  background: #ffffff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
 }
 
-.requests-table th,
+.requests-table thead {
+  background: #f3f4f6;
+}
+
+.requests-table th {
+  text-align: left;
+  padding: 14px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 1px solid #e5e7eb;
+}
+
 .requests-table td {
-  padding: 8px;
-  border-bottom: 1px solid #ddd;
+  padding: 14px 16px;
+  font-size: 14px;
+  color: #1f2937;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: middle;
+}
+
+.requests-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.requests-table tbody tr:last-child td {
+  border-bottom: none;
 }
 
 .mono {
-  font-family: monospace;
-  font-size: 12px;
-  color: #555;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+  color: #374151;
+}
+
+button {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  background: #2563eb;
+  color: #ffffff;
+  margin-right: 6px;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+button.cancel {
+  background: #6b7280;
+}
+
+button.cancel:hover {
+  background: #4b5563;
+}
+
+.reject-btn {
+  background: #dc2626;
+}
+
+.reject-btn:hover {
+  background: #b91c1c;
 }
 
 .approve-form {
   display: flex;
   gap: 6px;
-  margin-top: 4px;
+  align-items: center;
+  margin-bottom: 6px;
 }
 
-.reject-btn {
-  background: #e53935;
-  color: white;
-  border: none;
-  padding: 4px 8px;
-  margin-left: 6px;
-  cursor: pointer;
+.approve-form input {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 13px;
+  width: 140px;
 }
 
-.cancel {
-  background: #aaa;
-  color: white;
-  border: none;
-  padding: 4px 8px;
+.approve-form input:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+@media (max-width: 1024px) {
+  .requests-table th,
+  .requests-table td {
+    padding: 12px 12px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 768px) {
+  :host {
+    padding: 18px;
+  }
+
+  .requests-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
 }

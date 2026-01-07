@@ -5,22 +5,21 @@
   <aside class="sidebar">
     <h3>My Profile</h3>
 
-    <button [class.active]="activeTab === 'account'" (click)="activeTab = 'account'">
+    <button
+      [class.active]="activeTab === 'account'"
+      (click)="activeTab = 'account'">
       My Account
     </button>
 
-    <button *ngIf="isConsumer()" [class.active]="activeTab === 'profile'" (click)="activeTab = 'profile'">
-      Profile Details
-    </button>
-
-    <button [class.active]="activeTab === 'password'" (click)="activeTab = 'password'">
+    <button
+      [class.active]="activeTab === 'password'"
+      (click)="activeTab = 'password'">
       Change Password
     </button>
   </aside>
 
   <section class="content">
     <app-my-account *ngIf="activeTab === 'account'"></app-my-account>
-    <app-profile-details *ngIf="activeTab === 'profile'"></app-profile-details>
     <app-change-password *ngIf="activeTab === 'password'"></app-change-password>
   </section>
 

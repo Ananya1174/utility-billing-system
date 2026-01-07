@@ -1,14 +1,12 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { BaseChartDirective } from 'ng2-charts';
-import { ChartData, ChartType } from 'chart.js';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-accounts-reports',
   standalone: true,
-  imports: [CommonModule, BaseChartDirective,FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './accounts-reports.html',
   styleUrls: ['./accounts-reports.css']
 })
@@ -32,17 +30,10 @@ export class AccountsReportsComponent implements OnInit {
     { value: 12, name: 'December' }
   ];
 
-  paymentModePie: ChartData<'pie', number[], string> = {
-    labels: [],
-    datasets: [{ data: [] }]
-  };
-
-  yearlyRevenueBar: ChartData<'bar', number[], string> = {
-    labels: [],
-    datasets: [{ label: 'Revenue', data: [] }]
-  };
-
+  paymentModeSummary: any[] = [];
+  yearlyRevenue: any[] = [];
   consumerSummary: any[] = [];
+  paymentStatusSummary: any = null;
 
   baseUrl = 'http://localhost:8031';
 
@@ -59,6 +50,7 @@ export class AccountsReportsComponent implements OnInit {
     this.loadPaymentMode();
     this.loadYearlyRevenue();
     this.loadConsumerSummary();
+    this.loadPaymentStatusSummary();
   }
 
   onFilterChange(): void {
@@ -69,41 +61,34 @@ export class AccountsReportsComponent implements OnInit {
     this.http.get<any[]>(
       `${this.baseUrl}/dashboard/payments/revenue-by-mode?month=${this.month}&year=${this.year}`
     ).subscribe(res => {
-      this.paymentModePie.labels = res.map(r => r.mode);
-      this.paymentModePie.datasets[0].data = res.map(r => r.amount);
+      this.paymentModeSummary = res;
       this.cdr.detectChanges();
     });
   }
 
-  monthlyRevenueLine: ChartData<'line', number[], string> = {
-  labels: [],
-  datasets: [
-    {
-      label: 'Revenue',
-      data: []
-    }
-  ]
-};
-loadYearlyRevenue(): void {
-  this.http.get<any[]>(
-    `${this.baseUrl}/dashboard/payments/revenue-yearly?year=${this.year}`
-  ).subscribe(res => {
-
-    this.monthlyRevenueLine.labels =
-      res.map(r => `Month ${r.month}`);
-
-    this.monthlyRevenueLine.datasets[0].data =
-      res.map(r => r.revenue);
-
-    this.cdr.detectChanges();
-  });
-}
+  loadYearlyRevenue(): void {
+    this.http.get<any[]>(
+      `${this.baseUrl}/dashboard/payments/revenue-yearly?year=${this.year}`
+    ).subscribe(res => {
+      this.yearlyRevenue = res;
+      this.cdr.detectChanges();
+    });
+  }
 
   loadConsumerSummary(): void {
     this.http.get<any[]>(
       `${this.baseUrl}/dashboard/payments/consumer-summary?month=${this.month}&year=${this.year}`
     ).subscribe(res => {
       this.consumerSummary = res;
+      this.cdr.detectChanges();
+    });
+  }
+
+  loadPaymentStatusSummary(): void {
+    this.http.get<any>(
+      `${this.baseUrl}/dashboard/payments/payments-summary?month=${this.month}&year=${this.year}`
+    ).subscribe(res => {
+      this.paymentStatusSummary = res;
       this.cdr.detectChanges();
     });
   }

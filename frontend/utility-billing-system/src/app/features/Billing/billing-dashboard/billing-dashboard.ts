@@ -9,7 +9,7 @@ import { ChartData, ChartType } from 'chart.js';
 @Component({
   selector: 'app-billing-officer-dashboard',
   standalone: true,
-  imports: [CommonModule, BaseChartDirective,FormsModule],
+  imports: [CommonModule, BaseChartDirective, FormsModule],
   templateUrl: './billing-dashboard.html',
   styleUrls: ['./billing-dashboard.css']
 })
@@ -17,11 +17,13 @@ export class BillingOfficerDashboardComponent implements OnInit {
 
   loading = true;
 
+
   summary: any = null;
   outstandingSummary: any = null;
 
   unpaidCount = 0;
   overdueCount = 0;
+
 
   barChartType: ChartType = 'bar';
 
@@ -35,11 +37,22 @@ export class BillingOfficerDashboardComponent implements OnInit {
     ]
   };
 
+
   month = new Date().getMonth() + 1;
   year = new Date().getFullYear();
 
   months = [1,2,3,4,5,6,7,8,9,10,11,12];
   years = [2023, 2024, 2025, 2026];
+
+  monthNames = [
+    'January', 'February', 'March', 'April',
+    'May', 'June', 'July', 'August',
+    'September', 'October', 'November', 'December'
+  ];
+
+  get selectedMonthName(): string {
+    return this.monthNames[this.month - 1];
+  }
 
   private baseUrl = 'http://localhost:8031';
 
@@ -52,6 +65,7 @@ export class BillingOfficerDashboardComponent implements OnInit {
   ngOnInit(): void {
     this.loadDashboard();
   }
+
 
   loadDashboard(): void {
     this.loading = true;
@@ -66,6 +80,7 @@ export class BillingOfficerDashboardComponent implements OnInit {
     this.loadConsumptionSummary();
     this.loadBillSummary();
   }
+
 
   loadBillSummary(): void {
     this.http
@@ -84,6 +99,7 @@ export class BillingOfficerDashboardComponent implements OnInit {
       });
   }
 
+
   loadOutstandingSummary(): void {
     this.http
       .get<any>(`${this.baseUrl}/dashboard/payments/outstanding-summary`)
@@ -93,38 +109,41 @@ export class BillingOfficerDashboardComponent implements OnInit {
       });
   }
 
+
   loadConsumptionSummary(): void {
-  this.http
-    .get<any[]>(
-      `${this.baseUrl}/dashboard/billing/consumption-summary?month=${this.month}&year=${this.year}`
-    )
-    .subscribe(res => {
+    this.http
+      .get<any[]>(
+        `${this.baseUrl}/dashboard/billing/consumption-summary?month=${this.month}&year=${this.year}`
+      )
+      .subscribe(res => {
 
-      const utilityOrder = ['ELECTRICITY', 'WATER', 'GAS', 'INTERNET'];
+        const utilityOrder = ['ELECTRICITY', 'WATER', 'GAS', 'INTERNET'];
 
-      const labels: string[] = [];
-      const values: number[] = [];
+        const labels: string[] = [];
+        const values: number[] = [];
 
-      utilityOrder.forEach(type => {
-        const match = res.find(r => r.utilityType === type);
-        if (match) {
-          labels.push(match.utilityType);
-          values.push(match.totalUnits);
-        }
-      });
-      this.barChartData = {
-        labels,
-        datasets: [
-          {
-            label: 'Consumption Units',
-            data: values
+        utilityOrder.forEach(type => {
+          const match = res.find(r => r.utilityType === type);
+          if (match) {
+            labels.push(match.utilityType);
+            values.push(match.totalUnits);
           }
-        ]
-      };
+        });
 
-      this.cdr.detectChanges();
-    });
-}
+        this.barChartData = {
+          labels,
+          datasets: [
+            {
+              label: 'Consumption Units',
+              data: values
+            }
+          ]
+        };
+
+        this.cdr.detectChanges();
+      });
+  }
+
 
   loadAlerts(): void {
     this.http.get<any[]>(`${this.baseUrl}/bills?status=DUE`)
@@ -133,16 +152,7 @@ export class BillingOfficerDashboardComponent implements OnInit {
     this.http.get<any[]>(`${this.baseUrl}/bills?status=OVERDUE`)
       .subscribe(res => this.overdueCount = res.length);
   }
-
-  goToBillingLogs(): void {
-    this.router.navigate(['/billing-officer/billing-logs']);
-  }
-
-  goToMeterReadings(): void {
-    this.router.navigate(['/billing-officer/meter-readings']);
-  }
-
-  goToGenerateBill(): void {
-    this.router.navigate(['/billing-officer/generate-bill']);
-  }
+  goToMeterReadings() { this.router.navigate(['/billing/meter-readings']); }
+  goToGenerateBills() { this.router.navigate(['billing/generate-bills']); }
+  goToViewBills() { this.router.navigate(['/billing/logs']); }
 }

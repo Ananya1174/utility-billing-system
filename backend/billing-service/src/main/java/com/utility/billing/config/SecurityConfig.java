@@ -135,11 +135,11 @@ public class SecurityConfig {
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/dashboard/billing/total-billed-monthly"
-                        ).hasRole(ADMIN)
+                        ).hasAnyRole(ADMIN,ACCOUNTS_OFFICER)
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/dashboard/billing/total-billed"
-                        ).hasAnyRole(ADMIN,BILLING_OFFICER)
+                        ).hasAnyRole(ADMIN,BILLING_OFFICER,ACCOUNTS_OFFICER)
 
                         .requestMatchers(
                                 HttpMethod.GET,

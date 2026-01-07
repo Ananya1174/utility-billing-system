@@ -17,19 +17,66 @@
 <div class="charts-grid">
   <div class="card small">
     <h3>Revenue by Payment Mode (Monthly)</h3>
-    <canvas baseChart
-      [type]="'pie'"
-      [data]="paymentModePie">
-    </canvas>
-  </div>
-  <div class="card small">
-    <h3>Monthly Revenue Trend (Year)</h3>
-    <canvas baseChart
-      [type]="'line'"
-      [data]="monthlyRevenueLine">
-    </canvas>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Payment Mode</th>
+          <th>Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let r of paymentModeSummary">
+          <td>{{ r.mode }}</td>
+          <td>₹{{ r.amount }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
+  <div class="card small">
+    <h3>Payment Status Summary (Monthly)</h3>
+
+    <table *ngIf="paymentStatusSummary">
+      <thead>
+        <tr>
+          <th>Status</th>
+          <th>Count</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Successful</td>
+          <td>{{ paymentStatusSummary.successfulPayments }}</td>
+        </tr>
+        <tr>
+          <td>Failed</td>
+          <td>{{ paymentStatusSummary.failedPayments }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <h3>Yearly Revenue Trend</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Month</th>
+        <th>Total Revenue</th>
+        <th>Successful Payments</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let r of yearlyRevenue">
+        <td>{{ r.month }}</td>
+        <td>₹{{ r.totalRevenue }}</td>
+        <td>{{ r.successfulPayments }}</td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 
 <div class="card">

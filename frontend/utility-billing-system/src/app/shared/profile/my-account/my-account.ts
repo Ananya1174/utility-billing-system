@@ -21,16 +21,20 @@ export class MyAccountComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const userId = this.authService.getUserId();
-    if (!userId) return;
+  const userId = this.authService.getUserId();
+  if (!userId) return;
 
-    this.http.get<any>(`http://localhost:8031/users/${userId}`)
-      .subscribe({
-        next: res => {
-          this.account = res;
-          this.loading = false;
-        },
-        error: () => this.loading = false
-      });
-  }
+  this.account = {
+    userId,
+    username: this.authService.getUsername(),
+    role: this.authService.getRole()
+  };
+  this.loading = false;
+
+  this.http.get<any>(`http://localhost:8031/auth/users/${userId}`)
+    .subscribe({
+      next: res => this.account = res,
+      error: () => {}
+    });
+}
 }

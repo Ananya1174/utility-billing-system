@@ -17,41 +17,39 @@ import java.util.List;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtUtil jwtUtil;
+	private final JwtUtil jwtUtil;
 
-    public JwtAuthenticationFilter(JwtUtil jwtUtil) {
-        this.jwtUtil = jwtUtil;
-    }
+	public JwtAuthenticationFilter(JwtUtil jwtUtil) {
+		this.jwtUtil = jwtUtil;
+	}
 
-    @Override
-    protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain)
-            throws ServletException, IOException {
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+			throws ServletException, IOException {
 
-        String authHeader = request.getHeader("Authorization");
+		String authHeader = request.getHeader("Authorization");
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+		if (SecurityContextHolder.getContext().getAuthentication() != null) {
+			filterChain.doFilter(request, response);
+			return;
+		}
 
-            String token = authHeader.substring(7);
-            Claims claims = jwtUtil.extractClaims(token);
+		if (authHeader != null && authHeader.startsWith("Bearer ")) {
+			try {
+				String token = authHeader.substring(7);
+				Claims claims = jwtUtil.extractClaims(token);
 
-            String username = claims.getSubject();
-            String role = claims.get("role", String.class);
+				String username = claims.getSubject();
+				String role = claims.get("role", String.class);
 
-            UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(
-                            username,
-                            null,
-                            List.of(new SimpleGrantedAuthority("ROLE_" + role))
-                    );
+				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(username,
+						null, List.of(new SimpleGrantedAuthority("ROLE_" + role)));
+				SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            authentication.setDetails(token);
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        }
-
-        filterChain.doFilter(request, response);
-    }
+			} catch (Exception ex) {
+				SecurityContextHolder.clearContext();
+			}
+		}
+		filterChain.doFilter(request, response);
+	}
 }

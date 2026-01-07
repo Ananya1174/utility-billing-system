@@ -4,19 +4,6 @@
 
 <div *ngIf="!loading && summary">
 
-  <div class="filters">
-    <select [(ngModel)]="month" (change)="onDateChange()">
-      <option *ngFor="let m of months" [value]="m">
-        Month {{ m }}
-      </option>
-    </select>
-
-    <select [(ngModel)]="year" (change)="onDateChange()">
-      <option *ngFor="let y of years" [value]="y">
-        {{ y }}
-      </option>
-    </select>
-  </div>
 
   <div class="kpi-grid">
     <div class="kpi-card">
@@ -40,8 +27,26 @@
     </div>
   </div>
 
+
+  <div class="filters below-kpi">
+    <select [(ngModel)]="month" (change)="onDateChange()">
+      <option *ngFor="let m of months" [value]="m">
+        {{ monthNames[m - 1] }}
+      </option>
+    </select>
+
+    <select [(ngModel)]="year" (change)="onDateChange()">
+      <option *ngFor="let y of years" [value]="y">
+        {{ y }}
+      </option>
+    </select>
+  </div>
+
+
   <div class="card">
-    <h3>Monthly Consumption ({{ month }}/{{ year }})</h3>
+    <h3>
+      Monthly Consumption ({{ selectedMonthName }} {{ year }})
+    </h3>
 
     <canvas
       baseChart
@@ -50,28 +55,37 @@
     </canvas>
   </div>
 
+  
+
   <div class="alerts">
     <div class="alert warning" *ngIf="unpaidCount > 0">
-       {{ unpaidCount }} bills are pending payment
+     {{ unpaidCount }} bills are pending payment
     </div>
 
     <div class="alert danger" *ngIf="overdueCount > 0">
-       {{ overdueCount }} bills are overdue
+      {{ overdueCount }} bills are overdue
     </div>
   </div>
 
-  <div class="actions">
-    <button class="primary-btn" (click)="goToMeterReadings()">
-      Add Meter Reading
-    </button>
 
-    <button class="primary-btn" (click)="goToGenerateBill()">
-      Generate Bill
-    </button>
+<div class="actions">
+  <button
+    class="primary-btn"
+    (click)="goToMeterReadings()">
+    Add Meter Reading
+  </button>
 
-    <button class="secondary-btn" (click)="goToBillingLogs()">
-      View Billing Logs
-    </button>
-  </div>
+  <button
+    class="primary-btn"
+    (click)="goToGenerateBills()">
+    Generate Bill
+  </button>
+
+  <button
+    class="secondary-btn"
+   (click)="goToViewBills()">
+    View Billing Logs
+  </button>
+</div>
 
 </div>

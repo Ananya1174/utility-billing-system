@@ -1,19 +1,72 @@
-.password-card {
-  background: #fff;
-  border-radius: 14px;
-  padding: 32px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+:host {
+  display: block;
+  padding: 24px 28px;
+  background: #f6f8fb;
+  min-height: 100vh;
 }
 
 h2 {
   margin: 0 0 4px;
   font-size: 1.8rem;
+  font-weight: 600;
   color: #1e3a8a;
 }
 
 .subtitle {
-  color: #64748b;
   margin-bottom: 24px;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 20px 22px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  max-width: 520px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.value {
+  font-size: 14px;
+  font-weight: 500;
+  color: #111827;
+  word-break: break-all;
+}
+
+.badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #e0e7ff;
+  color: #1e40af;
+}
+
+.password-card {
+  margin-top: 28px;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 22px 24px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  max-width: 520px;
 }
 
 .form-group {
@@ -22,26 +75,29 @@ h2 {
 
 label {
   display: block;
-  font-weight: 500;
   margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
 }
 
 input {
   width: 100%;
   padding: 10px 12px;
   border-radius: 8px;
-  border: 1px solid #cbd5f5;
-  font-size: 0.95rem;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  transition: border-color 0.15s ease;
 }
 
 input:focus {
   outline: none;
-  border-color: #1e40af;
+  border-color: #2563eb;
 }
 
 .rules {
   margin-top: 10px;
-  font-size: 0.85rem;
+  font-size: 12.5px;
 }
 
 .rules p {
@@ -51,20 +107,44 @@ input:focus {
 
 .rules p.valid {
   color: #16a34a;
+  font-weight: 500;
 }
 
 .primary-btn {
+  margin-top: 16px;
   width: 100%;
   padding: 12px;
   background: #1e40af;
-  color: #fff;
+  color: #ffffff;
   border-radius: 10px;
   border: none;
-  font-size: 1rem;
+  font-size: 14.5px;
+  font-weight: 500;
   cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.primary-btn:hover:not(:disabled) {
+  background: #1e3a8a;
 }
 
 .primary-btn:disabled {
   background: #94a3b8;
   cursor: not-allowed;
+}
+
+div[ng-reflect-ng-if="true"] {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+@media (max-width: 768px) {
+  :host {
+    padding: 18px;
+  }
+
+  .card,
+  .password-card {
+    max-width: 100%;
+  }
 }
