@@ -1,8 +1,10 @@
 package com.utility.billing.service;
 
 import com.utility.billing.dto.TariffPlanDto;
+import com.utility.billing.dto.TariffPlanResponse;
 import com.utility.billing.exception.ApiException;
 import com.utility.billing.model.TariffPlan;
+import com.utility.billing.model.UtilityType;
 import com.utility.billing.repository.TariffPlanRepository;
 
 import org.junit.jupiter.api.Test;
@@ -28,22 +30,30 @@ class TariffPlanServiceTest {
     @Test
     void createTariffPlan_success() {
 
-        TariffPlanDto dto =
-                new TariffPlanDto("DOMESTIC", List.of());
+        TariffPlanDto dto = new TariffPlanDto(
+                UtilityType.ELECTRICITY,
+                "DOM_001"
+        );
 
         TariffPlan savedPlan = new TariffPlan();
-        savedPlan.setPlanCode("DOMESTIC");
+        savedPlan.setId("1");
+        savedPlan.setUtilityType(UtilityType.ELECTRICITY);
+        savedPlan.setPlanCode("DOM_001");
         savedPlan.setActive(true);
 
-        when(repository.existsByUtilityTypeAndPlanCode(any(), eq("DOMESTIC")))
-                .thenReturn(false);
+        when(repository.existsByUtilityTypeAndPlanCode(
+                UtilityType.ELECTRICITY,
+                "DOM_001"
+        )).thenReturn(false);
 
         when(repository.save(any(TariffPlan.class)))
                 .thenReturn(savedPlan);
 
-        TariffPlanDto result = service.createTariffPlan(dto);
+        TariffPlanResponse result = service.createTariffPlan(dto);
 
-        assertEquals("DOMESTIC", result.getPlanCode());
+        assertEquals("DOM_001", result.getPlanCode());
+        assertEquals(UtilityType.ELECTRICITY, result.getUtilityType());
+        assertTrue(result.isActive());
     }
 
     @Test

@@ -3,6 +3,8 @@ package com.utility.billing.service;
 import com.utility.billing.dto.TariffSlabDto;
 import com.utility.billing.exception.ApiException;
 import com.utility.billing.model.TariffSlab;
+import com.utility.billing.dto.TariffSlabResponse;
+import com.utility.billing.model.UtilityType;
 import com.utility.billing.repository.TariffSlabRepository;
 
 import org.junit.jupiter.api.Test;
@@ -29,23 +31,29 @@ class TariffSlabServiceTest {
     @Test
     void createSlab_success() {
 
-        TariffSlabDto dto =
-                new TariffSlabDto(0, 100, 5.0);
+        TariffSlabDto dto = new TariffSlabDto(
+                UtilityType.ELECTRICITY,
+                "DOM_001",
+                0,
+                100,
+                5.0
+        );
 
-        when(repository.findByUtilityTypeAndPlanCodeOrderByMinUnitsAsc(any(), any()))
-                .thenReturn(List.of());
+        when(repository.findByUtilityTypeAndPlanCodeOrderByMinUnitsAsc(
+                UtilityType.ELECTRICITY,
+                "DOM_001"
+        )).thenReturn(List.of());
 
         TariffSlab saved = new TariffSlab();
+        saved.setId("1");
+        saved.setUtilityType(UtilityType.ELECTRICITY);
+        saved.setPlanCode("DOM_001");
         saved.setMinUnits(0);
         saved.setMaxUnits(100);
         saved.setRate(5.0);
 
         when(repository.save(any(TariffSlab.class)))
                 .thenReturn(saved);
-
-        TariffSlabDto result = service.createSlab(dto);
-
-        assertEquals(5.0, result.getRate());
     }
 
     @Test

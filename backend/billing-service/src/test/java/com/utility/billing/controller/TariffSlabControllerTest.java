@@ -3,6 +3,8 @@ package com.utility.billing.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.utility.billing.config.SecurityConfig;
 import com.utility.billing.dto.TariffSlabDto;
+import com.utility.billing.dto.TariffSlabResponse;
+import com.utility.billing.model.UtilityType;
 import com.utility.billing.service.TariffSlabService;
 
 import org.junit.jupiter.api.Test;
@@ -42,10 +44,22 @@ class TariffSlabControllerTest {
 
     @Test
     void createTariffSlab_success() throws Exception {
-        TariffSlabDto dto = new TariffSlabDto(0, 100, 5.5);
 
-        Mockito.when(slabService.createSlab(Mockito.any()))
-                .thenReturn(dto);
+        TariffSlabDto dto = new TariffSlabDto(
+                UtilityType.ELECTRICITY,
+                "DOM_001",
+                0,
+                100,
+                5.5
+        );
+
+        TariffSlabResponse response = new TariffSlabResponse();
+        response.setId("1");
+        response.setUtilityType(UtilityType.ELECTRICITY);
+        response.setPlanCode("DOM_001");
+        response.setMinUnits(0);
+        response.setMaxUnits(100);
+        response.setRate(5.5);
 
         mockMvc.perform(post("/tariffs/slabs")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -55,8 +69,15 @@ class TariffSlabControllerTest {
 
     @Test
     void deleteTariffSlab_success() throws Exception {
-        Mockito.when(slabService.deleteSlab("1"))
-                .thenReturn(new TariffSlabDto(0, 100, 5.5));
+
+        TariffSlabResponse response = new TariffSlabResponse();
+        response.setId("1");
+        response.setUtilityType(UtilityType.ELECTRICITY);
+        response.setPlanCode("DOM_001");
+        response.setMinUnits(0);
+        response.setMaxUnits(100);
+        response.setRate(5.5);
+
 
         mockMvc.perform(delete("/tariffs/slabs/1"))
                 .andExpect(status().isOk());

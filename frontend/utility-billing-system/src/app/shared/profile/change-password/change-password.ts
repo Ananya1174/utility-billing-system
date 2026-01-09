@@ -39,9 +39,10 @@ export class ChangePasswordComponent {
     });
   }
 
-  passwordTouched(): boolean {
-    return this.form.get('newPassword')?.touched === true;
-  }
+  passwordInteracted(): boolean {
+  const control = this.form.get('newPassword');
+  return !!control && (control.dirty || control.touched);
+}
 
   hasMinLength(): boolean {
     const value = this.form.get('newPassword')?.value || '';

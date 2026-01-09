@@ -41,7 +41,7 @@ public class AccountRequestService {
     public AccountRequest createAccountRequest(AccountRequestDto dto) {
 
         if (accountRequestRepository.existsByEmail(dto.getEmail())) {
-            throw new UserAlreadyExistsException("Account request already exists for this email");
+            throw new UserAlreadyExistsException("Account already exists for this email");
         }
 
         AccountRequest request = AccountRequest.builder()

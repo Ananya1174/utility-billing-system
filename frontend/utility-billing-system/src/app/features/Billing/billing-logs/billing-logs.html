@@ -59,7 +59,7 @@
           <td>{{ b.utilityType }}</td>
           <td>{{ b.billingMonth }}/{{ b.billingYear }}</td>
           <td>{{ b.consumptionUnits }}</td>
-          <td>₹{{ b.totalAmount }}</td>
+         <td>₹{{ b.totalAmount | number:'1.2-2' }}</td>
           <td>
             <span class="status" [class]="statusClass(b.status)">
               {{ b.status }}

@@ -2,11 +2,11 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-
+import { ConfirmDialogComponent } from '../../../shared/confirm-dialog/confirm-dialog';
 @Component({
   selector: 'app-utility-requests',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ConfirmDialogComponent], 
   templateUrl: './utility-requests.html',
   styleUrl: './utility-requests.css'
 })
@@ -17,6 +17,10 @@ export class UtilityRequestsComponent implements OnInit {
   meterNumber: string = '';
 
   private baseUrl = 'http://localhost:8031/connections/requests';
+
+  // NEW
+  showRejectDialog = false;
+  rejectRequestId: string | null = null;
 
   constructor(
     private http: HttpClient,
@@ -56,13 +60,25 @@ export class UtilityRequestsComponent implements OnInit {
   }
 
   reject(requestId: string) {
-    if (!confirm('Are you sure you want to reject this request?')) return;
+    this.rejectRequestId = requestId;
+    this.showRejectDialog = true;
+  }
+
+  confirmReject() {
+    if (!this.rejectRequestId) return;
 
     this.http.put(
-      `${this.baseUrl}/${requestId}/reject`,
+      `${this.baseUrl}/${this.rejectRequestId}/reject`,
       {}
     ).subscribe(() => {
+      this.showRejectDialog = false;
+      this.rejectRequestId = null;
       this.loadPendingRequests();
     });
+  }
+
+  cancelReject() {
+    this.showRejectDialog = false;
+    this.rejectRequestId = null;
   }
 }

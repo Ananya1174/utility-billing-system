@@ -3,6 +3,8 @@ package com.utility.billing.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.utility.billing.config.SecurityConfig;
 import com.utility.billing.dto.TariffPlanDto;
+import com.utility.billing.dto.TariffPlanResponse;
+import com.utility.billing.model.UtilityType;
 import com.utility.billing.service.TariffPlanService;
 
 import org.junit.jupiter.api.Test;
@@ -45,10 +47,19 @@ class TariffPlanControllerTest {
 
     @Test
     void create_success() throws Exception {
-        TariffPlanDto dto = new TariffPlanDto("DOMESTIC", List.of());
+    	TariffPlanDto dto = new TariffPlanDto(
+    	        UtilityType.ELECTRICITY,
+    	        "DOM_001"
+    	);
 
-        Mockito.when(service.createTariffPlan(Mockito.any()))
-                .thenReturn(dto);
+    	TariffPlanResponse response = new TariffPlanResponse();
+    	response.setId("1");
+    	response.setUtilityType(UtilityType.ELECTRICITY);
+    	response.setPlanCode("DOM_001");
+    	response.setActive(true);
+
+    	Mockito.when(service.createTariffPlan(Mockito.any()))
+    	        .thenReturn(response);
 
         mockMvc.perform(post("/tariffs/plans")
                         .contentType(MediaType.APPLICATION_JSON)

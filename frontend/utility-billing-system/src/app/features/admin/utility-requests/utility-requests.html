@@ -50,3 +50,13 @@
     </tr>
   </tbody>
 </table>
+
+<app-confirm-dialog
+  [visible]="showRejectDialog"
+  title="Reject Request"
+  message="Are you sure you want to reject this utility request?"
+  confirmText="Reject"
+  cancelText="Cancel"
+  (confirm)="confirmReject()"
+  (cancel)="cancelReject()">
+</app-confirm-dialog>
